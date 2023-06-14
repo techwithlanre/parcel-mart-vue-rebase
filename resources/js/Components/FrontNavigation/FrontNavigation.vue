@@ -57,8 +57,8 @@ const mobileMenuOpen = ref(false)
                             <a v-for="item in navigation" :key="item.name" :href="item.href" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:text-primary-dark hover:bg-gray-50">{{ item.name }}</a>
                         </div>
                         <div class="py-6 flex flex-col gap-y-2">
-                            <Link :href="route('home') + '#quote-form'" class="text-sm font-semibold leading-6 py-1 px-8 rounded-lg hover:text-white bg-transparent hover:bg-primary text-primary border-2 border-primary">Get Quote</Link>
-                            <Link :href="route('login')" class="text-sm font-semibold leading-6 py-1 px-8 rounded-lg hover:text-primary bg-primary hover:bg-white text-white border-2 border-primary">Log In</Link>
+                            <Link :href="route('home') + '#quote-form'" class="text-sm font-semibold text-center leading-6 py-1 px-8 rounded-lg hover:text-white bg-transparent hover:bg-primary text-primary border-2 border-primary">Get Quote</Link>
+                            <Link :href="route('login')" class="text-sm font-semibold leading-6 py-1 text-center px-8 rounded-lg hover:text-primary bg-primary hover:bg-white text-white border-2 border-primary">Log In</Link>
                         </div>
                     </div>
                 </div>

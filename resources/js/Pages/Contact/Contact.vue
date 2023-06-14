@@ -101,7 +101,7 @@ const submit = () => {
                                     </svg>
                                 </span>
                                     <span class="text-lg">
-                                    NAHCO Office Complex, International cargo airport, Murtala Mohammed airport, Lagos
+                                    Outlet 8, Autograph Mall, Sani Abacha Road, Port Harcourt
                                 </span>
                                 </div>
                             </p>

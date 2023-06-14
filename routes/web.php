@@ -41,6 +41,12 @@ Route::get('coming-soon', function () {
     return Inertia::render('ComingSoon');
 })->name('coming.soon');
 
+Route::get('services', [\App\Http\Controllers\ServicesController::class, 'index'])->name('services');
+Route::get('contact', [\App\Http\Controllers\ContactController::class, 'index'])->name('contact');
+Route::get('company', [\App\Http\Controllers\AboutController::class, 'index'])->name('about');
+
+Route::post('contact', [\App\Http\Controllers\ContactController::class, 'send'])->name('contact.send');
+
 Route::post('/send-quote-form', function(\Illuminate\Http\Request $request) {
     Mail::to('testreceiver@gmail.com')->send(new \App\Mail\QuoteForm($request));
 })->name('send.quote.form');

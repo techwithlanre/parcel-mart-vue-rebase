@@ -6,10 +6,12 @@ import logo from '/resources/images/logo.png';
 import {Head, Link} from "@inertiajs/vue3";
 
 const navigation = [
-    { name: 'Services', href: route('coming.soon') },
-    { name: 'Support', href: route('coming.soon') },
     { name: 'Tracking', href: route('coming.soon') },
-    { name: 'Company', href: route('coming.soon') },
+    { name: 'Services', href: route('services') },
+    { name: 'Company', href: route('about') },
+    { name: 'Contact', href: route('contact') },
+
+
 ]
 
 const mobileMenuOpen = ref(false)
@@ -31,7 +33,7 @@ const mobileMenuOpen = ref(false)
                 </button>
             </div>
             <div class="hidden lg:flex lg:gap-x-12">
-                <Link v-for="item in navigation" :key="item.name" :href="item.href" class="text-sm font-semibold leading-6 text-gray-900">{{ item.name }}</Link>
+                <Link v-for="item in navigation" :key="item.name" :href="item.href" class="text-sm font-semibold leading-6 text-gray-900 hover:text-primary">{{ item.name }}</Link>
             </div>
             <div class="hidden lg:flex lg:flex-1 lg:justify-end gap-x-5">
                 <Link :href="route('login')" class="text-sm font-semibold leading-6 py-1 px-8 rounded-lg hover:text-primary bg-primary hover:bg-white text-white border-2 border-primary">Log In</Link>

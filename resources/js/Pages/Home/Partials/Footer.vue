@@ -3,10 +3,17 @@ import logo from '/resources/images/logo.png';
 import {Head, Link} from "@inertiajs/vue3";
 import mastercard  from '/resources/images/icons/mastercard.svg';
 import visa  from '/resources/images/visa.jpg';
+
+defineProps({
+    show: {
+        default: true
+    }
+})
+
 </script>
 
 <template>
-    <div class="flex flex-col gap-x-20 py-12 lg:px-[250px] bg-primary-dark-dark">
+    <div class="flex flex-col gap-x-20 py-12 lg:px-[250px] bg-primary-dark-dark" v-if="show">
 <!--        <div class="flex flex-col lg:flex-row justify-between">
             <ul class="flex flex-col gap-y-5 justify-center lg:p-0 px-10">
                 <li><Link class="text-white hover:text-primary">About Us </Link></li>

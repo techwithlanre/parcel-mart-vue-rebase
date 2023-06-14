@@ -5,7 +5,8 @@ import FrontNavigation from "@/Components/FrontNavigation/FrontNavigation.vue";
 import Footer from "@/Pages/Home/Partials/Footer.vue";
 
 defineProps({
-    head: String
+    head: String,
+    showFooter: Boolean
 })
 
 </script>
@@ -20,7 +21,7 @@ defineProps({
             </div>
         </div>
         <slot />
-        <Footer />
+        <Footer :show="showFooter" />
     </div>
 </template>
 

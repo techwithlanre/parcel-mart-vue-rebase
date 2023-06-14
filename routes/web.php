@@ -44,6 +44,9 @@ Route::get('coming-soon', function () {
 Route::get('services', [\App\Http\Controllers\ServicesController::class, 'index'])->name('services');
 Route::get('contact', [\App\Http\Controllers\ContactController::class, 'index'])->name('contact');
 Route::get('company', [\App\Http\Controllers\AboutController::class, 'index'])->name('about');
+Route::get('tracking', function () {
+    return Inertia::render('Tracking/Tracking');
+})->name('tracking');
 
 Route::post('contact', [\App\Http\Controllers\ContactController::class, 'send'])->name('contact.send');
 
@@ -108,16 +111,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
 
-
-
-
-
-
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-
 });
 
 Route::get('verify-email', EmailVerificationPromptController::class)->name('verification.notice');

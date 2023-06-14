@@ -31,7 +31,7 @@ const submit = () => {
 </script>
 
 <template>
-    <HomeLayout title="Services">
+    <HomeLayout title="Services" :show-footer="true">
         <div class="bg-opacity-40">
             <div class="flex lg:flex-row flex-col gap-x-36 lg:px-[250px] px-10 py-20">
                 <div class="w-full">

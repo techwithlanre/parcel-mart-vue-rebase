@@ -79,7 +79,7 @@ const services = [
 </script>
 
 <template>
-    <HomeLayout title="Services">
+    <HomeLayout title="Services" :show-footer="true">
         <div class="bg-opacity-40">
             <div class="lg:px-[250px] px-10 py-20">
                 <div class="max-w-3xl">

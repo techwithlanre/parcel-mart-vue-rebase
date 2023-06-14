@@ -3,12 +3,12 @@
         <Head title="Home" />
         <div class="bg-white overflow-x-hidden">
             <div class="p-6 xl:px-[150px] lg:px-[100px]">
-                <FrontNavigation />
+                <FrontNavigation id="#top" />
                 <Hero />
                 <Partners />
             </div>
         </div>
-        <QuoteForm :countries="countries" />
+        <QuoteForm :countries="countries" id="quote-form" />
         <Services />
         <Why />
         <Testimonials  />

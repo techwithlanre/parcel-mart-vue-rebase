@@ -19,3 +19,4 @@ yarn-error.log
 /.vscode
 .parcel-mart-vue.zip
 .Archive.zip
+/public/build.zip

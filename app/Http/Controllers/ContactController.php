@@ -21,6 +21,7 @@ class ContactController extends Controller
         Mail::send('mail.contact', [
             'name' => $name,
             'email' => $email,
-            'message' => $message ]);
+            'message' => $message ]
+        );
     }
 }

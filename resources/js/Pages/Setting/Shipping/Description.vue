@@ -60,38 +60,30 @@ const submit = () => {
         <TopNav :tabs="tabs"/>
         <div>
             <div class="flex flex-col justify-end items-end">
-                <div>
-                    <a-button type="primary" @click="showModal" class="bg-primary px-3 py-2  text-sm text-white hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 mb-10 focus:ring-offset-2 focus:ring-indigo-500">Open Modal with async logic</a-button>
-                    <a-modal
-                        v-model:visible="visible"
-                        title="Create Description"
-                        :confirm-loading="confirmLoading"
-                        @ok="handleOk"
-                        :class="twMerge('rounded-[50px]')">
-                        <div>
-                            <InputLabel />
-                            <TextAreaInput
-                                v-model="form.description"
-                                rows="5" placeholder="Enter description"
-                            />
-                        </div>
-                    </a-modal>
-                </div>
-                <Link href="#" @click="showModal" class="">Create Description</Link>
-                <input placeholder="Search" class="p-2 border rounded-lg">
+                <PrimaryButton href="#" @click="showModal" class="w-max">Create Description</PrimaryButton>
+                <a-modal
+                    v-model:visible="visible"
+                    title="Create Description"
+                    :confirm-loading="confirmLoading"
+                    @ok="handleOk"
+                    :class="twMerge('rounded-[50px]')">
+                    <div>
+                        <InputLabel />
+                        <TextAreaInput v-model="form.description" rows="5" placeholder="Enter description"/>
+                    </div>
+                </a-modal>
+
             </div>
             <div class="mt-10 border rounded-3xl bg-white">
                 <table class="w-full">
                     <thead class="rounded-t-3xl">
                     <tr class="text-sm font-medium text-gray-700 border-b border-gray-200 px-5">
-                        <td class="font-bold p-7">#</td>
                         <td class="font-bold p-7">Description</td>
                         <td class="font-bold p-7"></td>
                     </tr>
                     </thead>
                     <tbody>
                     <tr v-if="count > 0" v-for="item in descriptions.data" class="hover:bg-gray-100 transition-colors group border-b px-5">
-                        <td class="text-sm p-7">{{ 1 }}</td>
                         <td class="text-sm p-7">{{ item.description }}</td>
                         <td class="">
 

@@ -184,8 +184,8 @@ return [
     */
 
     'aliases' => Facade::defaultAliases()->merge([
-        // 'Example' => App\Facades\Example::class,
         'Paystack' => Unicodeveloper\Paystack\Facades\Paystack::class,
+        'Aramex' => Octw\Aramex\Aramex::class,
     ])->toArray(),
 
 ];

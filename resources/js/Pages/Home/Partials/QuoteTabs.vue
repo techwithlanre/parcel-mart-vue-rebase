@@ -1,9 +1,6 @@
 <script setup>
 
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import SelectInput from "@/Components/SelectInput.vue";
 import {Tab, TabGroup, TabList, TabPanel, TabPanels} from "@headlessui/vue";
-import TextInput from "@/Components/TextInput.vue";
 import QuoteTabParcelForm from "@/Pages/Home/Partials/QuoteTabParcelForm.vue";
 import QuoteTabDocumentForm from "@/Pages/Home/Partials/QuoteTabDocumentForm.vue";
 defineProps({
@@ -30,7 +27,6 @@ defineProps({
                     Document
                 </button>
             </Tab>
-
         </TabList>
 
         <TabPanels class="mt-5">

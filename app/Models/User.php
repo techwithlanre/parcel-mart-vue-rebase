@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Bavix\Wallet\Traits\HasWallet;
 use Bavix\Wallet\Interfaces\Wallet;
 use Spatie\Permission\Traits\HasRoles;
-use Laravel\Passport\HasApiTokens;  
+use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable implements Wallet, MustVerifyEmail
 {
@@ -49,8 +50,13 @@ class User extends Authenticatable implements Wallet, MustVerifyEmail
         'email_verified_at' => 'datetime',
     ];
 
-    public function cards()
+    public function cards(): HasMany
     {
         return $this->hasMany(Card::class);
+    }
+
+    public function addresses(): HasMany
+    {
+        return $this->hasMany(Address::class);
     }
 }

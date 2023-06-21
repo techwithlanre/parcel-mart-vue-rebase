@@ -12,7 +12,7 @@ import {Link} from "@inertiajs/vue3";
                  v-html="link.label" />
             <Link v-else
               class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded-full
-              hover:bg-primary-dark focus:border-primary focus:text-white text-primary"
+              hover:bg-primary-dark hover:text-gray-200 focus:border-primary focus:text-white text-primary"
               :class="{ 'bg-primary text-white': link.active }" :href="link.url" v-html="link.label" />
         </template>
     </div>

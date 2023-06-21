@@ -15,7 +15,23 @@ class Address extends Model
         'country_id',
         'state_id',
         'postcode',
-        'city',
+        'city_id',
+        'landmark',
         'status'
     ];
+
+    public function address_contacts()
+    {
+        return $this->hasMany(AddressContact::class);
+    }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
+
+    public function city()
+    {
+        return $this->belongsTo(City::class);
+    }
 }

@@ -9,26 +9,36 @@ import GroupChatIcon from "/resources/images/icons/group-chat.svg";
 import SettingsIcon from "/resources/images/icons/settings.svg";
 import LogoutIcon from "/resources/images/icons/logout.svg";
 import TopBar from "@/Components/TopBar.vue";
-import { Link } from '@inertiajs/vue3';
+import {Link, usePage} from '@inertiajs/vue3';
 import TestModeAlert from "@/Components/TestModeAlert.vue";
+import {toast} from "vue3-toastify";
+
+const page = usePage();
+if (page.props.flash.message) {
+    toast.success(page.props.flash.message);
+    page.props.flash.message = "";
+}
+
+if (page.props.flash.error) {
+    toast.error(page.props.flash.error);
+    page.props.flash.error = "";
+}
+
+defineProps({
+    pageTitle: String
+})
 
 const sidebar = [
     [
         { name: "Dashboard", icon: OverviewIcon, route: "/dashboard" },
-        { name: "Transactions", icon: ShoppingBagIcon, route: "/transactions" },
+        { name: "Shipments", icon: ShoppingBagIcon, route: "/shipments  " },
         { name: "Wallet", icon: WalletIcon, route: "/wallet" },
-        { name: "Reports", icon: GraphIcon, route: "/reports" },
-        { name: "Payouts", icon: WalletIcon, route: "/payouts" },
-        { name: "Statements", icon: FileIcon, route: "/statements" },
-    ],
-    [
-        { name: "Address Book", icon: GroupChatIcon, route: "/address-book"  },
-        { name: "Billing", icon: GroupChatIcon, route: "/billing"  },
-        { name: "Description Settings", icon: SettingsIcon, route: "/settings/shipping/description"  },
-        { name: "Measurement Settings", icon: SettingsIcon, route: "/settings/shipping/measurement"  },
-        { name: "Logout", icon: LogoutIcon, route: "/statements"  },
-    ],
+        { name: "Address Book", icon: GroupChatIcon, route: route('address-book.index')  },
+        { name: "Settings", icon: SettingsIcon, route: "/settings/shipping/description"  },
+        { name: "Logout", icon: LogoutIcon, route: route('logout')  },
+    ]
 ];
+
 </script>
 
 <template>
@@ -56,10 +66,12 @@ const sidebar = [
         <transition name="page" mode="out-in" appear>
             <main class="flex-1 pb-8">
                 <TestModeAlert />
-                <TopBar :title="$page.url" />
-                <div v-if="$page.props.flash.message" class="alert">
-                    {{ $page.props.flash.message }}
-                </div>
+                <TopBar :title="pageTitle" />
+<!--                <div>
+                    <div v-if="$page.props.flash.message" class="alert">
+                        {{ $page.props.flash.message }}
+                    </div>
+                </div>-->
                 <transition name="page" mode="out-in" appear>
                     <main :key="$page.url" class="">
                         <div class="p-5 ">

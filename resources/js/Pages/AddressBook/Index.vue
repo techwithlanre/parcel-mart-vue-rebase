@@ -2,66 +2,67 @@
 import {defineComponent} from 'vue'
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import {Head, Link} from "@inertiajs/vue3";
+import Pagination from "@/Components/Pagination.vue";
+import { DownOutlined, SmileOutlined } from '@ant-design/icons';
+import { Dropdown, Space } from 'ant-design-vue';
+import {twMerge} from "tailwind-merge";
 
-
-
+defineProps({
+    addresses: Object
+});
 </script>
 
 <template>
     <Head title="Address Book" />
-    <AuthenticatedLayout>
+    <AuthenticatedLayout page-title="Address Book">
         <div>
             <div class="flex flex-col justify-end items-end">
                 <Link :href="route('address-book.create')"
-                      class="bg-primary px-3 py-2  text-sm text-white hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 mb-10 focus:ring-offset-2 focus:ring-indigo-500">
+                      class="bg-primary px-3 py-2  text-sm text-white hover:text-gray-50 rounded-md focus:outline-none focus:ring-2 mb-10 focus:ring-offset-2 focus:ring-background">
                     Create Address
                 </Link>
-                <input placeholder="Search" class="p-2 border rounded-lg">
             </div>
-            <div class="mt-10 border rounded-3xl bg-white">
-                <table class="w-full">
-                    <thead class="rounded-t-3xl">
-                        <tr class="text-sm font-medium text-gray-700 border-b border-gray-200 px-5">
-                            <td class="font-bold p-7">Name</td>
-                            <td class="font-bold p-7">Phone</td>
-                            <td class="font-bold p-7">Country</td>
-                            <td class="font-bold p-7">City</td>
-                            <td class="font-bold p-7">Postcode</td>
-                            <td class="font-bold p-7"></td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <tr v-for="i in 3" class="hover:bg-gray-100 transition-colors group border-b px-5">
-                        <td class="text-sm p-7">John Doe</td>
-                        <td class="text-sm p-7">08123456789</td>
-                        <td class="text-sm p-7">Nigeria</td>
-                        <td class="text-sm p-7">Lagos</td>
-                        <td class="text-sm p-7">200423</td>
-                        <td class="">
-                            <div class="group-hover:flex group-hover:items-center group-hover:text-gray-500 group-hover:gap-x-2">
-                                <button class="p-2 hover:rounded-md hover:bg-gray-200">
-                                    <InvisibleIcon class="w-6 h-6 fill-current" />
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-                <div class="flex gap-x-2 justify-center p-8">
-                    <button class="flex justify-center items-center w-8 h-8">
-                        <ChevronLeftIcon class="w-6 h-6 to-gray-800 stroke-current hover:text-primary" />
-                    </button>
-                    <button
-                        v-for="i in 6"
-                        class="flex items-center justify-center w-8 h-8 font-medium rounded-full"
-                        :class=" i === 1 ? 'bg-primary text-white' : 'text-gray-400 hover:bg-primary-dark hover:text-white duration-300'">
-                        {{ i }}
-                    </button>
-                    <button class="flex justify-center items-center w-8 h-8">
-                        <ChevronRightIcon class="w-6 h-6 to-gray-800 stroke-current hover:text-primary" />
-                    </button>
+            <div class="grid lg:grid-cols-3 gap-x-5 gap-y-10">
+                <div class="card border bg-white p-5"  v-if="addresses.data.length > 0" v-for="item in addresses.data">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-xl font-bold">{{ item.address_contacts[0].contact_name }}</h3>
+                        <div>
+                            <button >
+                                <a-dropdown>
+                                    <a class="ant-dropdown-link" @click.prevent>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" id="option"><circle cx="12" cy="3" r="3"></circle><circle cx="12" cy="12" r="4"></circle><circle cx="12" cy="21" r="3"></circle></svg>
+                                    </a>
+                                    <template #overlay>
+                                        <a-menu>
+                                            <a-menu-item>
+                                                <Link :href="route('address-book.edit', item.id)">Edit</Link>
+                                            </a-menu-item>
+                                            <a-menu-item>
+                                                <a href="javascript:;">Set as default</a>
+                                            </a-menu-item>
+                                            <a-menu-item>
+                                                <Link :href="route('address-book.destroy', item.id)" :class="twMerge('text-red-600 font-bold')">Delete</Link>
+                                            </a-menu-item>
+                                        </a-menu>
+                                    </template>
+                                </a-dropdown>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="flex gap-x-10">
+                        <span class="font-semibold text-primary">{{ item.address_contacts[0].contact_phone }}</span>
+                        <span class="font-semibold">{{ item.address_contacts[0].contact_email }}</span>
+                    </p>
+                    <hr class="mt-2">
+                    <p class="mt-5"> {{ item.address }}</p>
+                    <p class=""> {{ item.landmark }}</p>
+                    <p class="flex gap-x-10">
+                        <div class="text-blue-950 font-bold">{{ item.country.name }}</div>
+                        <div class="text-blue-950 font-bold">{{ item.city.name }}</div>
+                    </p>
                 </div>
             </div>
+            <Pagination :links="addresses.links"/>
         </div>
     </AuthenticatedLayout>
 </template>

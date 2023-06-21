@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Address;
+use App\Services\ShipmentServices;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -20,7 +22,9 @@ class ShipmentController extends Controller
      */
     public function create()
     {
-        //
+        $addresses = Address::where('user_id', auth()->user()->id)
+            ->with('address_contacts', 'country', 'city')->get();
+        return Inertia::render('Shipments/Create', compact('addresses'));
     }
 
     /**
@@ -61,5 +65,15 @@ class ShipmentController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function testCalculateShipment(ShipmentServices $shipmentServices)
+    {
+        return $shipmentServices->calculateShipmentCost();
+    }
+
+    public function initialize()
+    {
+
     }
 }

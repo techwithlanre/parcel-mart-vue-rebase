@@ -10,7 +10,7 @@ class BillingController extends Controller
 {
     public function cards()
     {
-        $cards = Card::where('user_id', auth()->user()->id)->paginate(2);
+        $cards = Card::where('user_id', auth()->user()->id)->paginate(1);
         return Inertia::render('Billing/Cards', compact('cards'));
     }
 

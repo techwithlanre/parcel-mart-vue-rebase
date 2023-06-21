@@ -8,6 +8,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Dashboard');
+        $balance = number_format(auth()->user()->balance, 2);
+        return Inertia::render('Dashboard', compact('balance'));
     }
 }

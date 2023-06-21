@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PayInitializeRequest;
+use App\Services\PaystackServices;
+use App\Services\WalletServices;
 use Bavix\Wallet\Models\Wallet;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
+use Unicodeveloper\Paystack\Paystack;
 
 class WalletController extends Controller
 {
@@ -13,17 +18,16 @@ class WalletController extends Controller
      */
     public function index()
     {
-        $wallet = auth()->user()->wallet;
-        dd($wallet);
-        return Inertia::render('Wallet/Index');
+        $balance = number_format(auth()->user()->balance, 2);;
+        return Inertia::render('Wallet/Index', compact('balance'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function pay()
+    public function initialize(PayInitializeRequest $request, WalletServices $services, PaystackServices $paystackServices)
     {
-        //
+        return $services->initializePay($request, $paystackServices);
     }
 
     /**

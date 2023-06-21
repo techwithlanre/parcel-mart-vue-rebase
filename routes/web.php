@@ -85,15 +85,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
     /*Address Book*/
-    Route::resource('address-book',\App\Http\Controllers\AddressBook::class);
-    Route::resource('shipments', \App\Http\Controllers\ShipmentController::class);
+    Route::resource('address-book',\App\Http\Controllers\AddressBookController::class);
+    //Route::resource('shipments', \App\Http\Controllers\ShipmentController::class);
 
+    Route::prefix('shipments')->group(function () {
+        Route::get('start', [\App\Http\Controllers\ShipmentController::class, 'create']);
+        Route::get('calculate', [\App\Http\Controllers\ShipmentController::class, 'testCalculateShipment']);
+    });
 
     /*Wallet*/
-    Route::get('wallet', [\App\Http\Controllers\WalletController::class, 'index']);
+    Route::prefix('wallet')->group(function () {
+        Route::get('', [\App\Http\Controllers\WalletController::class, 'index'])->name('wallet.index');
+        Route::post('initialize', [App\Http\Controllers\WalletController::class, 'initialize'])->name('wallet.initialize');
+    });
 
     /*Settings*/
-
     Route::prefix('settings')->group(function () {
        Route::get('/', [\App\Http\Controllers\SettingController::class, 'index'])->name('setting.index');
        Route::prefix('shipping')->group(function () {
@@ -122,4 +128,4 @@ Route::post('email/verification-notification', [EmailVerificationNotificationCon
 Route::get('confirm-password', [ConfirmablePasswordController::class, 'show'])->name('password.confirm');
 Route::post('confirm-password', [ConfirmablePasswordController::class, 'store']);
 Route::put('password', [PasswordController::class, 'update'])->name('password.update');
-Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+Route::get('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');

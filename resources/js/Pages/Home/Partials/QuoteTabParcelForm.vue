@@ -21,6 +21,9 @@ const form  = useForm({
     width: "",
     height: "",
     length: "",
+    name: "",
+    email: "",
+    phone: "",
     //metric: "",
 
 });
@@ -35,12 +38,41 @@ const submit = () => {
 <template>
     <form @submit.prevent="submit">
         <div>
+            <TextInput
+                id="quantity"
+                type="text"
+                class="mt-1 w-full"
+                required
+                autocomplete="off"
+                placeholder="Enter your name"
+                v-model="form.name"/>
+        </div>
+        <div class="mt-4">
+            <TextInput
+                id="quantity"
+                type="text"
+                class="mt-1 w-full"
+                required
+                autocomplete="off"
+                placeholder="Phone number"
+                v-model="form.phone"/>
+        </div>
+        <div class="mt-4">
+            <TextInput
+                id="quantity"
+                type="email"
+                class="mt-1 w-full"
+                autocomplete="off"
+                placeholder="Email"
+                v-model="form.email"/>
+        </div>
+        <div class="mt-4">
             <InputLabel value="From" />
             <div class="grid lg:grid-cols-2 gap-x-5 w-full">
                 <SelectInput
                     place-holder="Select Country"
                     class="block w-full"
-                    :model-value="form.country_from"
+                    v-model="form.country_from"
                     :options="countries"
                 />
 
@@ -52,7 +84,7 @@ const submit = () => {
                     autofocus
                     autocomplete="off"
                     placeholder="Enter address"
-                    :model-value="form.address_from"/>
+                    v-model="form.address_from"/>
             </div>
         </div>
         <div class="mt-4">
@@ -61,31 +93,31 @@ const submit = () => {
                 <SelectInput
                     place-holder="Select Country"
                     class="block w-full"
-                    :model-value="form.country_to"
+                    v-model="form.country_to"
                     :options="countries"
                     required
                 />
 
                 <TextInput
                     id="email"
-                    type="email"
+                    type="text"
                     class="mt-3 lg:mt-1 w-1/2"
                     required
                     autocomplete="off"
                     placeholder="Enter address"
-                    :model-value="form.address_to"/>
+                    v-model="form.address_to"/>
             </div>
         </div>
 
         <div class="grid lg:grid-cols-3 gap-x-5 mt-5">
             <TextInput
-                id="email"
+                id="quantity"
                 type="number"
                 class="mt-1 w-full"
                 required
                 autocomplete="off"
                 placeholder="Quantity"
-                model-value=""/>
+                v-model="form.quantity"/>
 
             <TextInput
                 id="email"
@@ -94,7 +126,7 @@ const submit = () => {
                 required
                 autocomplete="off"
                 placeholder="Weight"
-                model-value=""/>
+                v-model="form.weight"/>
             <TextInput
                 id=""
                 type="number"
@@ -102,7 +134,7 @@ const submit = () => {
                 required
                 autocomplete="off"
                 placeholder="Length"
-                model-value=""/>
+                v-model="form.length"/>
         </div>
         <div class="grid lg:grid-cols-3 gap-x-5 mt-5">
             <TextInput
@@ -112,7 +144,7 @@ const submit = () => {
                 required
                 autocomplete="off"
                 placeholder="Width"
-                model-value=""/>
+                v-model="form.width"/>
 
             <TextInput
                 id=""
@@ -121,7 +153,7 @@ const submit = () => {
                 required
                 autocomplete="off"
                 placeholder="Height"
-                model-value=""/>
+                v-model="form.height"/>
 <!--            <SelectInput
                 id=""
                 type="number"

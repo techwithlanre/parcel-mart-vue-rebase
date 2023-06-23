@@ -38,14 +38,15 @@ class QuoteForm extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'mail.request-quote',
+            view: 'emails.request-quote',
             with: [
                 'name'=>$this->request->name,
                 'email'=>$this->request->email,
-                'from_country'=>$this->request->country_from,
-                'to_country'=>$this->request->country_to,
-                'from_address'=>$this->request->address_from,
-                'to_address'=>$this->request->address_to,
+                'phone'=>$this->request->phone,
+                'from_country'=>getCountry('id', $this->request->country_from)->name,
+                'to_country'=>getCountry('id', $this->request->country_to)->name,
+                'address_from'=>$this->request->address_from,
+                'address_to'=>$this->request->address_to,
                 'quantity'=>$this->request->quantity,
                 'weight'=>$this->request->weight,
                 'length'=>$this->request->length,

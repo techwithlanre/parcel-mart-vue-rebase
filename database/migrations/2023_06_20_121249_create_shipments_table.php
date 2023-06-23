@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('shipments', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('origin_address_id');
-            $table->unsignedBigInteger('destination_address_id');
-            $table->string('status');
+            $table->text('origin_address');
+            $table->text('destination_address');
+            $table->string('status')->nullable();
             $table->decimal('shipment_price')->nullable();
             $table->decimal('shipment_paid_amount')->nullable();
             $table->decimal('insurance_amount')->nullable();

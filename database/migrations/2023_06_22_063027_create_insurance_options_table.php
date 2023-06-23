@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_pricings', function (Blueprint $table) {
+        Schema::create('insurance_options', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->decimal('pickup');
-            $table->decimal('shipment');
-            $table->boolean('is_active')->default(1);
+            $table->string('name');
+            $table->string('description');
+            $table->decimal('cover');
+            $table->decimal('amount');
             $table->timestamps();
         });
     }
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_pricings');
+        Schema::dropIfExists('insurance_options');
     }
 };

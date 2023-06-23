@@ -2,7 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateShipmentRequest;
 use App\Models\Address;
+use App\Models\Country;
+use App\Models\InsuranceOption;
+use App\Models\ItemCategory;
+use App\Models\Shipment;
 use App\Services\ShipmentServices;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -24,7 +29,9 @@ class ShipmentController extends Controller
     {
         $addresses = Address::where('user_id', auth()->user()->id)
             ->with('address_contacts', 'country', 'city')->get();
-        return Inertia::render('Shipments/Create', compact('addresses'));
+        $countries = Country::all();
+        $categories = ItemCategory::all();
+        return Inertia::render('Shipments/Create', compact('addresses', 'countries', 'categories'));
     }
 
     /**
@@ -67,13 +74,22 @@ class ShipmentController extends Controller
         //
     }
 
-    public function testCalculateShipment(ShipmentServices $shipmentServices)
+    public function testCalculateShipment(CreateShipmentRequest $request, ShipmentServices $shipmentServices)
     {
-        return $shipmentServices->calculateShipmentCost();
+        return $shipmentServices->calculateShipmentCost($request);
     }
 
-    public function initialize()
+    public function initialize(Request $request)
     {
+        dd($request);
+    }
 
+    public function checkout($id)
+    {
+        $shipment = Shipment::whereId($id)->with('shipment_items')->first();
+        $origin = json_decode($shipment->origin_address);
+        $destination = json_decode($shipment->destination_address);
+        $insurance_options = InsuranceOption::all();
+        return Inertia::render('Shipments/Checkout', compact('shipment', 'origin', 'destination','insurance_options'));
     }
 }

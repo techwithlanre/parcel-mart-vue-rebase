@@ -51,7 +51,7 @@ Route::get('tracking', function () {
 Route::post('contact', [\App\Http\Controllers\ContactController::class, 'send'])->name('contact.send');
 
 Route::post('/send-quote-form', function(\Illuminate\Http\Request $request) {
-    Mail::to('testreceiver@gmail.com')->send(new \App\Mail\QuoteForm($request));
+    Mail::to('enquiries@parcelsmartsolutions.com')->send(new \App\Mail\QuoteForm($request));
 })->name('send.quote.form');
 
 
@@ -90,7 +90,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::prefix('shipments')->group(function () {
         Route::get('start', [\App\Http\Controllers\ShipmentController::class, 'create']);
-        Route::get('calculate', [\App\Http\Controllers\ShipmentController::class, 'testCalculateShipment']);
+        Route::post('calculate', [\App\Http\Controllers\ShipmentController::class, 'testCalculateShipment'])->name('shipment.initialize');
+        Route::get('checkout/{id}', [\App\Http\Controllers\ShipmentController::class, 'checkout'])->name('shipment.checkout');
     });
 
     /*Wallet*/

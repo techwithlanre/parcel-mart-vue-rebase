@@ -22,13 +22,9 @@ class CreateShipmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'shipper_address_id' => 'required',
-            'destination_address_id' => 'required',
-            'weight' => 'required',
-            'length' => '',
-            'width' => '',
-            'height' => '',
-            'quantity' => 'required'
+            'origin' => 'required',
+            'destination' => 'required',
+            'shipment' => 'required'
         ];
     }
 }

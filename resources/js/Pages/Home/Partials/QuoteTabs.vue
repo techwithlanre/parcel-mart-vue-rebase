@@ -9,7 +9,8 @@ defineProps({
 </script>
 
 <template>
-    <TabGroup>
+    <QuoteTabParcelForm :countries="countries" />
+<!--    <TabGroup>
         <TabList class="flex space-x-1 rounded-xl bg-gray-100 p-1 duration-300">
             <Tab as="template" v-slot="{ selected }" class="duration-300">
                 <button
@@ -34,10 +35,10 @@ defineProps({
                 <QuoteTabParcelForm :countries="countries" />
             </TabPanel>
             <TabPanel class="fade-in duration-300 w-full">
-                <QuoteTabDocumentForm />
+&lt;!&ndash;                <QuoteTabDocumentForm />&ndash;&gt;
             </TabPanel>
         </TabPanels>
-    </TabGroup>
+    </TabGroup>-->
 </template>
 
 <style scoped>

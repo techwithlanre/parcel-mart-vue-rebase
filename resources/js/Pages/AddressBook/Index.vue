@@ -25,7 +25,7 @@ defineProps({
             <div class="grid lg:grid-cols-3 gap-x-5 gap-y-10">
                 <div class="card border bg-white p-5"  v-if="addresses.data.length > 0" v-for="item in addresses.data">
                     <div class="flex justify-between items-center">
-                        <h3 class="text-xl font-bold">{{ item.address_contacts[0].contact_name }}</h3>
+                        <h3 class="text-lg font-semibold">{{ item.address_contacts[0].contact_name }}</h3>
                         <div>
                             <button >
                                 <a-dropdown>
@@ -50,8 +50,8 @@ defineProps({
                         </div>
                     </div>
                     <p class="flex gap-x-10">
-                        <span class="font-semibold text-primary">{{ item.address_contacts[0].contact_phone }}</span>
-                        <span class="font-semibold">{{ item.address_contacts[0].contact_email }}</span>
+                        <span class="text-sm text-primary">{{ item.address_contacts[0].contact_phone }}</span>
+                        <span class="text-sm">{{ item.address_contacts[0].contact_email }}</span>
                     </p>
                     <hr class="mt-2">
                     <p class="mt-5"> {{ item.address }}</p>

@@ -1,4 +1,4 @@
-<h1>You have a new request</h1>
+<h1>New request</h1>
 <p>Name: {{ $name }}</p>
 <p>Email: {{ $email }}</p>
 <p>Phone: {{ $phone }}</p>

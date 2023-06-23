@@ -12,9 +12,9 @@ defineProps({
 
 
 const form  = useForm({
-    country_from: "0",
+    country_from: "",
     address_from: "",
-    country_to: "0",
+    country_to: "",
     address_to: "",
     quantity: "",
     weight: "",

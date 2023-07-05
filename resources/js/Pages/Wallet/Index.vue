@@ -14,14 +14,16 @@ import {
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import Pagination from "@/Components/Pagination.vue";
 
 
 const form = useForm({
-    amount: 0
+    amount: ''
 });
 
 defineProps({
-    balance: String
+    balance: String,
+    transactions: Array
 })
 
 const isOpen = ref(false)
@@ -55,6 +57,31 @@ const submit = () => {
                 </button>
             </div>
         </div>
+        <div class="card p-5 border bg-white mt-10">
+            <h1>Transactions List</h1>
+
+            <div class="overflow-x-auto border-x border-t rounded-xl">
+                <table class="table-auto w-full ">
+                    <thead class="border-b">
+                    <tr class="bg-gray-100">
+                        <th class="text-left p-4 font-medium">Amount</th>
+                        <th class="text-left p-4 font-medium">Type</th>
+                        <th class="text-left p-4 font-medium">Date</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr class="border-b hover:bg-gray-50" v-for="item in transactions.data">
+                        <td class="p-4">
+                            <h1 class="text-md font-bold">N{{ Math.abs(item.amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") }}</h1>
+                        </td>
+                        <td class="p-4">{{ item.type }}</td>
+                        <td class="p-4">{{ item.created_at }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <Pagination :links="transactions.links"/>
         <TransitionRoot appear :show="isOpen" as="template">
             <Dialog as="div" @close="closeModal" class="relative z-10">
                 <TransitionChild
@@ -91,7 +118,7 @@ const submit = () => {
                                     <div class="mt-2 px-6 mb-5">
                                         <div>
                                             <InputLabel value="Amount"/>
-                                            <TextInput v-model="form.amount" class="mt-3 " type="number" min="0" placeholder="Enter the amount you want add to your wallet"/>
+                                            <TextInput v-model="form.amount" class="mt-3 " required type="number" min="0" placeholder="Enter the amount you want add to your wallet"/>
                                         </div>
                                     </div>
 

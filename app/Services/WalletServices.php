@@ -3,33 +3,78 @@
 namespace App\Services;
 
 use App\Http\Requests\PayInitializeRequest;
+use App\Models\PaystackTransaction;
+use Bavix\Wallet\Models\Transaction;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redirect;
 use Unicodeveloper\Paystack\Paystack;
 
 class WalletServices
 {
-    public function logInitPayment()
-    {
+    protected String $reference;
+    private PaystackTransaction $paystackTransaction;
 
+    private Transaction $transaction;
+    public function logInitPayment(PayInitializeRequest $request)
+    {
+        $this->transaction = auth()->user()->deposit($request->amount, null, false);
+        $data = [
+            'user_id' => auth()->user()->id,
+            'transaction_id' => $this->transaction->id,
+            'reference' => $this->transaction->uuid,
+            'status' => 'pending'
+        ];
+
+        $this->paystackTransaction = PaystackTransaction::create($data);
     }
     public function initializePay(PayInitializeRequest $request, PaystackServices $paystackServices)
     {
-        //$data = $request->validated();
-
+        $this->logInitPayment($request);
         try{
             $data = [
                 "amount" => $request->amount * 100,
-                "reference" => time(),
+                "reference" => $this->transaction->uuid,
                 "email" => auth()->user()->email,
                 "currency" => "NGN"
             ];
-            $response = $this->callPaystack($data);
-            return json_decode($response, true)['data']['authorization_url'];
+
+            $response = json_decode($this->callPaystack($data), true);
+            $payment_url = $response['data']['authorization_url'];
+            $this->paystackTransaction->status = 'processing';
+            $this->paystackTransaction->save();
+            return $payment_url;
         }catch(\Exception $e) {
-            return Redirect::back()->withMessage(['msg'=>'The paystack token has expired. Please refresh the page and try again.', 'type'=>'error']);
+            return Redirect::back()->withMessage(['error'=>'The paystack token has expired. Please refresh the page and try again.', 'type'=>'error']);
         }
+    }
+
+    public function webhook(Request $request)
+    {
+        $payload = file_get_contents("php://input");
+        $url_ref_1 = trim($request->trxref);
+        $url_ref_2 = trim($request->reference);
+        if ($url_ref_1 !== $url_ref_2) return false; //log to db
+        $response = json_decode($payload, true);
+
+        $paystack_transaction = PaystackTransaction::where('reference', $url_ref_1)->first();
+        //if ($response['data']['status'] === 'success') {
+            if ($paystack_transaction) {
+                $user = auth()->user();
+                $transaction = Transaction::whereId($paystack_transaction->transaction_id)->first();
+                if (!$transaction->confirmed) $user->confirm($transaction);
+                $paystack_transaction->status = 'success';
+                $paystack_transaction->save();
+                return \redirect(route('wallet.index'))->with('message', 'Wallet funded successfully');
+            }
+            return \redirect(route('wallet.index'))->with('message', 'An error occurred, please try again later');
+        //}
+
+        //$paystack_transaction->status = 'failed';
+        //$paystack_transaction->save();
+        //return \redirect(route('wallet.index'))->with('message', 'An error occurred, please try again later');
     }
 
     private function callPaystack($data)

@@ -10,6 +10,7 @@ class Shipment extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'origin_address',
         'destination_address',
         'status',
@@ -26,5 +27,30 @@ class Shipment extends Model
     public function shipment_items(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ShipmentItem::class);
+    }
+
+    public function shipping_rate_log(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ShippingRateLog::class);
+    }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
+
+    public function state()
+    {
+        return $this->belongsTo(State::class);
+    }
+
+    public function city()
+    {
+        return $this->belongsTo(City::class);
+    }
+
+    public function shipment_rate()
+    {
+        return $this->hasMany(ShippingRateLog::class);
     }
 }

@@ -5,19 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ShipmentItem extends Model
+class AramexShipmentLog extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'shipment_id',
-        'item_category_id',
-        'description',
-        'quantity',
-        'weight',
-        'width',
-        'height',
-        'length',
-        'value'
+        'shipment_rate_log_id',
+        'aramex_id',
+        'reference',
+        'label_url',
+        'label_content',
+        'details'
     ];
 }

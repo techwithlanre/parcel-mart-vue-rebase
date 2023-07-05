@@ -1,32 +1,21 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
-use App\Models\CourierApiProvider;
+use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class SettingController extends Controller
+class UserController extends Controller
 {
-    public function rate()
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
     {
-        $providers = CourierApiProvider::all();
-        return Inertia::render('Admin/Setting/Rate', compact('providers'));
-    }
-
-    public function editRate($id)
-    {
-        $provider = CourierApiProvider::find($id);
-        return Inertia::render('Admin/Setting/EditRate', compact('provider'));
-    }
-
-    public function updateRate($id)
-    {
-        $provider = CourierApiProvider::find($id);
-        $provider->status = \request('status');
-        $provider->profit_margin = \request('profit_margin');
-        $provider->save();
-        return redirect(route('setting.rate'))->with('message', 'Updated');
+        $users = User::with('wallet')->paginate(10);
+        return Inertia::render('Admin/Users/Users', compact('users'));
     }
 
     /**

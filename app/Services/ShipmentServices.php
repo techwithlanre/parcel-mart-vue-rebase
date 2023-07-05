@@ -3,12 +3,19 @@
 namespace App\Services;
 
 
+use App\Http\Requests\BookShipmentRequest;
 use App\Http\Requests\CreateShipmentRequest;
+use App\Http\Requests\TrackShipmentRequest;
+use App\Models\AramexShipmentLog;
 use App\Models\City;
 use App\Models\Country;
 use App\Models\CourierApiProvider;
+use App\Models\DhlRateLog;
+use App\Models\InsuranceOption;
 use App\Models\Shipment;
 use App\Models\ShipmentItem;
+use App\Models\ShippingRateLog;
+use App\Models\TrackingLog;
 use Illuminate\Support\Facades\Redirect;
 use Octw\Aramex\Aramex;
 
@@ -17,6 +24,7 @@ class ShipmentServices
     public function logShipment(CreateShipmentRequest $request)
     {
         $shipment = Shipment::create([
+            'user_id' => auth()->user()->id,
             'origin_address' => json_encode($request->origin),
             'destination_address' => json_encode($request->destination),
             'status' => 'pending'
@@ -30,6 +38,7 @@ class ShipmentServices
             'weight' => $request->shipment['weight'],
             'height' => $request->shipment['height'],
             'length' => $request->shipment['length'],
+            'width' => $request->shipment['width'],
             'value' => $request->shipment['value'],
         ]);
 
@@ -47,55 +56,170 @@ class ShipmentServices
     public function calculateShipmentCost(CreateShipmentRequest $request): bool|\Illuminate\Http\RedirectResponse
     {
         $shipment = $this->logShipment($request);
-        $check_aramex = CourierApiProvider::where('alias', 'aramex')->value('status');
-        if ($check_aramex == 'active') {
+        $check_aramex = CourierApiProvider::where('alias', 'aramex');
+        if ($check_aramex->value('status') == 'active') {
             $aramex = new AramexServices($request);
-            $response = $aramex->calculateShippingRate($request);
-            dd($response);
+            $response = $aramex->calculateShippingRate();
             if ($response) {
-                dd($response);
+                ShippingRateLog::create([
+                    'user_id' => auth()->user()->id,
+                    'shipment_id' => $shipment->id,
+                    'product_name' => 'Aramex Shipping',
+                    'courier_api_provider_id' => $check_aramex->value('id'),
+                    'currency' => $response->TotalAmount->CurrencyCode,
+                    'total_amount' => $response->TotalAmount->Value,
+                    'amount_before_tax' => $response->RateDetails->TotalAmountBeforeTax,
+                    'tax' => $response->RateDetails->TaxAmount,
+                    'provider_code' => 'aramex',
+                    'created_at' => now()
+                ]);
             }
         }
 
-        //$this->updateShipmentLog($shipment, $response);
+        $check_dhl = CourierApiProvider::where('alias', 'dhl');
+        if ($check_dhl->value('status') == 'active') {
+            $dhl = new DHLServices($request);
+            $response = $dhl->calculateRate();
+            $data = json_decode($response, true);
+            if ($data) {
+                $products = $data['products'];
+                foreach ($products as $product) {
+                    if ($product['totalPrice'][0]['price'] > 0) {
+                        $rate_log = ShippingRateLog::create([
+                            'shipment_id' => $shipment->id,
+                            'courier_api_provider_id' => $check_dhl->value('id'),
+                            'product_name' => 'DHL - ' . $product['productName'],
+                            'product_code' => $product['productCode'],
+                            'local_product_code' => $product['localProductCode'],
+                            'network_type_code' => $product['networkTypeCode'],
+                            'provider_code' => 'dhl',
+                            'currency' => 'NGN',
+                            'total_amount' => number_format(($product['totalPrice'][0]['price'] * 0.925) + ($product['totalPrice'][0]['price'] * 0.075), 2),
+                            'amount_before_tax' => number_format($product['totalPrice'][0]['price'] * 0.925, 2),
+                            'tax' => number_format($product['totalPrice'][0]['price'] * 0.075, 2),
+                            'created_at' => now()
+                        ]);
+
+                        DhlRateLog::create([
+                            'shipment_id' => $shipment->id,
+                            'shipping_rate_log_id' => $rate_log->id,
+                            'product_name' => $product['productName'],
+                            'product_code' => $product['productCode'],
+                            'amount' => number_format($product['totalPrice'][0]['price'] * 0.925, 2),
+                            'tax' => number_format($product['totalPrice'][0]['price'] * 0.075, 2),
+                            'total_amount' => number_format(($product['totalPrice'][0]['price'] * 0.925) + ($product['totalPrice'][0]['price'] * 0.075), 2),
+                            'local_product_code' => $product['localProductCode'],
+                            'network_type_code' => $product['networkTypeCode'],
+                            'weight' => json_encode($product['weight']),
+                            'total_price_breakdown' => isset($product['totalPriceBreakdown']) ? json_encode($product['totalPriceBreakdown']) : '',
+                            'total_price' => json_encode($product['totalPrice']),
+                            'detailed_price_breakdown' => json_encode($product['detailedPriceBreakdown']),
+                            'pickup_capabilities' => json_encode($product['pickupCapabilities']),
+                            'delivery_capabilities' => json_encode($product['deliveryCapabilities']),
+                            'pricing_date' => $product['pricingDate'],
+                        ]);
+                    }
+
+                }
+            }
+
+        }
+
         return Redirect::route('shipment.checkout', $shipment->id);
     }
 
-    public function createShipment(CreateShipmentRequest $request): void
+    public function bookShipment(BookShipmentRequest $bookShipmentRequest)
     {
-        $callResponse = Aramex::createShipment([
-            'shipper' => [
-                'name' => $request->origin['contact_name'],
-                'email' => 'email@users.companies',
-                'phone'      => '+123456789982',
-                'cell_phone' => '+321654987789',
-                'country_code' => 'NG',
-                'city' => City::whereId($request->origin['city'])->value('name'),
-                'zip_code' => '',
-                'line1' => 'Line1 Details',
-                'line2' => 'Line2 Details',
-                'line3' => 'Line3 Details',
-            ],
-            'consignee' => [
-                'name' => $request->destination['contact_name'],
-                'email' => 'email@users.companies',
-                'phone'      => '+123456789982',
-                'cell_phone' => '+321654987789',
-                'country_code' => 'NG',
-                'city' => City::whereId($request->destination['city'])->value('name'),
-                'zip_code' => '',
-                'line1' => 'Line1 Details',
-                'line2' => 'Line2 Details',
-                'line3' => 'Line3 Details',
-            ],
-            'shipping_date_time' => time() + 50000,
-            'due_date' => time() + 60000,
-            'comments' => 'No Comment',
-            'pickup_location' => 'at reception',
-            'pickup_guid' => '',
-            'weight' => 1,
-            'number_of_pieces' => $request->shipment['quantity'],
-            'description' => 'Goods Description, like Boxes of flowers',
-        ]);
+        $request = $bookShipmentRequest->validated();
+        $shipment = Shipment::whereId($request['shipment_id'])->first();
+        $shipment_item = ShipmentItem::where('shipment_id', $shipment->id)->first();
+        $insurance = InsuranceOption::whereId($request['insurance'])->first();
+        $insurance_amount = $insurance->amount;
+
+        $rate = ShippingRateLog::whereId($request['option_id'])->first();
+        $total_amount = floatval($rate->total_amount) + floatval($insurance_amount);
+        /*if (auth()->user()->user_type === 'individual' && auth()->user()->balance < $total_amount) {
+            //insufficient balance in wallet
+            dd('insufficient data');
+            return;
+        }*/
+
+        //$withdraw = auth()->user()->withdraw($total_amount);
+        $provider = $rate->provider_code;
+
+        $create_booking = false;
+        if ($provider == 'aramex') {
+            $aramex = new AramexServices($bookShipmentRequest);
+            $create_booking = $aramex->bookShipment($shipment, $shipment_item, $insurance, $rate);
+        }
+
+        if ($provider == 'dhl') {
+            $dhl = new DHLServices($bookShipmentRequest);
+            $create_booking = $dhl->bookShipment($shipment, $shipment_item, $insurance, $rate);
+        }
+
+
+        if ($create_booking) {
+            $shipment->provider_id = $rate->courier_api_provider_id;
+            $shipment->shipping_rate_log_id  = $rate->id;
+            $shipment->provider = $provider;
+            $shipment->number = random_int(1000000000, 9999999999);
+            $shipment->status = 'processing';
+            $shipment->save();
+        }
+
+
+        return \redirect(route('shipment.details', $shipment->id));
+        //refund
+        //book shipment with selected rate
+    }
+
+    private function bookWithAramex(BookShipmentRequest $bookShipmentRequest)
+    {
+
+    }
+
+    public function trackShipment(TrackShipmentRequest $request)
+    {
+        $shipment_number = trim($request->number);
+        $shipment = Shipment::where('number', $shipment_number)->first();
+
+        if (!$shipment) return \redirect(route('shipment.index'))->with('error', 'Tracking number not found');
+
+        if ($shipment->provider == 'aramex') {
+            $aramex_shipment = AramexShipmentLog::where('shipment_id', $shipment->id)->first();
+            $response = Aramex::trackShipments([$aramex_shipment->aramex_id]);
+            if (!$response->HasErrors) {
+                $data = $response->TrackingResults->KeyValueOfstringArrayOfTrackingResultmFAkxlpY->Value->TrackingResult;
+                $check = TrackingLog::where([
+                    'shipment_id' => $shipment->id,
+                    'update_code' => $data->UpdateCode,
+                    'provider' => 'aramex',
+                ])->first();
+
+                if (!$check) {
+                    TrackingLog::create([
+                        'shipment_id' => $shipment->id,
+                        'update_code' => $data->UpdateCode,
+                        'waybill_number' => $data->WaybillNumber,
+                        'update_description' => $data->UpdateDescription,
+                        'update_datetime' => $data->UpdateDateTime,
+                        'update_location' => $data->UpdateLocation,
+                        'comment' => $data->Comments,
+                        'problem_code' => $data->ProblemCode,
+                        'gross_weight' => $data->GrossWeight,
+                        'chargeable_weight' => $data->ChargeableWeight,
+                        'weight_unit' => $data->WeightUnit,
+                        'provider' => 'aramex',
+                    ]);
+                    return \redirect(route('shipment.track.details', $shipment->id));
+                }
+
+                return \redirect(route('shipment.track.details', $shipment->id));
+
+            }
+        }
+
+
     }
 }

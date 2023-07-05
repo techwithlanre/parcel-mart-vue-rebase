@@ -24,7 +24,6 @@ const form  = useForm({
     name: "",
     email: "",
     phone: "",
-    //metric: "",
 
 });
 

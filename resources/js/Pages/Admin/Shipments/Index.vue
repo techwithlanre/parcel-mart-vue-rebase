@@ -7,7 +7,7 @@ import {Link, Head, useForm} from "@inertiajs/vue3"
 import {DocumentIcon, WalletIcon} from "@heroicons/vue/20/solid/index.js";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Pagination from "@/Components/Pagination.vue";
-import parcel from "../../../images/parcel.png";
+import parcel from "../../../../images/parcel.png";
 
 const activeKey = ref('1');
 const tabs = [
@@ -37,16 +37,6 @@ const trackShipment = () => {
     <AuthenticatedLayout page-title="Shipments">
         <Head title="Start Shipment" />
         <div class="flex flex-col w-full gap-5">
-            <div class="p-10 w-full lg:w-1/3 bg-white border rounded-2xl" v-if="log.length > 0" >
-                <h1 class="text-lg">Track Shipment</h1>
-                <p class="text-gray-600 text-xs">Use this form to track your shipment, enter your tracking number below</p>
-                <div>
-                    <form @submit.prevent="trackShipment">
-                        <TextInput v-model="trackForm.number" required type="text" class="mt-3" placeholder="Enter tracking number" />
-                        <PrimaryButton class="mt-5" :class="{ 'opacity-25': trackForm.processing }" :disabled="trackForm.processing">Track</PrimaryButton>
-                    </form>
-                </div>
-            </div>
             <div class="p-10 w-full bg-white border rounded-2xl" v-if="log.length > 0" >
                 <h1 class="text-lg">Shipment History</h1>
                 <div>
@@ -82,8 +72,7 @@ const trackShipment = () => {
                                     </td>
                                     <td class="p-4">{{ item.status}}</td>
                                     <td class="p-4">
-                                        <Link :href="route('shipment.checkout', item.id)" v-if="item.status === 'pending'" class="text-primary font-medium hover:text-green-600">Checkout</Link>
-                                        <Link :href="route('shipment.details', item.id)" v-else class="text-primary font-medium hover:text-green-600">View</Link>
+                                        <Link :href="route('shipment.details', item.id)" v-if="item.status !== 'pending'" class="text-primary font-medium hover:text-green-600">View</Link>
                                     </td>
                                 </tr>
                                 </tbody>

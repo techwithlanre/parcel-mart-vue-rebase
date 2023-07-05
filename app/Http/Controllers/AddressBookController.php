@@ -17,7 +17,7 @@ class AddressBookController extends Controller
     public function index()
     {
         $addresses = Address::where('user_id', auth()->user()->id)
-            ->with('address_contacts', 'country', 'city')->paginate(3);
+            ->with('address_contacts', 'country', 'city')->paginate(10);
         return Inertia::render('AddressBook/Index', compact('addresses'));
     }
 

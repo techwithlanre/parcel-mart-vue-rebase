@@ -42,7 +42,7 @@ function openModal() {
 
     <AuthenticatedLayout page-title="Dashboard">
         <div class="flex lg:flex-row flex-col gap-x-5 gap-y-10">
-            <div class="lg:w-3/4 w-full">
+            <div class="w-full">
                 <div class="flex flex-col gap-y-10 lg:flex-row gap-x-10">
                     <div class="p-5 bg-white rounded-2xl w-full border">
                         <div class="flex gap-5 items-center">
@@ -73,7 +73,7 @@ function openModal() {
 
                 <div class="flex flex-col gap-y-10 lg:flex-row gap-x-10 mt-10">
                     <div class="p-5 bg-white rounded-2xl w-full border">
-                        <a href="javascript:void(0)" class="flex flex-col" @click="openModal">
+                        <Link :href="route('shipment.start')" class="flex flex-col">
                             <div class="border bg-background/50 rounded-full h-16 w-16 flex justify-center items-center">
                                 <img :src="parcel" alt="" class="h-10 w-10">
                             </div>
@@ -83,9 +83,9 @@ function openModal() {
                                     <h1 class="font-medium text-md text-gray-600 mt-5">Book Shipments</h1>
                                     <h3 class="text-xs text-gray-400">Send and receive item(s)</h3>
                                 </div>
-                                <div class="text-primary">icon here</div>
+                                <div class="text-primary"></div>
                             </div>
-                        </a>
+                        </link>
                     </div>
                     <div class="p-5 bg-white rounded-2xl w-full border">
                         <a href="javascript:void(0)" class="flex flex-col" @click="toggleQuote(true)">
@@ -103,7 +103,7 @@ function openModal() {
                         </a>
                     </div>
 
-                    <Link class="p-5 bg-white rounded-2xl w-full border">
+                    <Link :href="route('shipment.index')" class="p-5 bg-white rounded-2xl w-full border">
                         <div class="flex gap-5 items-center">
                             <div class="flex flex-col">
                                 <div class="border bg-background/50 rounded-full h-16 w-16 flex justify-center items-center">
@@ -117,29 +117,6 @@ function openModal() {
                     </Link>
                 </div>
             </div>
-            <div class="lg:w-1/4 w-full">
-                <div class="bg-white border rounded-xl w-full">
-                    <div class="p-5 font-bold">Latest Shipments (5)</div>
-                    <hr>
-                    <div class="p-5 w-full">
-                        <div v-for="i in 5" class="flex items-center gap-x-3 w-full mb-10">
-                            <div class="w-8 h-8 flex justify-center items-center rounded-full bg-green-600 text-white font-bold">
-                                <caret-down-outlined/>
-                            </div>
-                            <div class="flex flex-col">
-                                <div class="flex justify-between items-center gap-x-30 w-full">
-                                    <h3 class="font-bold">128173928293{{ i }}</h3>
-                                    <div class="bg-yellow-500 text-yellow-900 px-4 py-1 text-xs rounded-full">in transit</div>
-                                </div>
-                                <div class="text-sm">Your shipment will arrive in 7 - 9 days</div>
-                            </div>
-                        </div>
-                        <p>
-                            <Link class="text-primary font-semibold">View all</Link>
-                        </p>
-                    </div>
-                </div>
-            </div>
         </div>
         <TransitionRoot appear :show="isOpen" as="template">
             <Dialog as="div" @close="closeModal" class="relative z-10">
@@ -150,8 +127,7 @@ function openModal() {
                     enter-to="opacity-100"
                     leave="duration-200 ease-in"
                     leave-from="opacity-100"
-                    leave-to="opacity-0"
-                >
+                    leave-to="opacity-0" >
                     <div class="fixed inset-0 bg-black bg-opacity-25" />
                 </TransitionChild>
 

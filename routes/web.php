@@ -89,15 +89,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //Route::resource('shipments', \App\Http\Controllers\ShipmentController::class);
 
     Route::prefix('shipments')->group(function () {
-        Route::get('start', [\App\Http\Controllers\ShipmentController::class, 'create']);
+        Route::get('', [\App\Http\Controllers\ShipmentController::class, 'index'])->name('shipment.index');
+        Route::get('start', [\App\Http\Controllers\ShipmentController::class, 'create'])->name('shipment.start');
         Route::post('calculate', [\App\Http\Controllers\ShipmentController::class, 'testCalculateShipment'])->name('shipment.initialize');
         Route::get('checkout/{id}', [\App\Http\Controllers\ShipmentController::class, 'checkout'])->name('shipment.checkout');
+        Route::post('book', [\App\Http\Controllers\ShipmentController::class, 'bookShipment'])->name('shipment.book');
+        Route::get('details/{id}', [\App\Http\Controllers\ShipmentController::class, 'show'])->name('shipment.details');
+        Route::post('track', [\App\Http\Controllers\ShipmentController::class, 'trackShipment'])->name('shipment.track');
+        Route::get('tracking-details/{shipment_id}', [\App\Http\Controllers\ShipmentController::class, 'trackingDetails'])->name('shipment.track.details');
     });
 
     /*Wallet*/
     Route::prefix('wallet')->group(function () {
         Route::get('', [\App\Http\Controllers\WalletController::class, 'index'])->name('wallet.index');
         Route::post('initialize', [App\Http\Controllers\WalletController::class, 'initialize'])->name('wallet.initialize');
+        Route::get('paystack', [App\Http\Controllers\WalletController::class, 'paystackWebhook'])->name('wallet.paystack.webhook');
     });
 
     /*Settings*/

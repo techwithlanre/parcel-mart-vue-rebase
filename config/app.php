@@ -5,6 +5,10 @@ use Illuminate\Support\ServiceProvider;
 
 return [
 
+    /*Custom*/
+
+    'default_gateway' => env('DEFAULT_GATEWAY', 'paystack'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Name

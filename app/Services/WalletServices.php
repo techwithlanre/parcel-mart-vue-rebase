@@ -45,7 +45,8 @@ class WalletServices
             $payment_url = $response['data']['authorization_url'];
             $this->paystackTransaction->status = 'processing';
             $this->paystackTransaction->save();
-            return $payment_url;
+            return \redirect($payment_url);
+            //return $payment_url;
         }catch(\Exception $e) {
             return Redirect::back()->withMessage(['error'=>'The paystack token has expired. Please refresh the page and try again.', 'type'=>'error']);
         }

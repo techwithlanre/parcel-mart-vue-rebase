@@ -145,7 +145,7 @@ export default {
                             <div class="text-3xl"></div>
                         </div>
                     </div>
-                    <div v-if="page.props.auth.user.roles[0].name === 'admin'" class="p-5 bg-white rounded-2xl w-full border">
+                    <div v-if="page.props.auth.role === 'admin'" class="p-5 bg-white rounded-2xl w-full border">
                         <div class="flex justify-between">
                             <div class="flex gap-5 items-start">
                                 <div class="h-12 w-12">

@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Middleware;
 use Spatie\Permission\Models\Permission;
 use Tightenco\Ziggy\Ziggy;
@@ -32,10 +33,11 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         //dd($request->user()->roles->first()->name);
+        $check = DB::table('model_has_roles')->where('model_id')->count();
         return array_merge(parent::share($request), [
             'auth' => [
                 'user' => $request->user(),
-                'role' => isset($request->user()->roles->first()->name) ?? null,
+                'role' => ($check > 0) ? $request->user()->roles->first()->name : null,
                 'permissions' => $request->user() ? $request->user()->getPermissionsViaRoles() : [],
             ],
             'ziggy' => function () use ($request) {

@@ -30,12 +30,21 @@ defineProps({
 
 const sidebar = [
     [
-        { name: "Dashboard", icon: OverviewIcon, route: "/dashboard" },
-        { name: "Shipments", icon: ShoppingBagIcon, route: "/shipments" },
-        { name: "Wallet", icon: WalletIcon, route: "/wallet" },
-        { name: "Address Book", icon: GroupChatIcon, route: '/address-book'  },
-        { name: "Settings", icon: SettingsIcon, route: "/settings/shipping/description"  },
-        { name: "Logout", icon: LogoutIcon, route: route('logout')  },
+        { name: "Dashboard", icon: OverviewIcon, route: "/dashboard", admin: false },
+        { name: "Shipments", icon: ShoppingBagIcon, route: "/shipments", admin: false },
+        { name: "Wallet", icon: WalletIcon, route: "/wallet", admin: false },
+        { name: "Address Book", icon: GroupChatIcon, route: '/address-book', admin: false  },
+        { name: "Settings", icon: SettingsIcon, route: "/settings/shipping/description", admin: false },
+        { name: "Logout", icon: LogoutIcon, route: route('logout'), admin: false },
+    ],
+];
+
+const adminSidebar = [
+    [
+        { name: "Users", icon: "", route: "/admin/users", admin: true },
+        { name: "Roles", icon: "", route: "/admin/roles", admin: true },
+        { name: "Shipments", icon: "", route: "/admin/shipments" , admin: true },
+        { name: "Provider Rates", icon: "", route: "/admin/settings/rate", admin: false },
     ]
 ];
 
@@ -48,6 +57,18 @@ const sidebar = [
                 <img src="../../images/logo-dark.jpg" alt="parcel-mart-logo" class="w-16 h-16 rounded-full">
             </div>
             <ul v-for="group in sidebar" class="flex flex-col gap-y-6 pt-20">
+                <li v-for="item in group" class="">
+                    <Link :href="item.route" class="flex gap-x-4 items-center text-gray-500 hover:text-primary group px-5" :class="{'text-white bg-primary group font-bold rounded-md py-2 hover:text-white hover:bg-background ': $page.url.startsWith(item.route)}">
+                        <span class="absolute w-1.5 h-8 bg-primary rounded-r-full left-0 scale-y-0 -translate-x-full group-hover:scale-y-100 group-hover:translate-x-0 transition-transform ease-in-out" :class="{'group-hover:scale-y-100 group-hover:translate-x-0': $page.url.startsWith(item.route)}"/>
+                        <Component :is="item.icon" class="w-6 h-6 fill-current" />
+                        <span>{{ item.name }}</span>
+                    </Link>
+                </li>
+            </ul>
+
+
+            <ul v-if="page.props.auth.user.is_admin" v-for="group in adminSidebar" class="flex flex-col gap-y-6 pt-20">
+                <h1>Admin  Menu</h1>
                 <li v-for="item in group" class="">
                     <Link :href="item.route" class="flex gap-x-4 items-center text-gray-500 hover:text-primary group px-5" :class="{'text-white bg-primary group font-bold rounded-md py-2 hover:text-white hover:bg-background ': $page.url.startsWith(item.route)}">
                         <span class="absolute w-1.5 h-8 bg-primary rounded-r-full left-0 scale-y-0 -translate-x-full group-hover:scale-y-100 group-hover:translate-x-0 transition-transform ease-in-out" :class="{'group-hover:scale-y-100 group-hover:translate-x-0': $page.url.startsWith(item.route)}"/>

@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use Spatie\Permission\Models\Permission;
 use Tightenco\Ziggy\Ziggy;
 
 class HandleInertiaRequests extends Middleware
@@ -30,9 +31,12 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        //dd($request->user()->roles->first()->name);
         return array_merge(parent::share($request), [
             'auth' => [
                 'user' => $request->user(),
+                'role' => isset($request->user()->roles->first()->name) ?? null,
+                'permissions' => $request->user() ? $request->user()->getPermissionsViaRoles() : [],
             ],
             'ziggy' => function () use ($request) {
                 return array_merge((new Ziggy)->toArray(), [

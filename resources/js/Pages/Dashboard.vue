@@ -1,40 +1,117 @@
-<script setup>
+<script>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, Link } from '@inertiajs/vue3';
+import {Head, Link, useForm, usePage} from '@inertiajs/vue3';
 import { twMerge } from "tailwind-merge";
 import parcel from '/resources/images/parcel.png'
 import shipment from '/resources/images/shipment.png'
 import wallet from '/resources/images/wallet.png'
-import { CaretUpFilled, CaretDownOutlined } from '@ant-design/icons-vue';
-import {Dialog, DialogDescription, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
+import {Dialog, Tab, TabGroup, TabList, TabPanel, TabPanels, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputLabel from "@/Components/InputLabel.vue";
-import {ref} from "vue";
-import DashboardQuoteModal from "@/Components/Modals/DashboardQuoteModal.vue";
+import {ref, watch} from "vue";
+import SelectInput from "@/Components/SelectInput.vue";
+import TextAreaInput from "@/Components/TextAreaInput.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import InputError from "@/Components/InputError.vue";
 
-defineProps({
-    balance: String
-})
-const isOpen = ref(false)
-const isQuoteOpen = ref(false)
 
-function toggleQuote(value) {
-    isQuoteOpen.value = value
+export default {
+    data() {
+        return {
+            isOpen: false,
+            isQuoteOpen: false,
+            selectedOriginAddress: 0,
+            selectedDestinationAddress: 0,
+            selectedTab: 0,
+            originCities: [],
+            destinationCities: [],
+            state: 0,
+            originStates: [],
+            destinationStates: [],
+            originDisabled: false,
+            page: usePage(),
+            form: useForm({
+                country_from: "",
+                state_from: "",
+                city_from: "",
+                country_to: "",
+                state_to: "",
+                city_to: "",
+                quantity: "",
+                weight: "",
+                width: "",
+                height: "",
+                length: ""
+            })
+        }
+    },
+    components: {
+        TransitionRoot, TextAreaInput, PrimaryButton, SelectInput, Tab,
+        TabPanel, TabPanels, TabList, TabGroup, AuthenticatedLayout,
+        InputError, InputLabel, TextInput, Link
+    },
+
+    props: {
+        balance: String,
+        shipmentCount: String,
+        countries: Array
+    },
+    methods:{
+        toggleQuote(value) {
+            this.isQuoteOpen = value
+        },
+
+        closeQuote() {
+            this.isQuoteOpen = false
+        },
+
+        closeModal() {
+            this.isOpen = false
+        },
+
+        openModal() {
+            this.isOpen = true
+        },
+
+        getOriginStates: function() {
+            axios.get('/api/states/' + this.form.country_from).then(function(response){
+                this.originStates = response.data.states;
+            }.bind(this));
+        },
+
+        getOriginCities: function() {
+            axios.get('/api/cities/' + this.form.state_from).then(function(response){
+                this.originCities = response.data.cities;
+            }.bind(this));
+        },
+
+        getDestinationStates: function() {
+            axios.get('/api/states/' + this.form.country_to).then(function(response){
+                this.destinationStates = response.data.states;
+            }.bind(this));
+        },
+
+        getDestinationCities: function() {
+            axios.get('/api/cities/' + this.form.state_to).then(function(response){
+                this.destinationCities = response.data.cities;
+            }.bind(this));
+        },
+
+        changeTab(index) {
+            this.selectedTab = index
+        },
+
+        validateForm(index) {
+            this.changeTab(index)
+        },
+
+        initialize: function () {
+            this.form.post(route('shipment.initialize'), {
+
+            })
+        },
+    },
 }
-
-function closeQuote() {
-    isQuoteOpen.value = false
-}
-
-function closeModal() {
-    isOpen.value = false
-}
-function openModal() {
-    isOpen.value = true
-}
-
-
-
 </script>
 
 <template>
@@ -51,7 +128,7 @@ function openModal() {
                             </div>
                             <div class="flex flex-col">
                                 <h1 class="font-bold">Shipments</h1>
-                                <h3 class="text-2xl font-bold">0</h3>
+                                <h3 class="text-2xl font-bold">{{ shipmentCount }}</h3>
                             </div>
                         </div>
                     </div>
@@ -98,7 +175,7 @@ function openModal() {
                                     <h1 class="font-medium text-md text-gray-600 mt-5">Get Pricing</h1>
                                     <h3 class="text-xs text-gray-400">Request a quote</h3>
                                 </div>
-                                <div class="text-primary">icon here</div>
+                                <div class="text-primary"></div>
                             </div>
                         </a>
                     </div>
@@ -118,57 +195,132 @@ function openModal() {
                 </div>
             </div>
         </div>
-        <TransitionRoot appear :show="isOpen" as="template">
-            <Dialog as="div" @close="closeModal" class="relative z-10">
-                <TransitionChild
-                    as="template"
-                    enter="duration-300 ease-out"
-                    enter-from="opacity-0"
-                    enter-to="opacity-100"
-                    leave="duration-200 ease-in"
-                    leave-from="opacity-100"
-                    leave-to="opacity-0" >
-                    <div class="fixed inset-0 bg-black bg-opacity-25" />
-                </TransitionChild>
+        <div>
+            <a-modal v-model:visible="isQuoteOpen" title="Get Quote" @ok="" width="50%" wrap-class-name="full-modal" body-style="@apply ">
+                <div>
+                    <form>
+                        <div class="mt-4">
+                            <InputLabel value="From" />
+                            <div class="grid lg:grid-cols-3 gap-x-5 w-full">
+                                <SelectInput
+                                    place-holder="Select Country"
+                                    class="block w-full"
+                                    v-model="form.country_from"
+                                    required
+                                    :options="countries"
+                                    v-on:change="getOriginStates"
+                                />
 
-                <div class="fixed inset-0 overflow-y-auto">
-                    <div class="flex min-h-full items-center justify-center p-4 text-center">
-                        <TransitionChild
-                            as="template"
-                            enter="duration-300 ease-out"
-                            enter-from="opacity-0 scale-95"
-                            enter-to="opacity-100 scale-100"
-                            leave="duration-200 ease-in"
-                            leave-from="opacity-100 scale-100"
-                            leave-to="opacity-0 scale-95"
-                        >
-                            <DialogPanel
-                                class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white pt-6 text-left align-middle shadow-xl transition-all"
-                            >
-                                <form @submit.prevent="submit">
-<!--                                    <DialogTitle as="h3" class="text-lg font-medium leading-6 px-6 text-gray-900">
-                                        <div class="p-3 bg-yellow-100 text-yellow-500 text-sm">
-                                            xddd
-                                        </div>
-                                    </DialogTitle>-->
+                                <SelectInput
+                                    place-holder="Select State"
+                                    class="block w-full"
+                                    required
+                                    v-model="form.state_from"
+                                    :options="originStates"
+                                    v-on:change="getOriginCities"
+                                />
 
-                                    <div class="px-6 mb-5 flex flex-col gap-y-3">
-                                        <Link class="border p-3 rounded-lg">
-                                            <h3 class="font-semibold">Book a delivery</h3>
-                                            <div class="text-primary">Send out a parcel, locally or internationally</div>
-                                        </Link>
-                                        <Link class="border p-3 rounded-lg">
-                                            <h3 class="font-semibold">Book an import</h3>
-                                            <div class="text-primary">Receive a package from anywhere in the world</div>
-                                        </Link>
-                                    </div>
-                                </form>
-                            </DialogPanel>
-                        </TransitionChild>
-                    </div>
+                                <SelectInput
+                                    place-holder="Select State"
+                                    class="block w-full"
+                                    required
+                                    v-model="form.city_from"
+                                    :options="originCities"
+                                />
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <InputLabel value="To" />
+                            <div class="grid lg:grid-cols-3 gap-x-5 w-full">
+                                <SelectInput
+                                    place-holder="Select Country"
+                                    class="block w-full"
+                                    v-model="form.country_to"
+                                    required
+                                    :options="countries"
+                                    v-on:change="getDestinationStates"
+                                />
+
+                                <SelectInput
+                                    place-holder="Select State"
+                                    class="block w-full"
+                                    required
+                                    v-model="form.state_to"
+                                    :options="destinationStates"
+                                    v-on:change="getDestinationCities"
+                                />
+
+                                <SelectInput
+                                    place-holder="Select State"
+                                    class="block w-full"
+                                    required
+                                    v-model="form.city_to"
+                                    :options="destinationCities"
+                                />
+                            </div>
+                        </div>
+
+                        <div class="grid lg:grid-cols-3 gap-x-5 mt-5">
+                            <TextInput
+                                id="quantity"
+                                type="number"
+                                class="mt-1 w-full"
+                                required
+                                autocomplete="off"
+                                placeholder="Quantity"
+                                v-model="form.quantity"/>
+
+                            <TextInput
+                                id="email"
+                                type="number"
+                                class="mt-1 w-full"
+                                required
+                                autocomplete="off"
+                                placeholder="Weight"
+                                v-model="form.weight"/>
+                            <TextInput
+                                id=""
+                                type="number"
+                                class="mt-1 w-full block"
+                                required
+                                autocomplete="off"
+                                placeholder="Length"
+                                v-model="form.length"/>
+                        </div>
+                        <div class="grid lg:grid-cols-3 gap-x-5 mt-5">
+                            <TextInput
+                                id=""
+                                type="number"
+                                class="mt-1 w-full"
+                                required
+                                autocomplete="off"
+                                placeholder="Width"
+                                v-model="form.width"/>
+
+                            <TextInput
+                                id=""
+                                type="number"
+                                class="mt-1 w-full"
+                                required
+                                autocomplete="off"
+                                placeholder="Height"
+                                v-model="form.height"/>
+                        </div>
+                    </form>
                 </div>
-            </Dialog>
-        </TransitionRoot>
-        <DashboardQuoteModal :is-open="isQuoteOpen" @closeQuoteModal="(value) => toggleQuote(value)" />
+            </a-modal>
+        </div>
     </AuthenticatedLayout>
 </template>
+
+<style>
+
+.ant-modal-content  {
+    @apply rounded-xl
+}
+
+.ant-modal-header {
+    @apply rounded-t-xl
+}
+
+</style>

@@ -15,7 +15,7 @@ export default {
     <Head title="Roles Management" />
     <AuthenticatedLayout page-title="Roles Management">
         <div class="mb-5 flex flex-row justify-end">
-            <Link class="btn btn-primary" :href="route('roles.create')">
+            <Link class="" :href="route('roles.create')">
                 <PrimaryButton class="w-max">Create Role</PrimaryButton>
             </Link>
         </div>

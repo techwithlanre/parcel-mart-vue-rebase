@@ -1,18 +1,14 @@
 <script>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import {Head, Link, useForm, usePage} from '@inertiajs/vue3';
-import { twMerge } from "tailwind-merge";
-import parcel from '/resources/images/parcel.png'
-import shipment from '/resources/images/shipment.png'
-import wallet from '/resources/images/wallet.png'
-import {Dialog, Tab, TabGroup, TabList, TabPanel, TabPanels, TransitionChild, TransitionRoot} from "@headlessui/vue";
+import {Dialog, Tab, TabGroup, TabList, TabPanel, TabPanels, TransitionRoot} from "@headlessui/vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputLabel from "@/Components/InputLabel.vue";
-import {ref, watch} from "vue";
 import SelectInput from "@/Components/SelectInput.vue";
 import TextAreaInput from "@/Components/TextAreaInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import InputError from "@/Components/InputError.vue";
+import Parcel from "../../images/parcel.png";
 
 
 export default {
@@ -48,13 +44,17 @@ export default {
     components: {
         TransitionRoot, TextAreaInput, PrimaryButton, SelectInput, Tab,
         TabPanel, TabPanels, TabList, TabGroup, AuthenticatedLayout,
-        InputError, InputLabel, TextInput, Link
+        InputError, InputLabel, TextInput, Link, Head, Parcel
     },
 
     props: {
         balance: String,
         shipmentCount: String,
-        countries: Array
+        countries: Array,
+        totalWalletBalance: String,
+        totalUsersCount: String,
+        businessUsersCount: String,
+        individualUsersCount: String
     },
     methods:{
         toggleQuote(value) {
@@ -116,7 +116,6 @@ export default {
 
 <template>
     <Head title="Dashboard" />
-
     <AuthenticatedLayout page-title="Dashboard">
         <div class="flex lg:flex-row flex-col gap-x-5 gap-y-10">
             <div class="w-full">
@@ -124,7 +123,7 @@ export default {
                     <div class="p-5 bg-white rounded-2xl w-full border">
                         <div class="flex gap-5 items-center">
                             <div class="h-12 w-12">
-                                <img :src="shipment" alt="">
+                                <img src="../../images/shipment.png" alt="">
                             </div>
                             <div class="flex flex-col">
                                 <h1 class="font-bold">Shipments</h1>
@@ -136,11 +135,25 @@ export default {
                         <div class="flex justify-between">
                             <div class="flex gap-5 items-start">
                                 <div class="h-12 w-12">
-                                    <img :src="wallet" alt="">
+                                    <img src="../../images/wallet.png" alt="">
                                 </div>
                                 <div class="flex flex-col">
                                     <h1 class="font-bold">Wallet Balance</h1>
                                     <h3 class="text-2xl font-bold">{{ balance }}</h3>
+                                </div>
+                            </div>
+                            <div class="text-3xl"></div>
+                        </div>
+                    </div>
+                    <div v-if="page.props.auth.user.roles[0].name === 'admin'" class="p-5 bg-white rounded-2xl w-full border">
+                        <div class="flex justify-between">
+                            <div class="flex gap-5 items-start">
+                                <div class="h-12 w-12">
+                                    <img src="../../images/wallet.png" alt="">
+                                </div>
+                                <div class="flex flex-col">
+                                    <h1 class="font-bold">Total Users</h1>
+                                    <h3 class="text-2xl font-bold">{{ totalUsersCount }}</h3>
                                 </div>
                             </div>
                             <div class="text-3xl"></div>
@@ -152,7 +165,7 @@ export default {
                     <div class="p-5 bg-white rounded-2xl w-full border">
                         <Link :href="route('shipment.start')" class="flex flex-col">
                             <div class="border bg-background/50 rounded-full h-16 w-16 flex justify-center items-center">
-                                <img :src="parcel" alt="" class="h-10 w-10">
+                                <img src="../../images/parcel.png" alt="" class="h-10 w-10">
                             </div>
 
                             <div class="flex flex-row justify-between items-center">
@@ -167,7 +180,7 @@ export default {
                     <div class="p-5 bg-white rounded-2xl w-full border">
                         <a href="javascript:void(0)" class="flex flex-col" @click="toggleQuote(true)">
                             <div class="border bg-background/50 rounded-full h-16 w-16 flex justify-center items-center">
-                                <img :src="parcel" alt="" class="h-10 w-10">
+                                <img src="../../images/parcel.png" alt="" class="h-10 w-10">
                             </div>
 
                             <div class="flex flex-row justify-between items-center">
@@ -184,7 +197,7 @@ export default {
                         <div class="flex gap-5 items-center">
                             <div class="flex flex-col">
                                 <div class="border bg-background/50 rounded-full h-16 w-16 flex justify-center items-center">
-                                    <img :src="parcel" alt="" class="h-10 w-10">
+                                    <img src="../../images/parcel.png" alt="" class="h-10 w-10">
                                 </div>
 
                                 <h1 class="font-medium text-md text-gray-600 mt-5">Tracking</h1>

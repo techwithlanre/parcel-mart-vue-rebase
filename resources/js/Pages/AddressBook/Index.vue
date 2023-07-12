@@ -56,10 +56,10 @@ defineProps({
                     <hr class="mt-2">
                     <p class="mt-5"> {{ item.address }}</p>
                     <p class=""> {{ item.landmark }}</p>
-                    <p class="flex gap-x-10">
+                    <div class="flex gap-x-10">
                         <div class="text-blue-950 font-bold">{{ item.country.name }}</div>
                         <div class="text-blue-950 font-bold">{{ item.city.name }}</div>
-                    </p>
+                    </div>
                 </div>
             </div>
             <Pagination :links="addresses.links"/>

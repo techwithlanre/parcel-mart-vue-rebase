@@ -33,7 +33,8 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         //dd($request->user()->roles->first()->name);
-        $check = DB::table('model_has_roles')->where('model_id')->count();
+        $check = 0;
+        if ($request->user()) $check = DB::table('model_has_roles')->where('model_id', $request->user()->id)->count();
         return array_merge(parent::share($request), [
             'auth' => [
                 'user' => $request->user(),

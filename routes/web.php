@@ -65,7 +65,7 @@ Route::get('states/{country_id}', function () {
 
 
 
-Route::middleware('guest')->prefix('auth')->group(function () {
+Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])->name('register.index');
     Route::post('register', [RegisteredUserController::class, 'store']);
     Route::post('business-register', [RegisteredBusinessController::class, 'store'])->name('register.business.index');
@@ -90,6 +90,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::prefix('shipments')->group(function () {
         Route::get('', [\App\Http\Controllers\ShipmentController::class, 'index'])->name('shipment.index');
+        Route::get('filter', [\App\Http\Controllers\ShipmentController::class, 'filterShipment'])->name('shipment.filter');
         Route::get('start', [\App\Http\Controllers\ShipmentController::class, 'create'])->name('shipment.start');
         Route::post('calculate', [\App\Http\Controllers\ShipmentController::class, 'testCalculateShipment'])->name('shipment.initialize');
         Route::get('checkout/{id}', [\App\Http\Controllers\ShipmentController::class, 'checkout'])->name('shipment.checkout');
@@ -102,8 +103,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     /*Wallet*/
     Route::prefix('wallet')->group(function () {
         Route::get('', [\App\Http\Controllers\WalletController::class, 'index'])->name('wallet.index');
+        Route::get('filter', [\App\Http\Controllers\WalletController::class, 'filterTransactions'])->name('wallet.filter');
         Route::post('initialize', [App\Http\Controllers\WalletController::class, 'initialize'])->name('wallet.initialize');
-        Route::get('paystack', [App\Http\Controllers\WalletController::class, 'paystackWebhook'])->name('wallet.paystack.webhook');
+        Route::get('callback', [App\Http\Controllers\WalletController::class, 'paystackWebhook'])->name('wallet.paystack.webhook');
     });
 
     /*Settings*/

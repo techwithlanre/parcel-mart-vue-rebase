@@ -24,7 +24,7 @@ class BookShipmentRequest extends FormRequest
         return [
             'option_id' => 'required|exists:shipping_rate_logs,id',
             'shipment_id' => 'required|exists:shipments,id',
-            'insurance' => 'exists:insurance_options,id'
+            'insurance' => 'required|exists:insurance_options,id'
         ];
     }
 }

@@ -4,13 +4,12 @@ import Antd from "ant-design-vue";
 import "ant-design-vue/dist/antd.css";
 import 'vue3-toastify/dist/index.css';
 import Vue3Toastify from 'vue3-toastify';
-import VueCreditCardValidation from 'vue-credit-card-validation';
 import VueAnimateOnScroll from 'vue-animate-onscroll';
 import { createApp, h } from 'vue';
 import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy/dist/vue.m';
-//import Vuetify from 'vuetify';
+import TawkMessengerVue from '@tawk.to/tawk-messenger-vue-3';
 
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
 
@@ -22,9 +21,11 @@ createInertiaApp({
             .use(plugin)
             .use(ZiggyVue, Ziggy)
             .use(Antd)
-            .use(VueCreditCardValidation)
             .use(VueAnimateOnScroll)
-            //.use(Vuetify)
+            .use(TawkMessengerVue, {
+                propertyId : '60c6342465b7290ac635bafa',
+                widgetId : '1f833nce0'
+            })
             .use(Vue3Toastify, {
                 autoClose: 3000,
             })

@@ -1,27 +1,40 @@
 <script setup>
 import OverviewIcon from "/resources/images/icons/overview.svg";
 import ShoppingBagIcon from "/resources/images/icons/shopping-bag.svg";
-import GraphIcon from "/resources/images/icons/graph.svg";
-import CalendarIcon from "/resources/images/icons/calendar.svg";
 import WalletIcon from "/resources/images/icons/wallet.svg";
-import FileIcon from "/resources/images/icons/file.svg";
 import GroupChatIcon from "/resources/images/icons/group-chat.svg";
-import SettingsIcon from "/resources/images/icons/settings.svg";
 import LogoutIcon from "/resources/images/icons/logout.svg";
-import TopBar from "@/Components/TopBar.vue";
 import {Link, usePage} from '@inertiajs/vue3';
-import TestModeAlert from "@/Components/TestModeAlert.vue";
 import {toast} from "vue3-toastify";
+import 'flowbite';
+import {onMounted} from "vue";
+import { notification } from 'ant-design-vue';
+
+onMounted(() => {
+    initFlowbite();
+});
 
 const page = usePage();
+
+const openNotificationWithIcon = (type) => {
+    notification[type]({
+        message: 'Notification Title',
+        description:
+            'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
+    });
+};
+
 if (page.props.flash.message) {
+    //openNotificationWithIcon('success');
     toast.success(page.props.flash.message);
-    page.props.flash.message = "";
+    //page.props.flash.message = "";
 }
+
+
 
 if (page.props.flash.error) {
     toast.error(page.props.flash.error);
-    page.props.flash.error = "";
+    //page.props.flash.error = "";
 }
 
 defineProps({
@@ -34,73 +47,110 @@ const sidebar = [
         { name: "Shipments", icon: ShoppingBagIcon, route: "/shipments", admin: false },
         { name: "Wallet", icon: WalletIcon, route: "/wallet", admin: false },
         { name: "Address Book", icon: GroupChatIcon, route: '/address-book', admin: false  },
-        { name: "Settings", icon: SettingsIcon, route: "/settings/shipping/description", admin: false },
+        //{ name: "Settings", icon: SettingsIcon, route: "/settings/shipping/description", admin: false },
         { name: "Logout", icon: LogoutIcon, route: route('logout'), admin: false },
     ],
 ];
 
-const adminSidebar = [
-    [
-        { name: "Users", icon: "", route: "/admin/users", admin: true },
-        { name: "Roles", icon: "", route: "/admin/roles", admin: true },
-        { name: "Shipments", icon: "", route: "/admin/shipments" , admin: true },
-        { name: "Provider Rates", icon: "", route: "/admin/settings/rate", admin: false },
-    ]
+const adminMenu = [
+    { name: "Dashboard", icon: OverviewIcon, route: "/dashboard", admin: false },
+    { name: "My Shipments", icon: ShoppingBagIcon, route: "/shipments", admin: false },
+    { name: "My Wallet", icon: WalletIcon, route: "/wallet", admin: false },
+    { name: "Address Book", icon: GroupChatIcon, route: '/address-book', admin: false  },
+    { name: "Users List", icon: OverviewIcon, route: "/admin/users", admin: true },
+    { name: "Roles", icon: ShoppingBagIcon, route: "/admin/roles", admin: true },
+    { name: "All Shipments", icon: GroupChatIcon, route: "/admin/shipments" , admin: true },
+    { name: "Provider Rates", icon: OverviewIcon, route: "/admin/settings/rate", admin: false },
+    { name: "Logout", icon: LogoutIcon, route: route('logout'), admin: false },
 ];
-
 </script>
 
 <template>
-    <div class="w-full min-h-screen font-sans text-gray-900 bg-gray-50 flex overflow-x-hidden">
-        <aside class="hidden md:block py-6 px-5 w-64 bg-white ease-in-out duration-300 translate-x-0 border-r">
-            <div class="w-[100px]">
-                <img src="../../images/logo-dark.jpg" alt="parcel-mart-logo" class="w-16 h-16 rounded-full">
-            </div>
-            <ul v-for="group in sidebar" class="flex flex-col gap-y-6 pt-20">
-                <li v-for="item in group" class="">
-                    <Link :href="item.route" class="flex gap-x-4 items-center text-gray-500 hover:text-primary group px-5" :class="{'text-white bg-primary group font-bold rounded-md py-2 hover:text-white hover:bg-background ': $page.url.startsWith(item.route)}">
-                        <span class="absolute w-1.5 h-8 bg-primary rounded-r-full left-0 scale-y-0 -translate-x-full group-hover:scale-y-100 group-hover:translate-x-0 transition-transform ease-in-out" :class="{'group-hover:scale-y-100 group-hover:translate-x-0': $page.url.startsWith(item.route)}"/>
-                        <Component :is="item.icon" class="w-6 h-6 fill-current" />
-                        <span>{{ item.name }}</span>
-                    </Link>
-                </li>
-            </ul>
 
-
-            <ul v-if="page.props.auth.user.is_admin" v-for="group in adminSidebar" class="flex flex-col gap-y-6 pt-20">
-                <h1>Admin  Menu</h1>
-                <li v-for="item in group" class="">
-                    <Link :href="item.route" class="flex gap-x-4 items-center text-gray-500 hover:text-primary group px-5" :class="{'text-white bg-primary group font-bold rounded-md py-2 hover:text-white hover:bg-background ': $page.url.startsWith(item.route)}">
-                        <span class="absolute w-1.5 h-8 bg-primary rounded-r-full left-0 scale-y-0 -translate-x-full group-hover:scale-y-100 group-hover:translate-x-0 transition-transform ease-in-out" :class="{'group-hover:scale-y-100 group-hover:translate-x-0': $page.url.startsWith(item.route)}"/>
-                        <Component :is="item.icon" class="w-6 h-6 fill-current" />
-                        <span>{{ item.name }}</span>
-                    </Link>
-                </li>
-            </ul>
-            <div class="bottom-1 absolute w-3/4">
-                <div class="border p-5 rounded-2xl">
-
+    <nav class="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+        <div class="px-3 py-3 lg:px-5 lg:pl-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center justify-start">
+                    <button data-drawer-target="logo-sidebar" data-drawer-toggle="logo-sidebar" aria-controls="logo-sidebar" type="button" class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
+                        <span class="sr-only">Open sidebar</span>
+                        <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path clip-rule="evenodd" fill-rule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"></path>
+                        </svg>
+                    </button>
+                    <div class="flex ml-2 md:mr-24">
+                        <img src="../../images/logo.png" alt="parcel-mart-logo" class="w-28 rounded-full">
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <div class="flex items-center ml-3">
+                        <div>
+                            <button type="button" class="flex text-sm items-center gap-x-3" aria-expanded="false" data-dropdown-toggle="dropdown-user">
+                                <div class="p-1 bg-gray-300 rounded-full">
+                                    <svg width="10" height="10" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                        <g fill="#54595d">
+                                            <path d="M 10 11 C 4.08 11 2 14 2 16 L 2 19 L 18 19 L 18 16 C 18 14 15.92 11 10 11 Z"/>
+                                            <circle cx="10" cy="5.5" r="4.5"/>
+                                        </g>
+                                    </svg>
+                                </div>
+                                <div>{{ page.props.auth.user.first_name + " " + page.props.auth.user.last_name }}</div>
+                            </button>
+                        </div>
+                        <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded shadow-md dark:bg-gray-700 dark:divide-gray-600" id="dropdown-user">
+                            <div class="px-4 py-3" role="none">
+                                <p class="text-sm text-gray-900 dark:text-white" role="none">
+                                    {{ page.props.auth.user.first_name + " " + page.props.auth.user.last_name }}
+                                </p>
+                            </div>
+                            <ul class="py-1" role="none">
+                                <li>
+                                    <Link :href="route('profile.edit')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">Profile</Link>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </aside>
+        </div>
+    </nav>
 
-        <transition name="page" mode="out-in" appear>
-            <main class="flex-1 pb-8">
-                <TestModeAlert />
-                <TopBar :title="pageTitle" />
-<!--                <div>
+    <aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-64 mt-10 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700" aria-label="Sidebar">
+        <div class="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
+            <ul class="space-y-2 font-medium" v-for="group  in sidebar">
+                <li v-if="!page.props.auth.user.is_admin" v-for="item in group" class="">
+                    <Link :href="item.route" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group" :class="{'text-white bg-primary group font-bold rounded-md py-2 hover:text-primary hover:bg-background': $page.url.startsWith(item.route)}">
+                        <Component :is="item.icon" class="w-6 h-6 fill-current" />
+                        <span class="ml-3">{{ item.name }}</span>
+                    </Link>
+                </li>
+                <li v-else v-for="item in adminMenu" class="">
+                    <Link :href="item.route" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                        <Component :is="item.icon" class="w-6 h-6 fill-current" />
+                        <span class="flex-1 ml-3 whitespace-nowrap">{{ item.name }}</span>
+                    </Link>
+                </li>
+            </ul>
+        </div>
+    </aside>
+
+    <div class="sm:ml-64">
+        <div class="mt-14">
+            <main :key="$page.url" class="">
+                <div class="p-5 ">
                     <div v-if="$page.props.flash.message" class="alert">
                         {{ $page.props.flash.message }}
                     </div>
-                </div>-->
-                <transition name="page" mode="out-in" appear>
-                    <main :key="$page.url" class="">
-                        <div class="p-5 ">
-                            <slot />
+                    <div v-if="$page.props.flash.error" class="flex items-center p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+                        <svg class="flex-shrink-0 inline w-4 h-4 mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                        </svg>
+                        <div>
+                            {{ $page.props.flash.error }}
                         </div>
-                    </main>
-                </transition>
+                    </div>
+                    <slot />
+                </div>
             </main>
-        </transition>
+        </div>
     </div>
 </template>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Events\BusinessRegistered;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\BusinessRegisterRequest;
 use App\Models\User;
@@ -33,6 +34,8 @@ class RegisteredBusinessController extends Controller
         ]);
 
         event(new Registered($user));
+        event(new BusinessRegistered($user));
+
 
         Auth::login($user);
         return redirect(RouteServiceProvider::HOME);

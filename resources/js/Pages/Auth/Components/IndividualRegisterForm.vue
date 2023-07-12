@@ -3,10 +3,10 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import SelectInput from "@/Components/SelectInput.vue";
-import {useForm, Link} from "@inertiajs/vue3";
+import {useForm, Link, Head} from "@inertiajs/vue3";
 
 export default {
-    components: {SelectInput, PrimaryButton, InputError, TextInput},
+    components: {SelectInput, PrimaryButton, InputError, TextInput, Link, Head},
     data() {
         return {
             form: useForm({

@@ -7,8 +7,6 @@ use App\Http\Requests\BookShipmentRequest;
 use App\Http\Requests\CreateShipmentRequest;
 use App\Http\Requests\TrackShipmentRequest;
 use App\Models\AramexShipmentLog;
-use App\Models\City;
-use App\Models\Country;
 use App\Models\CourierApiProvider;
 use App\Models\DhlRateLog;
 use App\Models\InsuranceOption;
@@ -16,7 +14,9 @@ use App\Models\Shipment;
 use App\Models\ShipmentItem;
 use App\Models\ShippingRateLog;
 use App\Models\TrackingLog;
+use App\Models\WalletOverdraft;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Str;
 use Octw\Aramex\Aramex;
 
 class ShipmentServices
@@ -27,7 +27,8 @@ class ShipmentServices
             'user_id' => auth()->user()->id,
             'origin_address' => json_encode($request->origin),
             'destination_address' => json_encode($request->destination),
-            'status' => 'pending'
+            'status' => 'pending',
+            'reference' => Str::uuid()
         ]);
 
         $shipment_item = ShipmentItem::create([
@@ -57,75 +58,93 @@ class ShipmentServices
     {
         $shipment = $this->logShipment($request);
         $check_aramex = CourierApiProvider::where('alias', 'aramex');
+        $rate_found = false;
         if ($check_aramex->value('status') == 'active') {
             $aramex = new AramexServices($request);
-            $response = $aramex->calculateShippingRate();
-            if ($response) {
-                ShippingRateLog::create([
-                    'user_id' => auth()->user()->id,
-                    'shipment_id' => $shipment->id,
-                    'product_name' => 'Aramex Shipping',
-                    'courier_api_provider_id' => $check_aramex->value('id'),
-                    'currency' => $response->TotalAmount->CurrencyCode,
-                    'total_amount' => $response->TotalAmount->Value,
-                    'amount_before_tax' => $response->RateDetails->TotalAmountBeforeTax,
-                    'tax' => $response->RateDetails->TaxAmount,
-                    'provider_code' => 'aramex',
-                    'created_at' => now()
-                ]);
+            try {
+                $response = $aramex->calculateShippingRate();
+                if ($response) {
+                    ShippingRateLog::create([
+                        'user_id' => auth()->user()->id,
+                        'shipment_id' => $shipment->id,
+                        'product_name' => 'Aramex Shipping',
+                        'courier_api_provider_id' => $check_aramex->value('id'),
+                        'currency' => $response->TotalAmount->CurrencyCode,
+                        'total_amount' => $response->TotalAmount->Value,
+                        'amount_before_tax' => $response->RateDetails->TotalAmountBeforeTax,
+                        'tax' => $response->RateDetails->TaxAmount,
+                        'provider_code' => 'aramex',
+                        'created_at' => now()
+                    ]);
+
+                    $shipment->has_rate = 1;
+                    $shipment->save();
+                    $rate_found = true;
+                }
+            } catch (\Exception $e) {
+                dd($e);
             }
+
         }
 
         $check_dhl = CourierApiProvider::where('alias', 'dhl');
         if ($check_dhl->value('status') == 'active') {
             $dhl = new DHLServices($request);
-            $response = $dhl->calculateRate();
-            $data = json_decode($response, true);
-            if ($data) {
-                $products = $data['products'];
-                foreach ($products as $product) {
-                    if ($product['totalPrice'][0]['price'] > 0) {
-                        $rate_log = ShippingRateLog::create([
-                            'shipment_id' => $shipment->id,
-                            'courier_api_provider_id' => $check_dhl->value('id'),
-                            'product_name' => 'DHL - ' . $product['productName'],
-                            'product_code' => $product['productCode'],
-                            'local_product_code' => $product['localProductCode'],
-                            'network_type_code' => $product['networkTypeCode'],
-                            'provider_code' => 'dhl',
-                            'currency' => 'NGN',
-                            'total_amount' => number_format(($product['totalPrice'][0]['price'] * 0.925) + ($product['totalPrice'][0]['price'] * 0.075), 2),
-                            'amount_before_tax' => number_format($product['totalPrice'][0]['price'] * 0.925, 2),
-                            'tax' => number_format($product['totalPrice'][0]['price'] * 0.075, 2),
-                            'created_at' => now()
-                        ]);
+            try {
+                $response = $dhl->calculateRate();
+                $data = json_decode($response, true);
+                if ($data) {
+                    $products = $data['products'];
+                    foreach ($products as $product) {
+                        if ($product['totalPrice'][0]['price'] > 0) {
+                            $rate_log = ShippingRateLog::create([
+                                'shipment_id' => $shipment->id,
+                                'courier_api_provider_id' => $check_dhl->value('id'),
+                                'product_name' => 'DHL - ' . $product['productName'],
+                                'product_code' => $product['productCode'],
+                                'local_product_code' => $product['localProductCode'],
+                                'network_type_code' => $product['networkTypeCode'],
+                                'provider_code' => 'dhl',
+                                'currency' => 'NGN',
+                                'total_amount' => number_format(($product['totalPrice'][0]['price'] * 0.925) + ($product['totalPrice'][0]['price'] * 0.075), 2),
+                                'amount_before_tax' => number_format($product['totalPrice'][0]['price'] * 0.925, 2),
+                                'tax' => number_format($product['totalPrice'][0]['price'] * 0.075, 2),
+                                'created_at' => now()
+                            ]);
 
-                        DhlRateLog::create([
-                            'shipment_id' => $shipment->id,
-                            'shipping_rate_log_id' => $rate_log->id,
-                            'product_name' => $product['productName'],
-                            'product_code' => $product['productCode'],
-                            'amount' => number_format($product['totalPrice'][0]['price'] * 0.925, 2),
-                            'tax' => number_format($product['totalPrice'][0]['price'] * 0.075, 2),
-                            'total_amount' => number_format(($product['totalPrice'][0]['price'] * 0.925) + ($product['totalPrice'][0]['price'] * 0.075), 2),
-                            'local_product_code' => $product['localProductCode'],
-                            'network_type_code' => $product['networkTypeCode'],
-                            'weight' => json_encode($product['weight']),
-                            'total_price_breakdown' => isset($product['totalPriceBreakdown']) ? json_encode($product['totalPriceBreakdown']) : '',
-                            'total_price' => json_encode($product['totalPrice']),
-                            'detailed_price_breakdown' => json_encode($product['detailedPriceBreakdown']),
-                            'pickup_capabilities' => json_encode($product['pickupCapabilities']),
-                            'delivery_capabilities' => json_encode($product['deliveryCapabilities']),
-                            'pricing_date' => $product['pricingDate'],
-                        ]);
+                            DhlRateLog::create([
+                                'shipment_id' => $shipment->id,
+                                'shipping_rate_log_id' => $rate_log->id,
+                                'product_name' => $product['productName'],
+                                'product_code' => $product['productCode'],
+                                'amount' => number_format($product['totalPrice'][0]['price'] * 0.925, 2),
+                                'tax' => number_format($product['totalPrice'][0]['price'] * 0.075, 2),
+                                'total_amount' => number_format(($product['totalPrice'][0]['price'] * 0.925) + ($product['totalPrice'][0]['price'] * 0.075), 2),
+                                'local_product_code' => $product['localProductCode'],
+                                'network_type_code' => $product['networkTypeCode'],
+                                'weight' => json_encode($product['weight']),
+                                'total_price_breakdown' => isset($product['totalPriceBreakdown']) ? json_encode($product['totalPriceBreakdown']) : '',
+                                'total_price' => json_encode($product['totalPrice']),
+                                'detailed_price_breakdown' => json_encode($product['detailedPriceBreakdown']),
+                                'pickup_capabilities' => json_encode($product['pickupCapabilities']),
+                                'delivery_capabilities' => json_encode($product['deliveryCapabilities']),
+                                'pricing_date' => $product['pricingDate'],
+                            ]);
+                        }
+                        $rate_found = true;
                     }
-
                 }
+            } catch (\Exception $e) {
+                dd($e);
             }
-
         }
 
-        return Redirect::route('shipment.checkout', $shipment->id);
+        if (!$rate_found) {
+            $shipment->status = 'failed';
+            $shipment->save();
+        }
+
+        return $rate_found ? Redirect::route('shipment.checkout', $shipment->id) : Redirect::back()->with('error', 'No shipment rate found for your package');
     }
 
     public function bookShipment(BookShipmentRequest $bookShipmentRequest)
@@ -138,34 +157,54 @@ class ShipmentServices
 
         $rate = ShippingRateLog::whereId($request['option_id'])->first();
         $total_amount = floatval($rate->total_amount) + floatval($insurance_amount);
-        /*if (auth()->user()->user_type === 'individual' && auth()->user()->balance < $total_amount) {
-            //insufficient balance in wallet
-            dd('insufficient data');
-            return;
-        }*/
 
-        //$withdraw = auth()->user()->withdraw($total_amount);
+        if (auth()->user()->user_type === 'individual' && auth()->user()->balance < $total_amount) {
+            return redirect(route('shipment.checkout', $request['shipment_id']))->with('error', 'Insufficient balance');
+        }
+
+
         $provider = $rate->provider_code;
-
-        $create_booking = false;
+        $book_aramex = $book_dhl = false;
         if ($provider == 'aramex') {
             $aramex = new AramexServices($bookShipmentRequest);
-            $create_booking = $aramex->bookShipment($shipment, $shipment_item, $insurance, $rate);
+            $book_aramex = $aramex->bookShipment($shipment, $shipment_item, $insurance, $rate);
         }
 
         if ($provider == 'dhl') {
             $dhl = new DHLServices($bookShipmentRequest);
-            $create_booking = $dhl->bookShipment($shipment, $shipment_item, $insurance, $rate);
+            $book_dhl = $dhl->bookShipment($shipment, $shipment_item, $insurance, $rate);
         }
 
+        if ($book_aramex || $book_dhl) {
+            if (auth()->user()->user_type === 'business' && auth()->user()->balance < $total_amount) {
+                $current_balance = auth()->user()->balance;
+                $overdraft_amount = $total_amount - $current_balance;
+                $overdraft_wallet = WalletOverdraft::where('user_id', auth()->user()->id)->first();
+                if (!$overdraft_wallet) {
+                    WalletOverdraft::create([
+                        'user_id' => auth()->user()->id,
+                        'balance' => $overdraft_amount
+                    ]);
+                } else {
+                    $overdraft_wallet->balance += $overdraft_amount;
+                    $overdraft_wallet->save();
+                }
+                auth()->user()->withdraw($current_balance);
+            }
+            if (auth()->user()->user_type === 'business' && auth()->user()->balance < $total_amount) {
+                auth()->user()->withdraw($total_amount);
+            }
 
-        if ($create_booking) {
             $shipment->provider_id = $rate->courier_api_provider_id;
             $shipment->shipping_rate_log_id  = $rate->id;
             $shipment->provider = $provider;
             $shipment->number = random_int(1000000000, 9999999999);
             $shipment->status = 'processing';
             $shipment->save();
+        }
+
+        if (!$book_dhl && !$book_aramex) {
+            return redirect(route('shipment.checkout', $request['shipment_id']))->with('error', 'Shipment booking failed at this time. Please try again later');
         }
 
 

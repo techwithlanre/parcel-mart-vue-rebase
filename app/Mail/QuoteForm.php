@@ -38,7 +38,7 @@ class QuoteForm extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.request-quote',
+            view: 'mail.request-quote',
             with: [
                 'name'=>$this->request->name,
                 'email'=>$this->request->email,

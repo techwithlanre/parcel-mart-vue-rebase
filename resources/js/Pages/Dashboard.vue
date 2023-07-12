@@ -9,6 +9,7 @@ import TextAreaInput from "@/Components/TextAreaInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import InputError from "@/Components/InputError.vue";
 import Parcel from "../../images/parcel.png";
+import Pagination from "@/Components/Pagination.vue";
 
 
 export default {
@@ -42,12 +43,14 @@ export default {
         }
     },
     components: {
+        Pagination,
         TransitionRoot, TextAreaInput, PrimaryButton, SelectInput, Tab,
         TabPanel, TabPanels, TabList, TabGroup, AuthenticatedLayout,
         InputError, InputLabel, TextInput, Link, Head, Parcel
     },
 
     props: {
+        log: Array,
         balance: String,
         shipmentCount: String,
         countries: Array,
@@ -117,21 +120,21 @@ export default {
 <template>
     <Head title="Dashboard" />
     <AuthenticatedLayout page-title="Dashboard">
-        <div class="flex lg:flex-row flex-col gap-x-5 gap-y-10">
+        <div class="flex lg:flex-row flex-col gap-x-5 gap-y-10 mt-10">
             <div class="w-full">
                 <div class="flex flex-col gap-y-10 lg:flex-row gap-x-10">
-                    <div class="p-5 bg-white rounded-2xl w-full border">
+                    <div class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
                         <div class="flex gap-5 items-center">
                             <div class="h-12 w-12">
                                 <img src="../../images/shipment.png" alt="">
                             </div>
                             <div class="flex flex-col">
                                 <h1 class="font-bold">Shipments</h1>
-                                <h3 class="text-2xl font-bold">{{ shipmentCount }}</h3>
+                                <h3 class="text-xl font-bold">{{ shipmentCount }}</h3>
                             </div>
                         </div>
                     </div>
-                    <div class="p-5 bg-white rounded-2xl w-full border">
+                    <div v-if="!page.props.auth.user.is_admin" class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
                         <div class="flex justify-between">
                             <div class="flex gap-5 items-start">
                                 <div class="h-12 w-12">
@@ -139,13 +142,13 @@ export default {
                                 </div>
                                 <div class="flex flex-col">
                                     <h1 class="font-bold">Wallet Balance</h1>
-                                    <h3 class="text-2xl font-bold">{{ balance }}</h3>
+                                    <h3 class="text-xl font-bold">{{ balance }}</h3>
                                 </div>
                             </div>
                             <div class="text-3xl"></div>
                         </div>
                     </div>
-                    <div v-if="page.props.auth.role === 'admin'" class="p-5 bg-white rounded-2xl w-full border">
+                    <div v-if="page.props.auth.user.is_admin" class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
                         <div class="flex justify-between">
                             <div class="flex gap-5 items-start">
                                 <div class="h-12 w-12">
@@ -153,7 +156,49 @@ export default {
                                 </div>
                                 <div class="flex flex-col">
                                     <h1 class="font-bold">Total Users</h1>
-                                    <h3 class="text-2xl font-bold">{{ totalUsersCount }}</h3>
+                                    <h3 class="text-xl font-bold">{{ totalUsersCount }}</h3>
+                                </div>
+                            </div>
+                            <div class="text-3xl"></div>
+                        </div>
+                    </div>
+                    <div v-if="page.props.auth.user.is_admin" class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
+                        <div class="flex justify-between">
+                            <div class="flex gap-5 items-start">
+                                <div class="h-12 w-12">
+                                    <img src="../../images/wallet.png" alt="">
+                                </div>
+                                <div class="flex flex-col">
+                                    <h1 class="font-bold">Individual Users</h1>
+                                    <h3 class="text-xl font-bold">{{ individualUsersCount }}</h3>
+                                </div>
+                            </div>
+                            <div class="text-3xl"></div>
+                        </div>
+                    </div>
+                    <div v-if="page.props.auth.user.is_admin" class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
+                        <div class="flex justify-between">
+                            <div class="flex gap-5 items-start">
+                                <div class="h-12 w-12">
+                                    <img src="../../images/wallet.png" alt="">
+                                </div>
+                                <div class="flex flex-col">
+                                    <h1 class="font-bold">Business Users</h1>
+                                    <h3 class="text-xl font-bold">{{ businessUsersCount }}</h3>
+                                </div>
+                            </div>
+                            <div class="text-3xl"></div>
+                        </div>
+                    </div>
+                    <div v-if="page.props.auth.user.is_admin" class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
+                        <div class="flex justify-between">
+                            <div class="flex gap-5 items-start">
+                                <div class="h-12 w-12">
+                                    <img src="../../images/wallet.png" alt="">
+                                </div>
+                                <div class="flex flex-col">
+                                    <h1 class="font-bold">Total Wallet Balance</h1>
+                                    <h3 class="text-xl font-bold">{{ totalWalletBalance }}</h3>
                                 </div>
                             </div>
                             <div class="text-3xl"></div>
@@ -161,8 +206,8 @@ export default {
                     </div>
                 </div>
 
-                <div class="flex flex-col gap-y-10 lg:flex-row gap-x-10 mt-10">
-                    <div class="p-5 bg-white rounded-2xl w-full border">
+                <div v-if="!page.props.auth.user.is_admin" class="flex flex-col gap-y-10 lg:flex-row gap-x-10 mt-10">
+                    <div class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
                         <Link :href="route('shipment.start')" class="flex flex-col">
                             <div class="border bg-background/50 rounded-full h-16 w-16 flex justify-center items-center">
                                 <img src="../../images/parcel.png" alt="" class="h-10 w-10">
@@ -177,7 +222,7 @@ export default {
                             </div>
                         </link>
                     </div>
-                    <div class="p-5 bg-white rounded-2xl w-full border">
+                    <div class="p-5 bg-white rounded-2xl w-full border shadow-md hover:shadow-lg duration-300">
                         <a href="javascript:void(0)" class="flex flex-col" @click="toggleQuote(true)">
                             <div class="border bg-background/50 rounded-full h-16 w-16 flex justify-center items-center">
                                 <img src="../../images/parcel.png" alt="" class="h-10 w-10">
@@ -193,7 +238,7 @@ export default {
                         </a>
                     </div>
 
-                    <Link :href="route('shipment.index')" class="p-5 bg-white rounded-2xl w-full border">
+                    <Link :href="route('shipment.index')" class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
                         <div class="flex gap-5 items-center">
                             <div class="flex flex-col">
                                 <div class="border bg-background/50 rounded-full h-16 w-16 flex justify-center items-center">
@@ -205,6 +250,50 @@ export default {
                             </div>
                         </div>
                     </Link>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="mt-20">
+                <h1 class="text-lg">Recent Shipments</h1>
+                <div class="relative overflow-x-auto shadow sm:rounded-lg">
+                    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">Origin</th>
+                            <th scope="col" class="px-6 py-3">Destination</th>
+                            <th scope="col" class="px-6 py-3">Number</th>
+                            <th scope="col" class="px-6 py-3">Status</th>
+                            <th scope="col" class="px-6 py-3">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="item in log" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                            <td class="px-6 py-4">
+                                <div class="font-bold">{{ item.origin['name']}}</div>
+                                <span class="text-gray-600">{{ item.origin['phone'] }}</span>
+                                <div>{{ item.origin['address_1']}}</div>
+                                <div>{{item.origin['city']}}, {{ item.origin['country']}}</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-bold">{{ item.destination['name']}}</div>
+                                <span class="text-gray-600">{{ item.destination['phone'] }}</span>
+                                <div>{{ item.destination['address_1']}}</div>
+                                <div>{{item.destination['city']}}, {{ item.destination['country']}}</div>
+                            </td>
+                            <td scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                {{ item.number }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ item.status}}
+                            </td>
+                            <td class="px-6 py-4">
+                                <Link :href="route('shipment.checkout', item.id)" v-if="item.status === 'pending'" class="text-primary font-medium hover:text-green-600">Checkout</Link>
+                                <Link :href="route('shipment.details', item.id)" v-else class="text-primary font-medium hover:text-green-600">View</Link>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

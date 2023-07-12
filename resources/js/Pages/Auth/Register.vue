@@ -2,7 +2,7 @@
 import InputError from '@/Components/InputError.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { useForm } from '@inertiajs/vue3';
+import {Head, Link, useForm} from '@inertiajs/vue3';
 import SelectInput from "@/Components/SelectInput.vue";
 import GuestLayout from "@/Layouts/GuestLayout.vue";
 import IndividualRegisterForm from "@/Pages/Auth/Components/IndividualRegisterForm.vue";
@@ -16,7 +16,9 @@ export default {
         SelectInput,
         InputError,
         TextInput,
-        GuestLayout
+        GuestLayout,
+        Link,
+        Head
     },
     data() {
         return {

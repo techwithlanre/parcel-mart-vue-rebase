@@ -25,7 +25,6 @@ export default {
     items-center
     pt-24
     sm:pt-0
-    bg-gray-100
     overflow-x-hidden
 ">
         <div class="w-full ring-1 ring-gray-200 sm:max-w-xl mt-6 p-10 bg-white shadow-xs hover:drop-shadow-lg hover:drop-shadow-primary overflow-hidden rounded-3xl duration-500">

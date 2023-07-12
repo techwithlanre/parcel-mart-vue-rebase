@@ -15,6 +15,7 @@
     import InputError from "@/Components/InputError.vue";
     import {toast} from "vue3-toastify";
     import TextAreaInput from "@/Components/TextAreaInput.vue";
+    import {twMerge} from "tailwind-merge";
 
     export default {
         components: {
@@ -22,7 +23,7 @@
             TextAreaInput,
             PrimaryButton,
             SelectInput,
-            Tab, TabPanel, TabPanels, TabList, TabGroup, AuthenticatedLayout, InputError, InputLabel, TextInput},
+            Tab, TabPanel, TabPanels, TabList, TabGroup, AuthenticatedLayout, InputError, InputLabel, TextInput, Link, Head },
         props: {
             countries: Array,
             addresses: Array,
@@ -34,6 +35,9 @@
 
         data() {
             return {
+                showOriginAddressForm: true,
+                showOriginDestinationForm: false,
+                showPackageDetailsForm: false,
                 selectedOriginAddress: 0,
                 selectedDestinationAddress: 0,
                 selectedTab: 0,
@@ -43,6 +47,8 @@
                 originStates: [],
                 destinationStates: [],
                 originDisabled: false,
+                destinationDisabled: true,
+                packageDetailsDisabled: true,
                 page: usePage(),
                 form: useForm({
                     origin: {
@@ -85,6 +91,7 @@
             }
         },
         methods:{
+            twMerge,
             getOriginStates: function() {
                 axios.get('/api/states/' + this.form.origin.country).then(function(response){
                     this.originStates = response.data.states;
@@ -147,6 +154,21 @@
                 this.form.destination.state = address.state_id;
                 this.form.destination.city = address.city_id;
                 this.form.destination.postcode = address.postcode;
+            },
+
+            backToOrigin: function () {
+                this.originDisabled = false;
+                this.changeTab(0)
+            },
+
+            gotoDestination: function () {
+                this.originDisabled = true;
+                this.destinationDisabled = false;
+            },
+            gotoPackageDetails: function () {
+                this.originDisabled = true;
+                this.destinationDisabled = true;
+                this.packageDetailsDisabled = false;
             }
         },
         created: function(){
@@ -167,25 +189,25 @@
                 <TabList class="space-x-1 rounded-2xl bg-white border duration-300 lg:w-1/6 flex flex-col gap-y-3 p-5">
                     <Tab as="template" :disabled="originDisabled" v-slot="{ selected }" class="duration-300" v-on:click="changeTab(0)">
                         <button
-                            :class="['w-full text-left px-5 rounded-lg lg:py-2 py-2 font-medium leading-5 text-primary',
+                            :class="['w-full text-left px-5 rounded-lg lg:py-5 border bg-gray-100 py-3 font-medium leading-5 text-primary',
                                 'ring-white ring-opacity-60 ring-offset-2 ring-offset-background focus:outline-none focus:ring-2', selected
-                                ? 'bg-white border' : 'text-primary hover:bg-white/[0.12] hover:text-primary-dark', ]">
+                                ? 'bg-primary text-white border' : 'text-primary hover:bg-white/[0.12] hover:text-primary-dark', ]">
                             Origin Address
                         </button>
                     </Tab>
-                    <Tab as="template" v-slot="{ selected }" class="duration-300" v-on:click="changeTab(1)">
+                    <Tab as="template" :disabled="destinationDisabled" v-slot="{ selected }" class="duration-300" v-on:click="changeTab(1)">
                         <button
-                            :class="['w-full text-left px-5 rounded-lg lg:py-2 py-2 font-medium leading-5 text-primary',
+                            :class="['w-full text-left px-5 rounded-lg lg:py-5 border bg-gray-100 py-3 font-medium leading-5 text-primary',
                                 'ring-white ring-opacity-60 ring-offset-2 ring-offset-background focus:outline-none focus:ring-2', selected
-                                ? 'bg-white shadow border' : 'text-primary hover:bg-white/[0.12] hover:text-primary-dark', ]">
+                                ? 'bg-primary text-white shadow border' : 'text-primary hover:bg-white/[0.12] hover:text-primary-dark', ]">
                             Destination Address
                         </button>
                     </Tab>
-                    <Tab as="template" v-slot="{ selected }" class="duration-300" v-on:click="changeTab(2)">
+                    <Tab as="template" :disabled="packageDetailsDisabled" v-slot="{ selected }" class="duration-300" v-on:click="changeTab(2)">
                         <button
-                            :class="['w-full text-left px-5 rounded-lg lg:py-2 py-2 font-medium leading-5 text-primary',
+                            :class="['w-full text-left px-5 rounded-lg lg:py-5 border bg-gray-100 py-3 font-medium leading-5 text-primary',
                                 'ring-white ring-opacity-60 ring-offset-2 ring-offset-background focus:outline-none focus:ring-2', selected
-                                ? 'bg-white shadow border' : 'text-primary hover:bg-white/[0.12] hover:text-primary-dark', ]">
+                                ? 'bg-primary text-white shadow border' : 'text-primary hover:bg-white/[0.12] hover:text-primary-dark', ]">
                             Shipping Details
                         </button>
                     </Tab>
@@ -275,7 +297,6 @@
                                             class="mt-2 flex"
                                             v-model="form.origin.address_1"
                                             required
-
                                             placeholder="Start typing address"
                                             autocomplete="address" />
                                         <InputError class="mt-2" />
@@ -353,7 +374,7 @@
 
 
                                     <div class="flex flex-col items-center justify-end mt-6">
-                                        <PrimaryButton type="submit" class="w-full" @click="">
+                                        <PrimaryButton type="submit" class="w-full" @click="gotoDestination">
                                             Next
                                         </PrimaryButton>
                                     </div>
@@ -458,7 +479,6 @@
                                             class="mt-2 flex"
                                             v-model="form.destination.landmark"
                                             required
-
                                             placeholder="Start typing address or postcode"
                                             autocomplete="address" />
                                         <InputError class="mt-2" />
@@ -470,7 +490,6 @@
                                             type="text"
                                             class="mt-2 flex"
                                             v-model="form.destination.address_2"
-
                                             placeholder="Start typing address or postcode"
                                             autocomplete="address" />
                                         <InputError class="mt-2" />
@@ -485,6 +504,7 @@
                                                 class="mt-2"
                                                 v-on:change="getDestinationStates"
                                                 :options="countries"
+                                                required
                                                 v-model="form.destination.country"/>
                                             <InputError class="mt-2" />
                                         </div>
@@ -494,6 +514,7 @@
                                                 id="state"
                                                 type="text"
                                                 class="mt-2 flex"
+                                                required
                                                 v-on:change="getDestinationCities"
                                                 :options="destinationStates"
                                                 v-model="form.destination.state"/>
@@ -523,8 +544,9 @@
                                     </div>
 
 
-                                    <div class="flex flex-col items-center justify-end mt-6">
-                                        <PrimaryButton type="submit" class="w-full">
+                                    <div class="flex flex-row items-center justify-end mt-6 gap-x-10">
+                                        <PrimaryButton @click="backToOrigin" type="button" :class="twMerge('bg-background border')">Previous</PrimaryButton>
+                                        <PrimaryButton type="submit" class="w-full" @click="gotoPackageDetails">
                                             Next
                                         </PrimaryButton>
                                     </div>
@@ -544,11 +566,11 @@
                                     <div class="flex lg:flex-row flex-col w-full gap-x-10 gap-y-4">
                                         <div class="w-full">
                                             <InputLabel value="Item category" class="font-normal" />
-                                            <SelectInput v-model="form.shipment.category" :options="categories" place-holder="Select item category" class="mt-2 w-full" />
+                                            <SelectInput required v-model="form.shipment.category" :options="categories" place-holder="Select item category" class="mt-2 w-full" />
                                         </div>
                                         <div class="w-full">
                                             <InputLabel value="Item value" class="font-normal" />
-                                            <TextInput type="number" v-model="form.shipment.value" min="1" placeholder="Enter item value" class="mt-2" />
+                                            <TextInput required type="number" v-model="form.shipment.value" min="1" placeholder="Enter item value" class="mt-2" />
                                         </div>
                                     </div>
                                     <div>
@@ -558,29 +580,29 @@
                                     <div class="flex lg:flex-row flex-col w-full gap-x-10 gap-y-4">
                                         <div class="w-full">
                                             <InputLabel value="Quantity" class="font-normal" />
-                                            <TextInput type="number" v-model="form.shipment.quantity" min="1" placeholder="20" class="mt-2" />
+                                            <TextInput required type="number" v-model="form.shipment.quantity" min="1" placeholder="20" class="mt-2" />
                                         </div>
                                         <div class="w-full">
                                             <InputLabel value="Weight (KG)" class="font-normal" />
-                                            <TextInput type="number" v-model="form.shipment.weight" min="1" placeholder="15" class="mt-2" />
+                                            <TextInput required type="number" v-model="form.shipment.weight" min="1" placeholder="15" class="mt-2" />
                                         </div>
                                     </div>
                                     <div class="flex lg:flex-row flex-col w-full gap-x-10 gap-y-4">
                                         <div class="w-full">
                                             <InputLabel value="Length (CM)" class="font-normal" />
-                                            <TextInput type="number" v-model="form.shipment.length" min="1" placeholder="12" class="mt-2" />
+                                            <TextInput required type="number" v-model="form.shipment.length" min="1" placeholder="12" class="mt-2" />
                                         </div>
                                         <div class="w-full">
                                             <InputLabel value="Width (CM)" class="font-normal" />
-                                            <TextInput type="number" v-model="form.shipment.width" min="1" placeholder="8" class="mt-2" />
+                                            <TextInput required type="number" v-model="form.shipment.width" min="1" placeholder="8" class="mt-2" />
                                         </div>
                                         <div class="w-full">
                                             <InputLabel value="Height (CM)" class="font-normal" />
-                                            <TextInput type="number" v-model="form.shipment.height" min="1" placeholder="4" class="mt-2" />
+                                            <TextInput required type="number" v-model="form.shipment.height" min="1" placeholder="4" class="mt-2" />
                                         </div>
                                     </div>
                                     <div class="flex lg:flex-row flex-col w-full gap-x-10 gap-y-4">
-                                        <PrimaryButton>Next</PrimaryButton>
+                                        <PrimaryButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing">Next</PrimaryButton>
                                     </div>
                                 </div>
                             </form>

@@ -1,7 +1,7 @@
 <script setup>
 
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import {Head, useForm} from "@inertiajs/vue3";
+import {Head, useForm, usePage} from "@inertiajs/vue3";
 import {PlusIcon} from "@heroicons/vue/24/outline/index.js";
 import { ref } from 'vue'
 import {
@@ -15,11 +15,15 @@ import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Pagination from "@/Components/Pagination.vue";
+import {twMerge} from "tailwind-merge";
 
 
 const form = useForm({
     amount: ''
 });
+
+
+const page = usePage();
 
 defineProps({
     balance: String,
@@ -39,14 +43,36 @@ const submit = () => {
     form.post(route('wallet.initialize'));
 }
 
+const shipmentStatusOptions = [
+    {
+        id: "all",
+        name: "all"
+    },
+    {
+        id: "deposit",
+        name: "deposit"
+    },
+    {
+        id: "withdraw",
+        name: "withdraw"
+    }
+];
+const filterForm = useForm({
+    type: ''
+})
+
+const handleFilter = () => {
+    axios.get(route('wallet.filter'), { params: { type: filterForm.type }}).then((response) => {
+        page.props.transactions = response.data
+    })
+}
 </script>
 
 <template>
     <Head title="Dashboard" />
-
     <AuthenticatedLayout page-title="Wallet">
-        <div class="flex">
-            <div class="flex rounded-xl items-start p-5 border bg-white lg:w-max w-full gap-x-10 justify-between">
+        <div class="flex lg:flex-row flex-col gap-10 mt-10">
+            <div class="flex rounded-xl p-5 border bg-white w-full gap-x-36 justify-between items-center lg:w-2/6">
                 <div>
                     <h3 class="text-sm">Wallet Balance</h3>
                     <div class="text-2xl font-bold">{{ balance }}</div>
@@ -56,9 +82,31 @@ const submit = () => {
                     <span class="text-xs text-primary">Add Fund</span>
                 </button>
             </div>
+
+            <div v-if="page.props.auth.user.user_type === 'business'" class="flex rounded-xl p-5 border bg-white w-full gap-x-36 justify-between items-center lg:w-2/6">
+                <div>
+                    <h3 class="text-sm">Overdraft Wallet</h3>
+                    <div class="text-2xl font-bold">0</div>
+                </div>
+            </div>
         </div>
         <div class="card p-5 border bg-white mt-10">
-            <h1>Transactions List</h1>
+            <div class="flex flex-row justify-between mb-10 items-start">
+                <h1 class="text-lg">Wallet History</h1>
+                <div>
+                    <InputLabel value="Filter" class="mb-3" />
+                    <a-select
+                        :class="twMerge('w-[200px] rounded-lg')"
+                        ref="select"
+                        v-model:value="filterForm.type"
+                        @focus="focus"
+                        @change="handleFilter"
+                    >
+                        <a-select-option v-for="item in shipmentStatusOptions" :value="item.id">{{ item.name }}</a-select-option>
+                    </a-select>
+
+                </div>
+            </div>
 
             <div class="overflow-x-auto border-x border-t rounded-xl">
                 <table class="table-auto w-full ">

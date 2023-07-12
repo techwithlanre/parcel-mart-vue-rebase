@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redirect;
+use Inertia\Inertia;
 use Unicodeveloper\Paystack\Paystack;
 
 class WalletServices
@@ -38,15 +39,15 @@ class WalletServices
                 "amount" => $request->amount * 100,
                 "reference" => $this->transaction->uuid,
                 "email" => auth()->user()->email,
-                "currency" => "NGN"
+                "currency" => "NGN",
+                "callback_url" => route("wallet.paystack.webhook")
             ];
 
             $response = json_decode($this->callPaystack($data), true);
             $payment_url = $response['data']['authorization_url'];
             $this->paystackTransaction->status = 'processing';
             $this->paystackTransaction->save();
-            return \redirect($payment_url);
-            //return $payment_url;
+            return Inertia::location($payment_url);
         }catch(\Exception $e) {
             return Redirect::back()->withMessage(['error'=>'The paystack token has expired. Please refresh the page and try again.', 'type'=>'error']);
         }

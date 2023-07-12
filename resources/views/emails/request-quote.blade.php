@@ -11,4 +11,3 @@
 <p>Length: {{ $length }}cm</p>
 <p>Height: {{ $height }}cm</p>
 <p>Width: {{ $width }}cm</p>
-

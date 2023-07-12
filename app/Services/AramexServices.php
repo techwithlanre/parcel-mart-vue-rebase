@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Http\Requests\BookShipmentRequest;
 use App\Http\Requests\CreateShipmentRequest;
+use App\Mail\OrderConfirmation;
 use App\Models\AramexShipmentLog;
 use App\Models\City;
 use App\Models\Country;
@@ -11,6 +12,7 @@ use App\Models\InsuranceOption;
 use App\Models\Shipment;
 use App\Models\ShipmentItem;
 use App\Models\ShippingRateLog;
+use Illuminate\Support\Facades\Mail;
 use Octw\Aramex\Aramex;
 
 class AramexServices
@@ -60,6 +62,7 @@ class AramexServices
             'product_group' => $product_group,
             'product_type' => $product_type
         ];
+
         $this->setShippingCurrency();
     }
 
@@ -68,8 +71,8 @@ class AramexServices
         $this->initializeCalculateRate();
         $response = Aramex::calculateRate(
             $this->originAddressPayload,
-            $this->destinationAddressPayload ,
-            $this->shipmentDetailsPayload ,
+            $this->destinationAddressPayload,
+            $this->shipmentDetailsPayload,
             $this->shippingCurrency
         );
 
@@ -82,7 +85,7 @@ class AramexServices
         $this->shippingCurrency = (getCountry('id', auth()->user()->country_id)->iso2 == 'NG') ? 'NGN' : 'USD';
     }
 
-    public function bookShipment(Shipment $shipment, ShipmentItem $shipmentItem, InsuranceOption $insuranceOption, ShippingRateLog $shippingRateLog)
+    public function  bookShipment(Shipment $shipment, ShipmentItem $shipmentItem, InsuranceOption $insuranceOption, ShippingRateLog $shippingRateLog): bool
     {
         $origin = json_decode($shipment->origin_address, true);
         $destination = json_decode($shipment->origin_address, true);
@@ -132,10 +135,10 @@ class AramexServices
             //'customs_value_amount' => 0, //optional (required for express shipping)
             //'cash_additional_amount' => 0, // optional
             //'cash_additional_amount_description' => 'Something here',
-            'product_group' => $product_group, // or EXP (defined in config file, if you dont pass it will take the config value)
+            'product_group' => $product_group, // or EXP (defined in config file, if you don't pass it will take the config value)
             'product_type' => $product_type, // refer to the official documentation (defined in config file, if you dont pass it will take the config value)
             'payment_type' => 'P', // P,C, 3 refer to the official documentation (defined in config file, if you dont pass it will take the config value)
-            //'payment_option' => null, // refer to the official documentation (defined in config file, if you dont pass it will take the config value)
+            //'payment_option' => null, // refer to the official documentation (defined in config file, if you dont pass it will take the    value)
         ];
 
         $response = Aramex::createShipment($shipment_data);
@@ -146,13 +149,13 @@ class AramexServices
         AramexShipmentLog::create([
             'shipment_id' => $shipment->id,
             'shipment_rate_log_id' => $shippingRateLog->id,
-            'aramex_id' => $response->Shipments->ProcessedShipment->ID,
+            'shipment_tracking_number' => $response->Shipments->ProcessedShipment->ID,
             'reference' => $response->Shipments->ProcessedShipment->Reference1,
             'label_url' => $response->Shipments->ProcessedShipment->ShipmentLabel->LabelURL,
             'label_content' => $response->Shipments->ProcessedShipment->ShipmentLabel->LabelFileContents,
             'details' => json_encode($response->Shipments->ProcessedShipment->ShipmentDetails)
         ]);
-
+        //Mail::to(auth()->user()->email)->send(new OrderConfirmation($shipment_data));
         return true;
     }
 }

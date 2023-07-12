@@ -1,9 +1,11 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import {Head, useForm, usePage} from '@inertiajs/vue3';
+import {Head, Link, useForm, usePage} from '@inertiajs/vue3';
 import SelectInput from "@/Components/SelectInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {toast} from "vue3-toastify";
+import {twMerge} from "tailwind-merge";
+import InputError from "@/Components/InputError.vue";
 
 const page = usePage()
 defineProps({
@@ -14,6 +16,7 @@ defineProps({
     shipping_rate_log: Array,
     origin_location: Array,
     destination_location: Array,
+    item_category: Object
 });
 
 const form  = useForm({
@@ -48,136 +51,41 @@ const setOption = () => {
             <div class="w-full card bg-white p-5">
                 <h1 class="font-bold text-xl">Contact Information</h1>
                 <h3>Sender Information</h3>
-                <div class="relative overflow-x-auto border rounded-2xl mt-5">
-                    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                        <tbody>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                Contact Name
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ origin.contact_name }}
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                Contact Phone
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ origin.contact_phone }}
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                Contact Email
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ origin.contact_email }}
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                Address 1
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ origin.address_1 }}
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                Landmark
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ origin.landmark }}
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                Address 2
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ origin.address_2 }}
-                            </td>
-                        </tr>
-                        <tr class="bg-white dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                Location
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ origin_location.city }}, {{ origin_location.state }}, {{ origin_location.country }}
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                <div class="card bg-white p-5 shadow hover:shadow-lg duration-300">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-semibold">{{ origin.contact_name }}</h3>
+                    </div>
+                    <p class="flex gap-x-10">
+                        <span class="text-sm text-primary">{{ origin.contact_phone }}</span>
+                        <span class="text-sm">{{ origin.contact_email}}</span>
+                    </p>
+                    <hr class="mt-2">
+                    <p class="mt-5"> {{ origin.address_1 }}</p>
+                    <p class=""> {{ origin.landmark }}</p>
+                    <div class="flex gap-x-10">
+                        <div class="text-blue-950 font-bold">{{ origin_location.city }}, {{ origin_location.state }}, {{ origin_location.country }}</div>
+                    </div>
                 </div>
-
                 <h3 class="mt-10">Receiver Information</h3>
-                <div class="relative overflow-x-auto border rounded-2xl mt-">
-                    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                        <tbody>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                Contact Name
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ origin.contact_name }}
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                Contact Phone
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ origin.contact_phone }}
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                Contact Email
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ origin.contact_email }}
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                Address 1
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ origin.address_1 }}
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                Landmark
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ origin.landmark }}
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                Address 2
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ origin.address_2 }}
-                            </td>
-                        </tr>
-                        <tr class="bg-white dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                Location
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ destination_location.city }}, {{ destination_location.state }}, {{ destination_location.country }}
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                <div class="card bg-white p-5 mt-3 shadow hover:shadow-lg duration-300">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-semibold">{{ destination.contact_name }}</h3>
+                    </div>
+                    <p class="flex gap-x-10">
+                        <span class="text-sm text-primary">{{ destination.contact_phone }}</span>
+                        <span class="text-sm">{{ destination.contact_email}}</span>
+                    </p>
+                    <hr class="mt-2">
+                    <p class="mt-5"> {{ destination.address_1 }}</p>
+                    <p class=""> {{ destination.landmark }}</p>
+                    <div class="flex gap-x-10">
+                        <div class="text-blue-950 font-bold">{{ destination_location.city }}, {{ destination_location.state }}, {{ destination_location.country }}</div>
+                    </div>
                 </div>
             </div>
             <div class="card p-5  w-full bg-white">
                 <h1 class="font-bold text-xl mb-10">Shipment Information</h1>
-                <div class="relative overflow-x-auto border rounded-2xl mt-">
+                <div class="relative overflow-x-auto rounded-2xl shadow hover:shadow-lg duration-300">
                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                         <tbody v-for="item in shipment.shipment_items" :key="item.id" >
                             <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
@@ -185,7 +93,7 @@ const setOption = () => {
                                     Item Category
                                 </th>
                                 <td class="px-6 py-2">
-                                    {{ origin.contact_name }}
+                                    {{ item_category.name }}
 
                                 </td>
                             </tr>
@@ -201,9 +109,7 @@ const setOption = () => {
                                 <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                     Description
                                 </th>
-                                <td class="px-6 py-2">
-                                    {{ item.description }}
-                                </td>
+                                <td class="px-6 py-2">{{ item.description }}</td>
                             </tr>
                             <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                                 <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
@@ -218,7 +124,7 @@ const setOption = () => {
                                     Weight
                                 </th>
                                 <td class="px-6 py-2">
-                                    {{ item.weight }}cm
+                                    {{ item.weight }}kg
                                 </td>
                             </tr>
                             <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
@@ -241,7 +147,7 @@ const setOption = () => {
                     </table>
                 </div>
             </div>
-            <form @submit.prevent="pay" class="card p-5 w-full bg-white">
+            <form @submit.prevent="pay" class="card p-5 w-full bg-white shadow hover:shadow-lg duration-300">
                 <div>
                     <h1 class="font-bold text-xl">Shipment Options</h1>
                     <div v-for="item in shipping_rate_log" class="card mt-5 border">
@@ -265,6 +171,7 @@ const setOption = () => {
                     <div class="mt-10">
                         <h3>Choose an Insurance Option</h3>
                         <SelectInput v-model="form.insurance" :options="insurance_options" />
+                        <InputError :message="form.errors.insurance" />
                         <div class="mt-5 p-5 card border duration-300 transition-all flex flex-row justify-between items-center" v-if="form.insurance.length > 0">
                             <div>
                                 <div class="text-lg font-bold">{{ insurance_options[form.insurance - 1].name }}</div>
@@ -285,12 +192,8 @@ const setOption = () => {
                     <input type="hidden" v-model="form.option_id">
 
                     <div class="mt-10">
-                        <PrimaryButton type="submit" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+                        <PrimaryButton  type="submit" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
                             Pay
-<!--                            <span v-if="form.option">
-                                NGN {{ parseFloat(insurance_options[form.insurance - 1].amount) + parseInt() }}
-                            </span>
-                            <span v-else>0.00</span>-->
                         </PrimaryButton>
                     </div>
                 </div>

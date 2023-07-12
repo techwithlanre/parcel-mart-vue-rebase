@@ -27,6 +27,21 @@ class WalletController extends Controller
         return Inertia::render('Wallet/Index', compact('balance','transactions'));
     }
 
+    public function filterTransactions(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $transactions = Transaction::where([
+            'payable_id' => auth()->user()->id,
+            'confirmed' => 1
+        ])->where(function ($query) use ($request) {
+            $query->when($request->filled('type'), function ($query) use ($request) {
+                return $request->type == 'all'
+                    ? $query
+                    : $query->where('type', $request->type);
+            });
+        })->orderBy('created_at', 'desc')->paginate(10);
+        return response()->json($transactions);
+    }
+
     public function initialize(PayInitializeRequest $request, WalletServices $services, PaystackServices $paystackServices)
     {
         return $services->initializePay($request, $paystackServices);

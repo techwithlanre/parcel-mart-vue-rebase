@@ -3,10 +3,10 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import SelectInput from "@/Components/SelectInput.vue";
-import {useForm} from "@inertiajs/vue3";
+import {Head, Link, useForm} from "@inertiajs/vue3";
 
 export default {
-    components: {SelectInput, PrimaryButton, InputError, TextInput},
+    components: {SelectInput, PrimaryButton, InputError, TextInput, Link, Head},
     data() {
         return {
             form: useForm({
@@ -68,7 +68,7 @@ export default {
 
                 <InputError class="mt-2" :message="form.errors.first_name" />
             </div>
-            <div>
+            <div class="lg:mt-3">
                 <TextInput
                     id="last_name"
                     type="text"

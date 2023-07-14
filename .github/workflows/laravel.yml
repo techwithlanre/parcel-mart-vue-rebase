@@ -13,8 +13,6 @@ jobs:
     - uses: actions/setup-node@master
     - name: Install Dependencies
       run: composer update --ignore-platform-reqs
-    - name: Generate key
-      run: php artisan key:generate
     - name: Installing project dependencies
       run: npm install
     - name: Building the project

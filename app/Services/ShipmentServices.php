@@ -9,6 +9,7 @@ use App\Http\Requests\TrackShipmentRequest;
 use App\Models\AramexShipmentLog;
 use App\Models\CourierApiProvider;
 use App\Models\DhlRateLog;
+use App\Models\DhlShipmentLog;
 use App\Models\InsuranceOption;
 use App\Models\Shipment;
 use App\Models\ShipmentItem;
@@ -224,41 +225,84 @@ class ShipmentServices
         $shipment = Shipment::where('number', $shipment_number)->first();
 
         if (!$shipment) return \redirect(route('shipment.index'))->with('error', 'Tracking number not found');
+        if ($shipment->provider == 'aramex') return $this->trackAramex($shipment);
+        if ($shipment->provider == 'dhl') return $this->trackDhl($request, $shipment);
+        return redirect()->back()->with('error', 'An error occurred. Please try again later');
+    }
 
-        if ($shipment->provider == 'aramex') {
-            $aramex_shipment = AramexShipmentLog::where('shipment_id', $shipment->id)->first();
-            $response = Aramex::trackShipments([$aramex_shipment->aramex_id]);
-            if (!$response->HasErrors) {
-                $data = $response->TrackingResults->KeyValueOfstringArrayOfTrackingResultmFAkxlpY->Value->TrackingResult;
-                $check = TrackingLog::where([
+    private function trackAramex(Shipment $shipment)
+    {
+        $aramex_shipment = AramexShipmentLog::where('shipment_id', $shipment->id)->first();
+        $response = Aramex::trackShipments([$aramex_shipment->aramex_id]);
+        if (!$response->HasErrors) {
+            $data = $response->TrackingResults->KeyValueOfstringArrayOfTrackingResultmFAkxlpY->Value->TrackingResult;
+            $check = TrackingLog::where([
+                'shipment_id' => $shipment->id,
+                'update_code' => $data->UpdateCode,
+                'provider' => 'aramex',
+            ])->first();
+
+            if (!$check) {
+                TrackingLog::create([
                     'shipment_id' => $shipment->id,
                     'update_code' => $data->UpdateCode,
+                    'waybill_number' => $data->WaybillNumber,
+                    'update_description' => $data->UpdateDescription,
+                    'update_datetime' => $data->UpdateDateTime,
+                    'update_location' => $data->UpdateLocation,
+                    'comment' => $data->Comments,
+                    'problem_code' => $data->ProblemCode,
+                    'gross_weight' => $data->GrossWeight,
+                    'chargeable_weight' => $data->ChargeableWeight,
+                    'weight_unit' => $data->WeightUnit,
                     'provider' => 'aramex',
-                ])->first();
-
-                if (!$check) {
-                    TrackingLog::create([
-                        'shipment_id' => $shipment->id,
-                        'update_code' => $data->UpdateCode,
-                        'waybill_number' => $data->WaybillNumber,
-                        'update_description' => $data->UpdateDescription,
-                        'update_datetime' => $data->UpdateDateTime,
-                        'update_location' => $data->UpdateLocation,
-                        'comment' => $data->Comments,
-                        'problem_code' => $data->ProblemCode,
-                        'gross_weight' => $data->GrossWeight,
-                        'chargeable_weight' => $data->ChargeableWeight,
-                        'weight_unit' => $data->WeightUnit,
-                        'provider' => 'aramex',
-                    ]);
-                    return \redirect(route('shipment.track.details', $shipment->id));
-                }
-
+                ]);
                 return \redirect(route('shipment.track.details', $shipment->id));
-
             }
+
+            return \redirect(route('shipment.track.details', $shipment->id));
         }
 
+        return redirect()->back()->with('error', 'We are working on tracking info. Please check back later');
+    }
 
+    private function trackDhl(TrackShipmentRequest $request, Shipment $shipment)
+    {
+        $dhl_shipment = DhlShipmentLog::where('shipment_id', $shipment->id)->first();
+        if (!$dhl_shipment) return redirect()->back()->with('error', 'An error occurred. Please try again later');
+        try {
+            $dhl = new DHLServices($request);
+            $response = $dhl->trackShipment($dhl_shipment);
+            $tracking_data = json_decode($response, true);
+            foreach ($tracking_data['shipments'] as $td) {                //dd($td);
+                if (isset($td['events']) && count($td['events']) > 0) {
+                    foreach ($td['events'] as $event) {
+                        $check = TrackingLog::where([
+                            'shipment_id' => $shipment->id,
+                            'update_code' => $event['typeCode'],
+                            'provider' => 'dhl',
+                        ])->first();
+                        if (!$check) {
+                            TrackingLog::create([
+                                'shipment_id' => $shipment->id,
+                                'update_code' => $event['typeCode'],
+                                'waybill_number' => $td['pieces'][0]['trackingNumber'],
+                                'update_description' => $event['description'],
+                                'update_datetime' => $event['date'] . ' ' . $event['time'],
+                                'update_location' => $event['serviceArea'][0]['description'],
+                                'comment' => $td['description'],
+                                'gross_weight' => $td['totalWeight'],
+                                'chargeable_weight' => $td['totalWeight'],
+                                'weight_unit' => 'metric',
+                                'provider' => 'dhl',
+                            ]);
+                        }
+                    }
+                }
+            }
+            return \redirect(route('shipment.track.details', $shipment->id));
+        } catch (\Exception $exception) {
+            return redirect()->back()->with('error', 'We are working on tracking info. Please check back later');
+        }
     }
 }

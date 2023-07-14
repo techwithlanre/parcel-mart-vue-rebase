@@ -10,10 +10,7 @@ defineProps({
     data: Array,
     countries: Array
 });
-const editForm = useForm({
-    origin: '',
-    destinations: []
-})
+
 
 const page = usePage();
 const visible = ref(false);

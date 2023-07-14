@@ -133,6 +133,7 @@ class ShipmentController extends Controller
     public function show(string $id)
     {
         $shipment = Shipment::whereId($id)->with('shipment_items', 'country', 'city', 'state')->first();
+        $item_category = ItemCategory::find($shipment->shipment_items[0]->item_category_id);
         $origin = json_decode($shipment->origin_address);
         $destination = json_decode($shipment->destination_address);
         $origin_location = [
@@ -148,34 +149,11 @@ class ShipmentController extends Controller
         ];
 
         $insurance_options = InsuranceOption::all();
-        $aramex_shipment = AramexShipmentLog::where('shipment_id', $id)->first();
-        $shipping_rate_log = ShippingRateLog::where('id', $aramex_shipment->shipment_rate_log_id)->with('courier_api_provider')->first();
-        return Inertia::render('Shipments/Details', compact('shipment', 'aramex_shipment','origin', 'destination','insurance_options','shipping_rate_log', 'origin_location', 'destination_location'));
+        $shipping_rate_log = ShippingRateLog::where('id', $shipment->shipping_rate_log_id)->with('courier_api_provider')->first();
+        return Inertia::render('Shipments/Details', compact('shipment','item_category','origin', 'destination','insurance_options','shipping_rate_log', 'origin_location', 'destination_location'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
 
     public function testCalculateShipment(CreateShipmentRequest $request, ShipmentServices $shipmentServices)
     {

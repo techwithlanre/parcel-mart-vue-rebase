@@ -14,7 +14,7 @@ defineProps({
     shipping_rate_log: Object,
     origin_location: Array,
     destination_location: Array,
-    aramex_shipment: Object
+    item_category: Object
 });
 
 const form  = useForm({
@@ -65,9 +65,7 @@ const pay = () => {
                         </ol>
                     </div>
                 </div>
-                <div class="mt-10">
-                    <a :href="aramex_shipment.label_url" target="_blank" class="text-primary">View Shipment Label</a>
-                </div>
+
             </div>
             <div class="card p-5 border bg-white w-full">
                 <h1 class="font-bold text-xl">History</h1>
@@ -214,7 +212,7 @@ const pay = () => {
                                 Item Category
                             </th>
                             <td class="px-6 py-2">
-                                {{ origin.contact_name }}
+                                {{ item_category.name }}
                             </td>
                         </tr>
                         <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">

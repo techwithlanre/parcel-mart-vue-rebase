@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Http\Requests\BookShipmentRequest;
 use App\Http\Requests\CreateShipmentRequest;
+use App\Http\Requests\TrackShipmentRequest;
 use App\Models\DhlShipmentLog;
 use App\Models\InsuranceOption;
 use App\Models\Shipment;
@@ -13,6 +14,7 @@ use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Http\Request;
 use League\Flysystem\Config;
 use GuzzleHttp\Psr7;
 use Illuminate\Support\Str;
@@ -27,7 +29,7 @@ class DHLServices
     protected String $password;
     protected array $calculateRatePayload;
     protected array $bookShipmentPayload;
-    public function __construct(CreateShipmentRequest | BookShipmentRequest $request)
+    public function __construct(CreateShipmentRequest | BookShipmentRequest | TrackShipmentRequest $request)
     {
         $this->request = $request;
         $this->initialize();
@@ -240,6 +242,24 @@ class DHLServices
             return false;
         }
 
+    }
+
+    public function trackShipment(DhlShipmentLog $dhlShipmentLog)
+    {
+        try {
+            $client = new Client([
+                'auth' => [$this->username, $this->password]
+            ]);
+            //$response = $client->get('https://express.api.dhl.com/mydhlapi/test/shipments/7957673080/tracking?trackingView=all-checkpoints&levelOfDetail=all' . $dhlShipmentLog->tracking_url. '?trackingView=all-checkpoints&levelOfDetail=all');
+            $response = $client->get('https://express.api.dhl.com/mydhlapi/test/shipments/7957673080/tracking?trackingView=all-checkpoints&levelOfDetail=all');
+            if ($response->getStatusCode() == 200)  return $response->getBody()->getContents();
+            return false;
+        } catch (GuzzleException $e) {
+            $response = $e->getResponse();
+            //$responseBodyAsString = $response->getBody()->getContents();
+            return redirect()->back()->with('error', 'We are working on tracking info. Please check back later');
+
+        }
     }
 
     public function hello()

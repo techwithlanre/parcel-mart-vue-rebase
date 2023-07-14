@@ -1,0 +1,20 @@
+{
+    "name": "cubes-doo/my-dhl",
+    "description": "Unofficial SDK for the MyDHL API",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Cubes\\MyDhl\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Cubes\\MyDhl\\MyDhlServiceProvider"
+            ],
+            "aliases": {
+                "MyDhl": "Cubes\\MyDhl\\MyDhlFacade"
+            }
+        }
+    }
+}

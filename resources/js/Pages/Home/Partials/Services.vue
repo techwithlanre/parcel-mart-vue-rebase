@@ -8,7 +8,7 @@ import smartSend from '/resources/images/icons/smart-send.svg';
 
 <template>
     <div class="bg-background bg-opacity-40">
-        <div class="lg:px-[250px] px-10 py-20">
+        <div class="md:px-[250px] sm:px-[100px] px-10 py-20">
             <h1 class="text-3xl lg:text-5xl font-bold">We Provide Safe and <br>Reliable Cargo Solutions</h1>
             <div class="flex lg:flex-row flex-col justify-between gap-x-20 gap-y-10 mt-20">
                 <div class="flex flex-col p-10 w-full justify-between gap-y-10 bg-white rounded-xl ring ring-background hover:ring-primary duration-500">

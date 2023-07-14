@@ -16,7 +16,7 @@ defineProps({
     <div class="bg-white overflow-x-hidden">
 
         <div class="bg-white overflow-x-hidden">
-            <div class="p-6 xl:px-[150px] lg:px-[100px]">
+            <div class="p-6 w-full md:px-[500px]">
                 <FrontNavigation />
             </div>
         </div>

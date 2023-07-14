@@ -15,7 +15,7 @@ defineProps({
 </script>
 
 <template>
-    <div class="flex flex-col lg:flex-row gap-x-20 p-6 lg:px-[250px] py-20">
+    <div class="flex flex-col lg:flex-row gap-x-20 p-6 md:px-[50px] py-20">
         <div class="lg:w-1/2 w-full">
             <h1 class="text-left lg:text-5xl text-3xl font-bold ">Find out the price right now</h1>
             <p class="text-left lg:text-2xl text-xl mb-10">Use our quote form to calculate cost of shipping</p>

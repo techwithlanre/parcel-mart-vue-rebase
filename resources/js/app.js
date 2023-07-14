@@ -10,6 +10,7 @@ import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy/dist/vue.m';
 import TawkMessengerVue from '@tawk.to/tawk-messenger-vue-3';
+import DateFormat from '@voidsolutions/vue-dateformat'
 
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
 
@@ -21,6 +22,7 @@ createInertiaApp({
             .use(plugin)
             .use(ZiggyVue, Ziggy)
             .use(Antd)
+            .use(DateFormat)
             .use(VueAnimateOnScroll)
             .use(TawkMessengerVue, {
                 propertyId : '60c6342465b7290ac635bafa',

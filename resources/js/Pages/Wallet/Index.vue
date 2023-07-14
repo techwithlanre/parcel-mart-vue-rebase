@@ -124,7 +124,7 @@ const handleFilter = () => {
                             <h1 class="text-md font-bold">N{{ Math.abs(item.amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") }}</h1>
                         </td>
                         <td class="p-4">{{ item.type }}</td>
-                        <td class="p-4">{{ item.created_at }}</td>
+                        <td class="p-4"><date-format :date="item.created_at" /></td>
                     </tr>
                     </tbody>
                 </table>

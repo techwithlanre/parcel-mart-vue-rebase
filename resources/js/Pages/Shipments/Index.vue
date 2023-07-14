@@ -108,10 +108,9 @@ const handleFilter = () => {
 <template>
     <AuthenticatedLayout page-title="Shipments">
         <Head title="Start Shipment" />
-        {{ ship}}
         <div class="flex flex-col w-full gap-5 mt-10">
             <div class="flex flex-row gap-5 justify-end items-end">
-                <PrimaryButton data-modal-target="defaultModal" data-modal-toggle="defaultModal" :class="twMerge('w-max bg-white text-red-900 border-2 border-[#008083]')" style="color: #008083" type="button">
+                <PrimaryButton v-if="log.length > 0 || parseInt(shipmentsCount) > 0"  data-modal-target="defaultModal" data-modal-toggle="defaultModal" :class="twMerge('w-max bg-white text-red-900 border-2 border-[#008083]')" style="color: #008083" type="button">
                     Track Shipment
                 </PrimaryButton>
                 <Link :href="route('shipment.start')">

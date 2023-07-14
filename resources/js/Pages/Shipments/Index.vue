@@ -111,11 +111,11 @@ const handleFilter = () => {
         {{ ship}}
         <div class="flex flex-col w-full gap-5 mt-10">
             <div class="flex flex-row gap-5 justify-end items-end">
-                <SecondaryButton data-modal-target="defaultModal" data-modal-toggle="defaultModal" class="w-max" type="button">
+                <PrimaryButton data-modal-target="defaultModal" data-modal-toggle="defaultModal" :class="twMerge('w-max bg-white text-red-900 border-2 border-[#008083]')" style="color: #008083" type="button">
                     Track Shipment
-                </SecondaryButton>
+                </PrimaryButton>
                 <Link :href="route('shipment.start')">
-                    <SecondaryButton class="w-max" :class="{ 'opacity-25': trackForm.processing }" :disabled="trackForm.processing">New Shipment</SecondaryButton>
+                    <PrimaryButton class="w-max bg-primary text-white" :class="{ 'opacity-25': trackForm.processing }" :disabled="trackForm.processing">New Shipment</PrimaryButton>
                 </Link>
             </div>
             <div id="defaultModal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
@@ -194,11 +194,14 @@ const handleFilter = () => {
                                 {{ item.number }}
                             </td>
                             <td class="px-6 py-4">
-                                {{ item.status}}
+                              <span :class="{ 'bg-orange-400 px-3 py-1 rounded-full text-white font-medium': item.status ==='processing' }">{{ item.status}}</span>
+
                             </td>
                             <td class="px-6 py-4">
                                 <Link :href="route('shipment.checkout', item.id)" v-if="item.status === 'pending'" class="text-primary font-medium hover:text-green-600">Checkout</Link>
-                                <Link :href="route('shipment.details', item.id)" v-else class="text-primary font-medium hover:text-green-600">View</Link>
+                                <Link :href="route('shipment.details', item.id)" v-else class="text-primary font-medium hover:text-green-600"  >
+                                  View
+                                </Link>
                             </td>
                         </tr>
                         </tbody>

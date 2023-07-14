@@ -6,6 +6,8 @@ import Pagination from "@/Components/Pagination.vue";
 import { DownOutlined, SmileOutlined } from '@ant-design/icons';
 import { Dropdown, Space } from 'ant-design-vue';
 import {twMerge} from "tailwind-merge";
+import addressBook from "../../../images/address-book.png";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 
 defineProps({
     addresses: Object
@@ -18,12 +20,12 @@ defineProps({
         <div>
             <div class="flex flex-col justify-end items-end">
                 <Link :href="route('address-book.create')"
-                      class="bg-primary px-3 py-2  text-sm text-white hover:text-gray-50 rounded-md focus:outline-none focus:ring-2 mb-10 focus:ring-offset-2 focus:ring-background">
+                      class="bg-primary px-3 py-2 mt-10 text-sm text-white hover:text-gray-50 rounded-md focus:outline-none focus:ring-2 mb-10 focus:ring-offset-2 focus:ring-background">
                     Create Address
                 </Link>
             </div>
-            <div class="grid lg:grid-cols-3 gap-x-5 gap-y-10">
-                <div class="card border bg-white p-5"  v-if="addresses.data.length > 0" v-for="item in addresses.data">
+            <div v-if="addresses.data.length > 0" class="grid lg:grid-cols-3 gap-x-5 gap-y-10">
+                <div class="card border bg-white p-5"  v-for="item in addresses.data">
                     <div class="flex justify-between items-center">
                         <h3 class="text-lg font-semibold">{{ item.address_contacts[0].contact_name }}</h3>
                         <div>
@@ -62,6 +64,13 @@ defineProps({
                     </div>
                 </div>
             </div>
+          <div v-else class="flex flex-row justify-center mt-20">
+            <div class="flex flex-col items-center">
+              <img :src="addressBook" alt="" class="">
+              <h1 class="mt-5 text-center">You don't have any address created. Click the button below to create one</h1>
+              <Link :href="route('address-book.create')" class="mt-5"><PrimaryButton>Create Address</PrimaryButton></Link>
+            </div>
+          </div>
             <Pagination :links="addresses.links"/>
         </div>
     </AuthenticatedLayout>

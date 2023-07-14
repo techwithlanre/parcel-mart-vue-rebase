@@ -254,7 +254,7 @@ export default {
             </div>
         </div>
         <div>
-            <div class="mt-20">
+            <div class="mt-20" v-if="page.props.auth.user.is_admin">
                 <h1 class="text-lg">Recent Shipments</h1>
                 <div class="relative overflow-x-auto shadow sm:rounded-lg">
                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">

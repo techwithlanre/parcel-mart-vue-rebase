@@ -86,9 +86,8 @@ class DHLServices
             'package_details' => json_encode($result['packages'])
         ]);
 
-        dd($dhl_shipment_log);
         //Mail::to(auth()->user()->email)->send(new OrderConfirmation($shipment_data));
-        //return true;
+        return true;
     }
 
 

@@ -16,6 +16,7 @@ use App\Models\ShipmentItem;
 use App\Models\ShippingRateLog;
 use App\Models\TrackingLog;
 use App\Models\WalletOverdraft;
+use App\Models\WalletOverdraftLog;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
 use Octw\Aramex\Aramex;
@@ -83,7 +84,7 @@ class ShipmentServices
                     $rate_found = true;
                 }
             } catch (\Exception $e) {
-                dd($e);
+                return Redirect::back()->with('error', 'No shipment rate found for your package: ' . $e->getMessage());
             }
 
         }
@@ -132,11 +133,13 @@ class ShipmentServices
                                 'pricing_date' => $product['pricingDate'],
                             ]);
                         }
+                        $shipment->has_rate = 1;
+                        $shipment->save();
                         $rate_found = true;
                     }
                 }
             } catch (\Exception $e) {
-                dd($e);
+                return Redirect::back()->with('error', 'No shipment rate found for your package: ' . $e->getMessage());
             }
         }
 
@@ -157,12 +160,11 @@ class ShipmentServices
         $insurance_amount = $insurance->amount;
 
         $rate = ShippingRateLog::whereId($request['option_id'])->first();
-        $total_amount = floatval($rate->total_amount) + floatval($insurance_amount);
+        $total_amount = str_replace(',', '', $rate->total_amount) + str_replace(',', '', $insurance_amount);
 
         if (auth()->user()->user_type === 'individual' && auth()->user()->balance < $total_amount) {
             return redirect(route('shipment.checkout', $request['shipment_id']))->with('error', 'Insufficient balance');
         }
-
 
         $provider = $rate->provider_code;
         $book_aramex = $book_dhl = false;
@@ -190,9 +192,20 @@ class ShipmentServices
                     $overdraft_wallet->balance += $overdraft_amount;
                     $overdraft_wallet->save();
                 }
+
+                WalletOverdraftLog::create([
+                    'user_id' => auth()->user()->id,
+                    'shipment_id' => $shipment->id,
+                    'amount' => $overdraft_amount
+                ]);
                 auth()->user()->withdraw($current_balance);
             }
-            if (auth()->user()->user_type === 'business' && auth()->user()->balance < $total_amount) {
+
+            if (auth()->user()->user_type === 'business' && auth()->user()->balance >= $total_amount) {
+                auth()->user()->withdraw($total_amount);
+            }
+
+            if (auth()->user()->user_type === 'individual') {
                 auth()->user()->withdraw($total_amount);
             }
 

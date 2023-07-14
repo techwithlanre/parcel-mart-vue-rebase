@@ -118,6 +118,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
        });
     });
 
+    Route::get('faq', [\App\Http\Controllers\FaqController::class, 'index'])->name('faq.index');
+
 
     Route::prefix('billing')->group(function (){
         Route::get('', [\App\Http\Controllers\BillingController::class, 'cards'])->name('billing.cards.get');

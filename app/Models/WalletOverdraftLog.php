@@ -8,4 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class WalletOverdraftLog extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'user_id','shipment_id','amount'
+    ];
 }

@@ -212,7 +212,7 @@ const pay = () => {
                                 Item Category
                             </th>
                             <td class="px-6 py-2">
-                                {{ item_category.name }}
+<!--                                {{ item_category.name }}-->
                             </td>
                         </tr>
                         <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">

@@ -26,8 +26,9 @@ const form = useForm({
 const page = usePage();
 
 defineProps({
-    balance: String,
-    transactions: Array
+  balance: String,
+  transactions: Array,
+  overdraft_wallet_balance: String
 })
 
 const isOpen = ref(false)
@@ -86,7 +87,7 @@ const handleFilter = () => {
             <div v-if="page.props.auth.user.user_type === 'business'" class="flex rounded-xl p-5 border bg-white w-full gap-x-36 justify-between items-center lg:w-2/6">
                 <div>
                     <h3 class="text-sm">Overdraft Wallet</h3>
-                    <div class="text-2xl font-bold">0</div>
+                    <div class="text-2xl font-bold">{{ overdraft_wallet_balance }}</div>
                 </div>
             </div>
         </div>

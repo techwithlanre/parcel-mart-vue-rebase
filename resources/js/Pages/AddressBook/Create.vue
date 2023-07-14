@@ -37,7 +37,7 @@ const submit = () => {
     <Head title="Create Address" />
     <AuthenticatedLayout page-title="Create Address">
         <div >
-            <div class="mx-auto lg:mt-17 mt max-w-2xl p-10 bg-white  rounded-2xl border">
+            <div class="mx-auto lg:mt-17 mt max-w-2xl p-10 bg-white  rounded-2xl shadow">
                 <div>
                     <h3 class="font-bold text-2xl ">Create a new address</h3>
                 </div>
@@ -50,7 +50,8 @@ const submit = () => {
                             type="text"
                             class="mt-2 flex"
                             required
-                            placeholder="Enter Contact Name"
+                            autofocus
+                            placeholder=""
                             autocomplete="contact_name" />
 
                         <InputError class="mt-2" />
@@ -64,7 +65,7 @@ const submit = () => {
                                 type="text"
                                 class="mt-2 flex"
                                 required
-                                placeholder="Enter Contact Phone"
+                                placeholder=""
                                 autocomplete="contact_email" />
 
                             <InputError class="mt-2" />
@@ -76,7 +77,7 @@ const submit = () => {
                                 v-model="form.contact_email"
                                 type="text"
                                 class="mt-2 flex"
-                                placeholder="Enter Contact Email"
+                                placeholder=""
                                 autocomplete="contact_email" />
                             <InputError class="mt-2" />
                         </div>
@@ -89,7 +90,7 @@ const submit = () => {
                             type="text"
                             v-model="form.business_name"
                             class="mt-2 flex"
-                            placeholder="Enter Business Name"
+                            placeholder=""
                             autocomplete="business_name" />
 
                         <InputError class="mt-2" />
@@ -102,8 +103,9 @@ const submit = () => {
                             class="mt-2 flex"
                             v-model="form.address"
                             required
-                            autofocus
-                            placeholder="Start typing address"
+                            
+                            maxlength="45"
+                            placeholder=""
                             autocomplete="address" />
                         <InputError class="mt-2" />
                     </div>
@@ -115,8 +117,7 @@ const submit = () => {
                             class="mt-2 flex"
                             v-model="form.landmark"
                             required
-                            autofocus
-                            placeholder="Start typing address or postcode"
+                            placeholder=""
                             autocomplete="address" />
                         <InputError class="mt-2" />
                     </div>
@@ -127,8 +128,8 @@ const submit = () => {
                             type="text"
                             class="mt-2 flex"
                             v-model="form.address_2"
-                            autofocus
-                            placeholder="Start typing address or postcode"
+                            maxlength="45"
+                            placeholder=""
                             autocomplete="address" />
                         <InputError class="mt-2" />
                     </div>
@@ -170,8 +171,7 @@ const submit = () => {
                             type="text"
                             class="mt-2 flex"
                             v-model="form.postcode"
-                            autofocus
-                            placeholder="Enter postcode"
+                            placeholder=""
                             autocomplete="postcode" />
                         <InputError class="mt-2" />
                     </div>

@@ -1,9 +1,12 @@
 <script setup>
 import OverviewIcon from "/resources/images/icons/overview.svg";
+import TruckIcon from "/resources/images/icons/_truck.svg";
 import ShoppingBagIcon from "/resources/images/icons/shopping-bag.svg";
-import WalletIcon from "/resources/images/icons/wallet.svg";
-import GroupChatIcon from "/resources/images/icons/group-chat.svg";
-import LogoutIcon from "/resources/images/icons/logout.svg";
+import WalletIcon from "/resources/images/icons/_wallet.svg";
+import LocationIcon from "/resources/images/icons/_location.svg";
+import FAQ from "/resources/images/icons/_faq.svg";
+import InviteIcon from "/resources/images/icons/_invite.svg";
+import LogoutIcon from "/resources/images/icons/_logout.svg";
 import {Link, usePage} from '@inertiajs/vue3';
 import {toast} from "vue3-toastify";
 import 'flowbite';
@@ -44,10 +47,11 @@ defineProps({
 const sidebar = [
     [
         { name: "Dashboard", icon: OverviewIcon, route: "/dashboard", admin: false },
-        { name: "Shipments", icon: ShoppingBagIcon, route: "/shipments", admin: false },
+        { name: "Shipments", icon: TruckIcon, route: "/shipments", admin: false },
         { name: "Wallet", icon: WalletIcon, route: "/wallet", admin: false },
-        { name: "Address Book", icon: GroupChatIcon, route: '/address-book', admin: false  },
-        //{ name: "Settings", icon: SettingsIcon, route: "/settings/shipping/description", admin: false },
+        { name: "Address Book", icon: LocationIcon, route: '/address-book', admin: false  },
+        { name: "FAQs", icon: FAQ, route: route('faq.index'), admin: false  },
+        { name: "Invite & Earn", icon: InviteIcon, route: '#', admin: false  },
         { name: "Logout", icon: LogoutIcon, route: route('logout'), admin: false },
     ],
 ];
@@ -56,10 +60,10 @@ const adminMenu = [
     { name: "Dashboard", icon: OverviewIcon, route: "/dashboard", admin: false },
     { name: "My Shipments", icon: ShoppingBagIcon, route: "/shipments", admin: false },
     { name: "My Wallet", icon: WalletIcon, route: "/wallet", admin: false },
-    { name: "Address Book", icon: GroupChatIcon, route: '/address-book', admin: false  },
+    { name: "Address Book", icon: LocationIcon, route: '/address-book', admin: false  },
     { name: "Users List", icon: OverviewIcon, route: "/admin/users", admin: true },
     { name: "Roles", icon: ShoppingBagIcon, route: "/admin/roles", admin: true },
-    { name: "All Shipments", icon: GroupChatIcon, route: "/admin/shipments" , admin: true },
+    { name: "All Shipments", icon: TruckIcon, route: "/admin/shipments" , admin: true },
     { name: "Provider Rates", icon: OverviewIcon, route: "/admin/settings/rate", admin: false },
     { name: "Logout", icon: LogoutIcon, route: route('logout'), admin: false },
 ];
@@ -118,13 +122,13 @@ const adminMenu = [
         <div class="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
             <ul class="space-y-2 font-medium" v-for="group  in sidebar">
                 <li v-if="!page.props.auth.user.is_admin" v-for="item in group" class="">
-                    <Link :href="item.route" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group" :class="{'text-white bg-primary group font-bold rounded-md py-2 hover:text-primary hover:bg-background': $page.url.startsWith(item.route)}">
+                    <Link :href="item.route" class="flex items-center hover:text-primary p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group" :class="{'text-white bg-primary group font-bold rounded-md py-2 hover:text-primary hover:bg-background': $page.url.startsWith(item.route)}">
                         <Component :is="item.icon" class="w-6 h-6 fill-current" />
                         <span class="ml-3">{{ item.name }}</span>
                     </Link>
                 </li>
                 <li v-else v-for="item in adminMenu" class="">
-                    <Link :href="item.route" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                    <Link :href="item.route" class="flex items-center p-2 hover:text-primary text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                         <Component :is="item.icon" class="w-6 h-6 fill-current" />
                         <span class="flex-1 ml-3 whitespace-nowrap">{{ item.name }}</span>
                     </Link>

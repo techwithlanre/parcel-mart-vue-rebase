@@ -5,6 +5,7 @@
 /public/storage
 /storage/*.key
 parcel-mart-vue.zip
+/vendor
 .env
 .env.backup
 .env.production

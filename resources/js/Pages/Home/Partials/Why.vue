@@ -4,7 +4,7 @@ import {Link} from "@inertiajs/vue3";
 </script>
 
 <template>
-    <div class="flex lg:flex-row flex-col gap-y-10 gap-x-20 p-6 lg:px-[250px] py-16 mb-10">
+    <div class="flex lg:flex-row flex-col gap-y-10 gap-x-20 p-6 px-[50px]  py-16 mb-10">
         <div class="lg:w-1/3">
             <h1 class="text-3xl lg:text-5xl font-bold">Why Choose Parcels Mart?</h1>
             <p class="text-lg mb-10">If you're looking for cheap parcel deliveries but don't want to compromise on quality or reliability, look no further than Parcels Mart.</p>

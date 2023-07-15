@@ -72,7 +72,7 @@ const handleMenuClick = e => {
                 </div>
             </div>
             <div class="w-1/2 lg:flex flex-col hidden">
-                <img :src="phoneMockup" class="h-full sm:w-auto md:h-[300px] lg:h-[330px] xl:h-full xl:w-[750px]" alt="">
+                <img :src="phoneMockup" class="h-auto max-w-full " alt="">
             </div>
         </div>
         <div class="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]" aria-hidden="true">

@@ -46,14 +46,14 @@ const testimonials = [
 </script>
 
 <template>
-    <div class="flex flex-col p-6 lg:px-[250px]">
+    <div class="flex flex-col p-6 px-[50px] xl:px-[150px]">
         <section class="bg-background/70 rounded-2xl">
             <div class="mx-auto max-w-[1340px] px-4 py-16 sm:px-6 sm:py-24 lg:me-0 lg:pe-0 lg:ps-8">
                 <div class="grid grid-cols-1 gap-y-8 lg:grid-cols-3 lg:items-center lg:gap-x-16">
                     <div class="max-w-xl ltr:sm:text-left rtl:sm:text-right">
-                        <h2 class="xl:text-5xl text-3xl font-bold tracking-tight sm:text-4xl">
+                        <h2 class="xl:text-4xl text-2xl font-bold tracking-tight sm:text-4xl">
                             Don't just take our word for it...
-                            <br class="hidden sm:block lg:hidden" />
+                            <br class="hidden sm:block mt-2" />
                             Read reviews from our customers
                         </h2>
 

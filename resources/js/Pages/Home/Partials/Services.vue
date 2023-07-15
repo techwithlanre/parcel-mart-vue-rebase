@@ -7,43 +7,43 @@ import smartSend from '/resources/images/icons/smart-send.svg';
 </script>
 
 <template>
-    <div class="bg-background bg-opacity-40">
-        <div class="md:px-[250px] sm:px-[100px] px-10 py-20">
+    <div class="bg-background bg-opacity-40 w-full">
+        <div class="px-10 py-20">
             <h1 class="text-3xl lg:text-5xl font-bold">We Provide Safe and <br>Reliable Cargo Solutions</h1>
-            <div class="flex lg:flex-row flex-col justify-between gap-x-20 gap-y-10 mt-20">
-                <div class="flex flex-col p-10 w-full justify-between gap-y-10 bg-white rounded-xl ring ring-background hover:ring-primary duration-500">
-                    <Component :is="plane" class="flex justify-center h-52 w-52" />
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 justify-between gap-x-20 gap-y-10 mt-20">
+                <div class="p-5 w-full justify-between gap-y-10 bg-white rounded-xl ring ring-background hover:ring-primary duration-500">
+                    <Component :is="plane" class="flex justify-center h-auto max-w-full" />
                     <div class="flex justify-between">
-                        <h3 class="font-bold text-xl">Air <br>Freight</h3>
-                        <div class="border-background border-2 flex justify-center items-center rounded-full h-10 w-10 hover:bg-primary duration-300">
+                        <h3 class="font-bold text-lg">Air <br>Freight</h3>
+                        <div class="border-background border-2 xl:flex justify-center items-center rounded-full h-10 w-10 hidden">
                             <Component :is="arrowRightUp" class="text-primary" />
                         </div>
                     </div>
                 </div>
-                <div class="flex flex-col lg:p-10 p-5 w-full justify-between gap-y-10 bg-white rounded-xl ring ring-background hover:ring-primary duration-500">
-                    <Component :is="ship" class="flex justify-center h-52 w-52" />
+                <div class="p-5 w-full justify-between gap-y-10 bg-white rounded-xl ring ring-background hover:ring-primary duration-500">
+                    <Component :is="ship" class="flex justify-center h-auto max-w-full " />
                     <div class="flex justify-between">
-                        <h3 class="font-bold text-xl">Ocean <br>Freight</h3>
-                        <div class="border-background border-2 flex justify-center items-center rounded-full h-10 w-10">
+                        <h3 class="font-bold text-lg">Ocean <br>Freight</h3>
+                      <div class="border-background border-2 xl:flex justify-center items-center rounded-full h-10 w-10 hidden">
                             <Component :is="arrowRightUp" class="text-primary" />
                         </div>
                     </div>
                 </div>
 
-                <div class="flex flex-col p-10 w-full justify-between gap-y-10 bg-white rounded-xl ring ring-background hover:ring-primary duration-500">
-                    <Component :is="truck" class="flex justify-center h-52 w-52" />
+                <div class="p-5 w-full justify-between gap-y-10 bg-white rounded-xl ring ring-background hover:ring-primary duration-500">
+                    <Component :is="truck" class="flex justify-center h-auto max-w-full" />
                     <div class="flex justify-between">
-                        <h3 class="font-bold text-xl">Road <br> Transportation</h3>
-                        <div class="border-background border-2 flex justify-center items-center rounded-full h-10 w-10">
-                            <Component :is="arrowRightUp" class="text-primary" />
+                        <h3 class="font-bold text-lg">Road <br> Transportation</h3>
+                        <div class="border-background border-2 xl:flex justify-center items-center rounded-full h-10 w-10 hidden">
+                            <Component :is="arrowRightUp" class="text-primary h-auto max-w-full" />
                         </div>
                     </div>
                 </div>
-                <div class="flex flex-col p-10 w-full justify-between items-center gap-y-10 bg-white rounded-xl ring ring-background hover:ring-primary duration-500">
-                    <Component :is="smartSend" class="flex justify-center h-52 w-52" />
+                <div class="p-5 w-full justify-between gap-y-10 bg-white rounded-xl ring ring-background hover:ring-primary duration-500">
+                    <Component :is="smartSend" class="flex justify-center h-auto max-w-full" />
                     <div class="flex justify-between">
-                        <h3 class="font-bold text-xl">Smart <br>Parcel delivery</h3>
-                        <div class="border-background border-2 flex justify-center items-center rounded-full h-10 w-10">
+                        <h3 class="font-bold text-lg">Smart <br>Parcel delivery</h3>
+                        <div class="border-background border-2 xl:flex justify-center items-center rounded-full h-10 w-10 hidden">
                             <Component :is="arrowRightUp" class="text-primary" />
                         </div>
                     </div>

@@ -2,7 +2,7 @@
     <div class="bg-white overflow-x-hidden">
         <Head title="Home" />
         <div class="bg-white overflow-x-hidden">
-            <div class="p-6 px-[50px] sm:px-[50px]">
+            <div class="p-6 px-[20px] sm:px-[50px]">
                 <FrontNavigation id="#top" />
                 <Hero />
                 <Partners />

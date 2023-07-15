@@ -29,7 +29,7 @@ const handleMenuClick = e => {
         </div>
         <div class="flex lg:flex-row flex-col lg:pt-32 pt-16 justify-between gap-x-32">
             <div class="lg:w-1/2">
-                <h1 class="lg:text-6xl text-5xl font-bold">Your Package <br>Delivered With Speed and Precision</h1>
+                <h1 class="lg:text-6xl text-5xl font-bold">Your Packaging <br>Delivered With Speed and Precision</h1>
                 <p class=" lg:text-2xl  text-gray-600">We providing fast, reliable, and affordable delivery services. Whether you need to send a package across town or across the country, we've got you covered.</p>
                 <div class="flex gap-x-10 mt-10">
                     <div class="flex flex-row mt-5 gap-x-5">

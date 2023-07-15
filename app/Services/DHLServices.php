@@ -249,8 +249,9 @@ class DHLServices
             $client = new Client([
                 'auth' => [$this->username, $this->password]
             ]);
+
             //$response = $client->get('https://express.api.dhl.com/mydhlapi/test/shipments/7957673080/tracking?trackingView=all-checkpoints&levelOfDetail=all' . $dhlShipmentLog->tracking_url. '?trackingView=all-checkpoints&levelOfDetail=all');
-            $response = $client->get('https://express.api.dhl.com/mydhlapi/test/shipments/7957673080/tracking?trackingView=all-checkpoints&levelOfDetail=all');
+            $response = $client->get($dhlShipmentLog->tracking_url . '?trackingView=all-checkpoints&levelOfDetail=all');
             if ($response->getStatusCode() == 200)  return $response->getBody()->getContents();
             return false;
         } catch (GuzzleException $e) {

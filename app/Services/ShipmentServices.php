@@ -287,6 +287,7 @@ class ShipmentServices
             $dhl = new DHLServices($request);
             $response = $dhl->trackShipment($dhl_shipment);
             $tracking_data = json_decode($response, true);
+            $tracking_log = false;
             foreach ($tracking_data['shipments'] as $td) {                //dd($td);
                 if (isset($td['events']) && count($td['events']) > 0) {
                     foreach ($td['events'] as $event) {
@@ -296,7 +297,7 @@ class ShipmentServices
                             'provider' => 'dhl',
                         ])->first();
                         if (!$check) {
-                            TrackingLog::create([
+                            $tracking_log = TrackingLog::create([
                                 'shipment_id' => $shipment->id,
                                 'update_code' => $event['typeCode'],
                                 'waybill_number' => $td['pieces'][0]['trackingNumber'],
@@ -313,7 +314,8 @@ class ShipmentServices
                     }
                 }
             }
-            return \redirect(route('shipment.track.details', $shipment->id));
+            if ($tracking_log) return \redirect(route('shipment.track.details', $shipment->id));
+            return redirect()->back()->with('message', 'We are working on tracking info. Please check back later');
         } catch (\Exception $exception) {
             return redirect()->back()->with('error', 'We are working on tracking info. Please check back later');
         }

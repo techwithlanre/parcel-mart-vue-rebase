@@ -121,13 +121,13 @@ const adminMenu = [
     <aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-64 mt-10 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700" aria-label="Sidebar">
         <div class="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
             <ul class="space-y-2 font-medium" v-for="group  in sidebar">
-                <li v-if="!page.props.auth.user.is_admin" v-for="item in group" class="">
+                <li v-if="page.props.auth.user.is_admin === 0" v-for="item in group" class="">
                     <Link :href="item.route" class="flex items-center hover:text-primary p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group" :class="{'text-white bg-primary group font-bold rounded-md py-2 hover:text-primary hover:bg-background': $page.url.startsWith(item.route)}">
                         <Component :is="item.icon" class="w-6 h-6 fill-current" />
                         <span class="ml-3">{{ item.name }}</span>
                     </Link>
                 </li>
-                <li v-else v-for="item in adminMenu" class="">
+                <li v-if="page.props.auth.user.is_admin === 1" v-for="item in adminMenu" class="">
                     <Link :href="item.route" class="flex items-center p-2 hover:text-primary text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                         <Component :is="item.icon" class="w-6 h-6 fill-current" />
                         <span class="flex-1 ml-3 whitespace-nowrap">{{ item.name }}</span>

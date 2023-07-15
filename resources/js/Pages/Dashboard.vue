@@ -1,7 +1,7 @@
 <script>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import {Head, Link, useForm, usePage} from '@inertiajs/vue3';
-import {Dialog, Tab, TabGroup, TabList, TabPanel, TabPanels, TransitionRoot} from "@headlessui/vue";
+import {Tab, TabGroup, TabList, TabPanel, TabPanels, TransitionRoot} from "@headlessui/vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import SelectInput from "@/Components/SelectInput.vue";
@@ -134,7 +134,7 @@ export default {
                             </div>
                         </div>
                     </div>
-                    <div v-if="!page.props.auth.user.is_admin" class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
+                    <div v-if="page.props.auth.role !== 'admin'" class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
                         <div class="flex justify-between">
                             <div class="flex gap-5 items-start">
                                 <div class="h-12 w-12">
@@ -148,7 +148,7 @@ export default {
                             <div class="text-3xl"></div>
                         </div>
                     </div>
-                    <div v-if="page.props.auth.user.is_admin" class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
+                    <div v-if="page.props.auth.role === 'admin'" class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
                         <div class="flex justify-between">
                             <div class="flex gap-5 items-start">
                                 <div class="h-12 w-12">
@@ -162,7 +162,7 @@ export default {
                             <div class="text-3xl"></div>
                         </div>
                     </div>
-                    <div v-if="page.props.auth.user.is_admin" class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
+                    <div v-if="page.props.auth.role === 'admin'" class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
                         <div class="flex justify-between">
                             <div class="flex gap-5 items-start">
                                 <div class="h-12 w-12">
@@ -190,7 +190,7 @@ export default {
                             <div class="text-3xl"></div>
                         </div>
                     </div>
-                    <div v-if="page.props.auth.user.is_admin" class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
+                    <div v-if="page.props.auth.role === 'admin'" class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
                         <div class="flex justify-between">
                             <div class="flex gap-5 items-start">
                                 <div class="h-12 w-12">
@@ -206,7 +206,7 @@ export default {
                     </div>
                 </div>
 
-                <div v-if="!page.props.auth.user.is_admin" class="flex flex-col gap-y-10 lg:flex-row gap-x-10 mt-10">
+                <div v-if="page.props.auth.role !== 'admin'" class="flex flex-col gap-y-10 lg:flex-row gap-x-10 mt-10">
                     <div class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
                         <Link :href="route('shipment.start')" class="flex flex-col">
                             <div class="border bg-background/50 rounded-full h-16 w-16 flex justify-center items-center">
@@ -254,7 +254,7 @@ export default {
             </div>
         </div>
         <div>
-            <div class="mt-20" v-if="page.props.auth.user.is_admin">
+            <div class="mt-20" v-if="page.props.auth.role === 'admin'">
                 <h1 class="text-lg">Recent Shipments</h1>
                 <div class="relative overflow-x-auto shadow sm:rounded-lg">
                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -281,7 +281,7 @@ export default {
                                 <div>{{ item.destination['address_1']}}</div>
                                 <div>{{item.destination['city']}}, {{ item.destination['country']}}</div>
                             </td>
-                            <td scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                            <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                 {{ item.number }}
                             </td>
                             <td class="px-6 py-4">
@@ -416,13 +416,5 @@ export default {
 </template>
 
 <style>
-
-.ant-modal-content  {
-    @apply rounded-xl
-}
-
-.ant-modal-header {
-    @apply rounded-t-xl
-}
 
 </style>

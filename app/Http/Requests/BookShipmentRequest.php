@@ -24,7 +24,21 @@ class BookShipmentRequest extends FormRequest
         return [
             'option_id' => 'required|exists:shipping_rate_logs,id',
             'shipment_id' => 'required|exists:shipments,id',
-            'insurance' => 'required|exists:insurance_options,id'
+            'insurance' => 'required|exists:insurance_options,id',
+            'shipment_date' => [
+                'required',
+                'date',
+                'after:'.date('Y-m-d'),
+                'before:'.date('Y-m-d', strtotime("+10 days"))
+            ],
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'shipment_date.after' => "Planned shipment date must start from tomorrow",
+            'shipment_date.before' => "Planned shipment date must not be more than 10 days",
         ];
     }
 }

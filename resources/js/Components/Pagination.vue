@@ -6,7 +6,7 @@ import {Link} from "@inertiajs/vue3";
 </script>
 
 <template>
-    <div class="flex gap-x-2 justify-center p-8" v-if="links.length > 3">
+    <div class="flex gap-x-2 justify-center p-8" v-if="links.length > 0">
         <template v-for="(link, p) in links" :key="p">
             <div v-if="link.url === null" class="mr-1 mb-1 px-4 py-3 text-sm leading-4 text-gray-400 border rounded-full"
                  v-html="link.label" />

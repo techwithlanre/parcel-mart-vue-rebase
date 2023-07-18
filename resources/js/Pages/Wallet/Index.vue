@@ -72,8 +72,8 @@ const handleFilter = () => {
 <template>
     <Head title="Dashboard" />
     <AuthenticatedLayout page-title="Wallet">
-        <div class="flex lg:flex-row flex-col gap-10 mt-10">
-            <div class="flex rounded-xl p-5 border bg-white w-full gap-x-36 justify-between items-center lg:w-2/6">
+        <div class="grid sm:grid-cols-2 gap-10 mt-10">
+            <div class="flex rounded-xl p-5 border bg-white w-full gap-x-36 justify-between items-center ">
                 <div>
                     <h3 class="text-sm">Wallet Balance</h3>
                     <div class="text-2xl font-bold">{{ balance }}</div>
@@ -84,7 +84,7 @@ const handleFilter = () => {
                 </button>
             </div>
 
-            <div v-if="page.props.auth.user.user_type === 'business'" class="flex rounded-xl p-5 border bg-white w-full gap-x-36 justify-between items-center lg:w-2/6">
+            <div v-if="page.props.auth.user.user_type === 'business'" class="flex rounded-xl p-5 border bg-white w-full gap-x-36 justify-between items-center">
                 <div>
                     <h3 class="text-sm">Overdraft Wallet</h3>
                     <div class="text-2xl font-bold">{{ overdraft_wallet_balance }}</div>

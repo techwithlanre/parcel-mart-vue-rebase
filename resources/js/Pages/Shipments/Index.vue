@@ -41,60 +41,12 @@ const trackShipment = () => {
 }
 
 const shipmentStatusOptions = [
-    {
-        id: "all",
-        name: "all"
-    },
-    {
-        id: "pending",
-        name: "pending"
-    },
-    {
-        id: "processing",
-        name: "processing"
-    },
-    {
-        id: "delivered",
-        name: "delivered"
-    },
-    {
-        id: "cancelled",
-        name: "cancelled"
-    },
+    {id: "all", name: "all"},
+    {id: "pending", name: "pending"},
+    {id: "processing", name: "processing"},
+    {id: "delivered", name: "delivered"},
+    {id: "cancelled",name: "cancelled"}
 ];
-
-const dataSource = [
-        {
-            key: "1",
-            name: 'Mike',
-            age: 32,
-            address: '10 Downing Street',
-        },
-        {
-            key: "2",
-            name: 'John',
-            age: 42,
-            address: '10 Downing Street',
-        },
-    ];
-
-const columns = [
-        {
-            title: 'Name',
-            dataIndex: 'name',
-            key: 'name',
-        },
-        {
-            title: 'Age',
-            dataIndex: 'age',
-            key: 'age',
-        },
-        {
-            title: 'Address',
-            dataIndex: 'address',
-            key: 'address',
-        },
-    ];
 
 const page = usePage();
 
@@ -170,7 +122,7 @@ const handleFilter = () => {
                         <tr>
                             <th scope="col" class="px-6 py-3">Origin</th>
                             <th scope="col" class="px-6 py-3">Destination</th>
-                            <th scope="col" class="px-6 py-3">Number</th>
+                            <th scope="col" class="px-6 py-3">Tracking Number</th>
                             <th scope="col" class="px-6 py-3">Status</th>
                             <th scope="col" class="px-6 py-3">Action</th>
                         </tr>
@@ -193,14 +145,14 @@ const handleFilter = () => {
                                 {{ item.number }}
                             </td>
                             <td class="px-6 py-4">
-                              <span :class="{ 'bg-orange-400 px-3 py-1 rounded-full text-white font-medium': item.status ==='processing' }">{{ item.status}}</span>
+                              <span
+                                  :class="{'bg-orange-400' : item.status ==='processing', 'bg-yellow-400' : item.status ==='pending', 'bg-green-400' : item.status ==='delivered'}"
+                                  class="px-3 py-1 rounded-full text-white font-medium">{{ item.status}}</span>
 
                             </td>
                             <td class="px-6 py-4">
-                                <Link :href="route('shipment.checkout', item.id)" v-if="item.status === 'pending'" class="text-primary font-medium hover:text-green-600">Checkout</Link>
-                                <Link :href="route('shipment.details', item.id)" v-else class="text-primary font-medium hover:text-green-600"  >
-                                  View
-                                </Link>
+                                <Link :href="route('shipment.checkout', item.id)" v-if="item.status === 'pending'" class="text-primary btn btn-sm font-medium hover:text-green-600">Checkout</Link>
+                                <Link :href="route('shipment.details', item.id)" v-else class="btn btn-sm bg-green-400 text-white font-medium hover:text-green-600">View</Link>
                             </td>
                         </tr>
                         </tbody>

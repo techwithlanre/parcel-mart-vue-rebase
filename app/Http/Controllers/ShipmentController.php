@@ -7,7 +7,9 @@ use App\Http\Requests\CreateShipmentRequest;
 use App\Http\Requests\TrackShipmentRequest;
 use App\Mail\OrderConfirmation;
 use App\Models\Address;
+use App\Models\AllowedShipmentCountry;
 use App\Models\AramexShipmentLog;
+use App\Models\City;
 use App\Models\Country;
 use App\Models\DhlRateLog;
 use App\Models\InsuranceOption;
@@ -15,6 +17,7 @@ use App\Models\ItemCategory;
 use App\Models\Shipment;
 use App\Models\ShipmentItem;
 use App\Models\ShippingRateLog;
+use App\Models\State;
 use App\Models\TrackingLog;
 use App\Services\ShipmentServices;
 use Illuminate\Http\Request;
@@ -78,7 +81,17 @@ class ShipmentController extends Controller
     {
         $addresses = Address::where('user_id', auth()->user()->id)
             ->with('address_contacts', 'country', 'city')->get();
-        $countries = Country::all();
+        $all_countries = Country::all();
+        $countries = [];
+        foreach ($all_countries as $country) {
+            $allowed = AllowedShipmentCountry::where('country_id', $country->id)->count();
+            $countries[] = [
+                'id' => $country->id,
+                'name' => $country->name,
+                'can_ship_from' => $allowed > 0
+            ];
+        }
+
         $categories = ItemCategory::all();
         return Inertia::render('Shipments/Create', compact('addresses', 'countries', 'categories'));
     }
@@ -185,7 +198,10 @@ class ShipmentController extends Controller
         ];
         $insurance_options = InsuranceOption::all();
         $dhl_rate_log = DhlRateLog::where('shipment_id', $id)->get();
-        return Inertia::render('Shipments/Checkout', compact('item_category','shipment', 'dhl_rate_log','origin', 'destination','insurance_options','shipping_rate_log', 'origin_location', 'destination_location'));
+        $countries = Country::all();
+        $origin_states = State::where('country_id', $origin->country)->get();
+        $origin_cities = City::where('state_id', $origin->state)->get();
+        return Inertia::render('Shipments/Checkout', compact('countries', 'origin_states', 'origin_cities', 'item_category','shipment', 'dhl_rate_log','origin', 'destination','insurance_options','shipping_rate_log', 'origin_location', 'destination_location'));
     }
 
     public function bookShipment(BookShipmentRequest $request, ShipmentServices $services)

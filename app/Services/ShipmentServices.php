@@ -175,7 +175,7 @@ class ShipmentServices
 
         if ($provider == 'dhl') {
             $dhl = new DHLServices($bookShipmentRequest);
-            $book_dhl = $dhl->bookShipment($shipment, $shipment_item, $insurance, $rate);
+            $book_dhl = $dhl->bookShipment($shipment, $shipment_item, $insurance, $rate, $bookShipmentRequest);
         }
 
         if ($book_aramex || $book_dhl) {
@@ -235,7 +235,10 @@ class ShipmentServices
     public function trackShipment(TrackShipmentRequest $request)
     {
         $shipment_number = trim($request->number);
-        $shipment = Shipment::where('number', $shipment_number)->first();
+        $shipment = Shipment::where([
+            'number' => $shipment_number,
+            'user_id' => auth()->user()->id,
+        ])->first();
 
         if (!$shipment) return \redirect(route('shipment.index'))->with('error', 'Tracking number not found');
         if ($shipment->provider == 'aramex') return $this->trackAramex($shipment);

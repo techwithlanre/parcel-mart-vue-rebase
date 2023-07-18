@@ -51,10 +51,9 @@ Route::get('tracking', function () {
 Route::post('contact', [\App\Http\Controllers\ContactController::class, 'send'])->name('contact.send');
 
 Route::post('/send-quote-form', function(\Illuminate\Http\Request $request) {
-    Mail::to('enquiries@parcelsmartsolutions.com')->send(new \App\Mail\QuoteForm($request));
+    Mail::to('quotes@parcelsmartsolution.com')->send(new \App\Mail\QuoteForm($request));
+    return redirect(\route('dashboard'))->with('message', 'Your request has been sent');
 })->name('send.quote.form');
-
-
 
 
 Route::get('states/{country_id}', function () {
@@ -143,3 +142,21 @@ Route::get('logout', [AuthenticatedSessionController::class, 'destroy'])->name('
 Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
 //////////////
+
+
+//TODO
+Route::get('workbench/{id}', function (\Illuminate\Http\Request $request) {
+   $cc = \App\Models\AllowedShipmentCountry::where('country_id', $request->id)->first();
+   $origin = $cc->country_id;
+   $destinations = explode(',', $cc->allowed_destinations);
+   $data = [];
+   foreach ($destinations as $d) {
+       $data[] = [
+           'id' => $d,
+           'name' => getCountry('id', $d)->name
+       ];
+   }
+   echo '<pre>';
+   print_r($data);
+   exit;
+});

@@ -1,7 +1,7 @@
 import './bootstrap';
 import '../css/app.css';
 import Antd from "ant-design-vue";
-import "ant-design-vue/dist/antd.css";
+import "ant-design-vue/dist/reset.css";
 import 'vue3-toastify/dist/index.css';
 import Vue3Toastify from 'vue3-toastify';
 import VueAnimateOnScroll from 'vue-animate-onscroll';
@@ -10,7 +10,7 @@ import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy/dist/vue.m';
 import TawkMessengerVue from '@tawk.to/tawk-messenger-vue-3';
-import DateFormat from '@voidsolutions/vue-dateformat'
+import DateFormat from '@voidsolutions/vue-dateformat';
 
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
 
@@ -24,10 +24,10 @@ createInertiaApp({
             .use(Antd)
             .use(DateFormat)
             .use(VueAnimateOnScroll)
-            .use(TawkMessengerVue, {
+            /*.use(TawkMessengerVue, {
                 propertyId : '60c6342465b7290ac635bafa',
                 widgetId : '1f833nce0'
-            })
+            })*/
             .use(Vue3Toastify, {
                 autoClose: 3000,
             })

@@ -13,31 +13,33 @@ import 'flowbite';
 import {onMounted} from "vue";
 import { notification } from 'ant-design-vue';
 
+/*
 onMounted(() => {
     initFlowbite();
 });
+*/
 
 const page = usePage();
 
-const openNotificationWithIcon = (type) => {
+const openNotificationWithIcon = (type, message) => {
     notification[type]({
-        message: 'Notification Title',
-        description:
-            'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
+        message: type,
+        description: message
     });
 };
 
 if (page.props.flash.message) {
-    //openNotificationWithIcon('success');
-    toast.success(page.props.flash.message);
-    //page.props.flash.message = "";
+    openNotificationWithIcon('success', page.props.flash.message);
+    //toast.success(page.props.flash.message);
+    page.props.flash.message = "";
 }
 
 
 
 if (page.props.flash.error) {
-    toast.error(page.props.flash.error);
-    //page.props.flash.error = "";
+  openNotificationWithIcon('error', page.props.flash.error);
+    //toast.error(page.props.flash.error);
+    page.props.flash.error = "";
 }
 
 defineProps({

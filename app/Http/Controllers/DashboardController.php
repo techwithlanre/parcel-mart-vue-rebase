@@ -22,7 +22,12 @@ class DashboardController extends Controller
             ? Shipment::where('user_id', auth()->user()->id)->where('status', '!=', 'pending')->count()
             : Shipment::count();
 
-        $shipments = Shipment::where('status', '!=', 'failed')->where('has_rate', 1)->with('shipment_rate')->latest()->take(10)->get();
+        $shipments = auth()->user()->is_admin ?
+            Shipment::where('status', '!=', 'failed')->where('has_rate', 1)->with('shipment_rate')->latest()->take(5)->get()
+        : Shipment::where('status', '!=', 'failed')
+                ->where('has_rate', 1)
+                ->where('user_id', auth()->user()->id)
+                ->with('shipment_rate')->latest()->take(5)->get();
         $log = [];
         foreach ($shipments as $shipment) {
             $origin = json_decode($shipment->origin_address, true);

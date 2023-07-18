@@ -28,7 +28,7 @@
         "@voidsolutions/vue-dateformat": "^0.5.1",
         "@vuejs-community/vue-filter-date-format": "^1.7.1",
         "animate.css": "^4.1.1",
-        "ant-design-vue": "^3.2.20",
+        "ant-design-vue": "^4.0.0",
         "flowbite-vue": "^0.0.12",
         "swiper": "^9.4.0",
         "tailwind-merge": "^1.12.0",

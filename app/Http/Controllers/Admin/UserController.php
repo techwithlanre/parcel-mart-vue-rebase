@@ -14,7 +14,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::with('wallet')->paginate(10);
+        $users = User::with('wallet')->latest()->paginate(10);
         return Inertia::render('Admin/Users/Users', compact('users'));
     }
 

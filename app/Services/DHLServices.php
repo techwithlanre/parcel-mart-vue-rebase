@@ -11,6 +11,8 @@ use App\Models\Shipment;
 use App\Models\ShipmentItem;
 use App\Models\ShippingRateLog;
 use Carbon\Carbon;
+use DateTime;
+use DateTimeZone;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
@@ -73,10 +75,11 @@ class DHLServices
         ];
     }
 
-    public function bookShipment(Shipment $shipment, ShipmentItem $shipmentItem, InsuranceOption $insuranceOption, ShippingRateLog $shippingRateLog)
+    public function bookShipment(Shipment $shipment, ShipmentItem $shipmentItem, InsuranceOption $insuranceOption, ShippingRateLog $shippingRateLog, BookShipmentRequest $bookShipmentRequest)
     {
-        $this->bookShipmentPayload($shipment, $shipmentItem, $insuranceOption, $shippingRateLog);
+        $this->bookShipmentPayload($shipment, $shipmentItem, $insuranceOption, $shippingRateLog, $bookShipmentRequest);
         $result = $this->sendBookShipmentRequest();
+        dd($result);
         $dhl_shipment_log = DhlShipmentLog::create([
             'shipment_id' => $shipment->id,
             'shipment_rate_log_id' => $shippingRateLog->id,
@@ -92,20 +95,15 @@ class DHLServices
 
 
 
-    private function bookShipmentPayload(Shipment $shipment, ShipmentItem $shipmentItem, InsuranceOption $insuranceOption, ShippingRateLog $shippingRateLog)
+    private function bookShipmentPayload(Shipment $shipment, ShipmentItem $shipmentItem, InsuranceOption $insuranceOption, ShippingRateLog $shippingRateLog, BookShipmentRequest $bookShipmentRequest)
     {
         $origin = json_decode($shipment->origin_address, true);
         $destination = json_decode($shipment->origin_address, true);
         //$product_code = (getCountry('id', $origin['country'])->iso2 == getCountry('id', $destination['country'])->iso2) ? 'DOM' : 'EXP';
-
-
-
-
-        $today = Carbon::now();
-        $tomorrow = $today->addDay();
-
+        $shipment_date = Carbon::create($bookShipmentRequest->shipment_date)->timezone('GMT+1');
+        $shipment_date = str_replace(' ', 'T', $shipment_date->toDateTimeString()) . " GMT+01:00";
         $this->bookShipmentPayload = [
-            "plannedShippingDateAndTime" => "2023-07-14T17:10:09 GMT+01:00",
+            "plannedShippingDateAndTime" => $shipment_date,
             "productCode" => "N",
             "pickup" => [
                 "isRequested" => false
@@ -215,6 +213,7 @@ class DHLServices
             $response = curl_exec($curl);
             curl_close($curl);
             $result = json_decode($response, true);
+            dd($result);
             if (!isset($result['shipmentTrackingNumber'])) return false;
             return $result;
         } catch (\Exception $e) {

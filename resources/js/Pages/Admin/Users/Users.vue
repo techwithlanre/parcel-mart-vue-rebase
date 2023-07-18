@@ -1,6 +1,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import {Link} from "@inertiajs/vue3";
+import Pagination from "@/Components/Pagination.vue";
 
 defineProps({
     users: Array
@@ -36,6 +37,7 @@ defineProps({
                 </table>
             </div>
         </div>
+      <Pagination :links="users.links"/>
     </AuthenticatedLayout>
 </template>
 

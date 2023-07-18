@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { Dialog, DialogPanel } from '@headlessui/vue'
 import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline'
 import logo from '/resources/images/logo.png';
-import {Head, Link} from "@inertiajs/vue3";
+import {Head, Link, usePage} from "@inertiajs/vue3";
 
 const navigation = [
     { name: 'Tracking', href: route('tracking') },
@@ -13,6 +13,8 @@ const navigation = [
 ]
 
 const mobileMenuOpen = ref(false)
+
+const page = usePage();
 </script>
 
 <template>
@@ -34,8 +36,9 @@ const mobileMenuOpen = ref(false)
                 <Link v-for="item in navigation" :key="item.name" :href="item.href" class="text-sm font-semibold leading-6 text-gray-900 hover:text-primary">{{ item.name }}</Link>
             </div>
             <div class="hidden lg:flex lg:flex-1 lg:justify-end gap-x-5">
-                <Link :href="route('home') + '#quote-form'" class="text-sm font-semibold leading-6 py-1 px-8 rounded-lg hover:text-white bg-transparent hover:bg-primary text-primary border-2 border-primary">Get Quote</Link>
-                <Link :href="route('login')" class="text-sm font-semibold leading-6 py-1 px-8 rounded-lg hover:text-primary bg-primary hover:bg-white text-white border-2 border-primary">Log In</Link>
+                <Link :href="route('home') + '#quote-form'" class="text-sm font-semibold leading-6 py-1 px-8 rounded-lg hover:text-white bg-transparent hover:bg-primary text-primary border-2 border-primary duration-300">Get Quote</Link>
+                <Link  v-if="!page.props.auth.user" :href="route('login')" class="text-sm font-semibold leading-6 py-1 px-8 rounded-lg hover:text-primary bg-primary hover:bg-white text-white border-2 border-primary duration-300">Log In</Link>
+                <Link  v-else :href="route('dashboard')" class="text-sm font-semibold leading-6 py-1 px-8 rounded-lg hover:text-primary bg-primary hover:bg-white text-white border-2 border-primary duration-300">Dashboard</Link>
             </div>
         </nav>
         <Dialog as="div" class="lg:hidden" @close="mobileMenuOpen = false" :open="mobileMenuOpen">
@@ -57,8 +60,9 @@ const mobileMenuOpen = ref(false)
                             <a v-for="item in navigation" :key="item.name" :href="item.href" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:text-primary-dark hover:bg-gray-50">{{ item.name }}</a>
                         </div>
                         <div class="py-6 flex flex-col gap-y-2">
-                            <Link :href="route('home') + '#quote-form'" class="text-sm font-semibold text-center leading-6 py-1 px-8 rounded-lg hover:text-white bg-transparent hover:bg-primary text-primary border-2 border-primary">Get Quote</Link>
-                            <Link :href="route('login')" class="text-sm font-semibold leading-6 py-1 text-center px-8 rounded-lg hover:text-primary bg-primary hover:bg-white text-white border-2 border-primary">Log In</Link>
+                            <Link :href="route('home') + '#quote-form'" class="text-sm font-semibold text-center leading-6 py-1 px-8 rounded-lg hover:text-white bg-transparent hover:bg-primary text-primary border-2 border-primary duration-300">Get Quote</Link>
+                            <Link v-if="!page.props.auth.user" :href="route('login')" class="text-sm font-semibold leading-6 py-1 text-center px-8 rounded-lg hover:text-primary bg-primary hover:bg-white text-white border-2 border-primary duration-300">Get Started</Link>
+                          <Link  v-else :href="route('dashboard')" class="text-sm font-semibold leading-6 py-1 px-8 text-center rounded-lg hover:text-primary bg-primary hover:bg-white text-white border-2 border-primary duration-300">Dashboard</Link>
                         </div>
                     </div>
                 </div>

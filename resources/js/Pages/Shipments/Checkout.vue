@@ -30,7 +30,9 @@ defineProps({
     item_category: Object,
     countries: Array,
     origin_states: Array,
+    destination_states: Array,
     origin_cities: Array,
+    destination_cities: Array,
 });
 
 const form  = useForm({
@@ -152,13 +154,13 @@ const today = new Date();
             <a-collapse v-model:activeKey="activeKey" class="border-0 shadow-md">
               <a-collapse-panel key="1" header="Package Information">
                 <div class="relative overflow-x-auto duration-300">
-                  <div class="mb-3 mt-3 flex flex-row justify-end">
+<!--                  <div class="mb-3 mt-3 flex flex-row justify-end">
                     <button @click="isEditOriginAddressOpen = true" class="shadow p-2 rounded-full bg-primary">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-white">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
                       </svg>
                     </button>
-                  </div>
+                  </div>-->
                   <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <tbody v-for="item in shipment.shipment_items" :key="item.id" >
                     <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
@@ -310,7 +312,7 @@ const today = new Date();
             </div>
             <hr>
             <div class="p-5">
-              <EditOriginAddressModal :address="destination" :countries="countries" :states="origin_states" :cities="origin_cities" />
+              <EditOriginAddressModal :address="destination" :countries="countries" :states="destination_states" :cities="destination_cities" />
             </div>
           </div>
         </Modal>

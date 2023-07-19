@@ -10,7 +10,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import InputError from "@/Components/InputError.vue";
 import Parcel from "../../images/parcel.png";
 import Pagination from "@/Components/Pagination.vue";
-import { Modal } from 'flowbite';
+import { notification } from 'ant-design-vue';
 
 
 export default {
@@ -122,7 +122,11 @@ export default {
         this.form.post(route('send.quote.form'), {
           onFinish: () => {
             this.form.reset()
-            this.closeModal()
+            this.toggleQuote(false);
+            notification['success']({
+              message: 'success',
+              description: 'Request has been submitted, You will be contacted via email'
+            });
           },
         });
       }
@@ -133,6 +137,11 @@ export default {
 <script setup>
 
 import {useForm} from "@inertiajs/vue3";
+import Modal from "@/Components/Modal.vue";
+import {ref} from "vue";
+import {notification} from "ant-design-vue";
+
+const isTrackingOpen = ref(false);
 
 const trackForm = useForm({
   number: ''
@@ -141,7 +150,14 @@ const trackForm = useForm({
 
 const trackShipment = () => {
   trackForm.post(route('shipment.track'), {
-    onFinish: () => trackForm.reset(),
+    onFinish: ()  => {
+      trackForm.reset();
+      isTrackingOpen.value = false;
+      /*notification['success']({
+        message: 'success',
+        description: 'Request has been submitted, You will be contacted via email'
+      });*/
+    },
   })
 }
 </script>
@@ -252,7 +268,7 @@ const trackShipment = () => {
                         </link>
                     </div>
                     <div class="p-5 bg-white rounded-2xl w-full border shadow-md hover:shadow-lg duration-300">
-                        <a href="javascript:void(0)" id="" class="flex flex-col" data-modal-target="getQuoteModal" data-modal-toggle="getQuoteModal">
+                        <a href="javascript:void(0)" id="" class="flex flex-col" @click="toggleQuote(true)">
                             <div class="border bg-background/50 rounded-full h-16 w-16 flex justify-center items-center">
                                 <img src="../../images/price-tag.png" alt="" class="h-10 w-10">
                             </div>
@@ -266,7 +282,7 @@ const trackShipment = () => {
                             </div>
                         </a>
                     </div>
-                    <a href="javascript:void(0)" data-modal-target="trackingModal" data-modal-toggle="trackingModal" class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
+                    <a href="javascript:void(0)" @click="isTrackingOpen = true" class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
                         <div class="flex gap-5 items-center">
                             <div class="flex flex-col">
                                 <div class="border bg-background/50 rounded-full h-16 w-16 flex justify-center items-center">
@@ -331,175 +347,177 @@ const trackShipment = () => {
                 </div>
             </div>
         </div>
-        <div id="getQuoteModal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full transition-all duration-300">
-          <div class="relative w-full max-w-2xl max-h-full duration-300">
-            <!-- Modal content -->
-            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-              <!-- Modal header -->
-              <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
-                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                  Get Pricing
-                  <p class="text-gray-500 font-normal text-xs mt-2">Use this form to get request for a quote</p>
-                </h3>
-                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="getQuoteModal">
-                  <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-                  </svg>
-                  <span class="sr-only">Close modal</span>
-                </button>
-              </div>
-              <!-- Modal body -->
-              <div class="">
-                <form @submit.prevent="submitQuote">
-                  <div class="px-6 mb-5">
-                    <div class="grid lg:grid-cols-3 gap-y-3 mt-3 gap-x-5 w-full">
-                      <div>
-                        <TextInput
-                            id="quantity"
-                            type="text"
-                            class="mt-1 w-full"
-                            required
-                            autocomplete="off"
-                            readonly
-                            v-model="form.name"/>
-                      </div>
-                      <div class="">
-                        <TextInput
-                            id="quantity"
-                            type="text"
-                            class="mt-1 w-full"
-                            required
-                            autocomplete="off"
-                            readonly
-                            v-model="form.phone"/>
-                      </div>
-                      <div class="">
-                        <TextInput
-                            id="quantity"
-                            type="email"
-                            class="mt-1 w-full"
-                            autocomplete="off"
-                            readonly
-                            v-model="form.email"/>
-                      </div>
-                    </div>
-                    <div class="mt-4">
-                      <InputLabel value="Origin Location" />
+        <Modal :show="isQuoteOpen">
+          <div class="">
+            <div class="relative w-full max-w-2xl max-h-full duration-300">
+              <!-- Modal content -->
+              <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <!-- Modal header -->
+                <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
+                  <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                    Get Pricing
+                    <p class="text-gray-500 font-normal text-xs mt-2">Use this form to get request for a quote</p>
+                  </h3>
+                  <button type="button" class="text-gray-400 bg-transparent duration-300 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="getQuoteModal">
+                    <svg @click="isQuoteOpen = false" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-red-900 cursor-pointer" fill="none" viewBox="0 0 24 24"
+                         stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                  </button>
+                </div>
+                <!-- Modal body -->
+                <div class="">
+                  <form @submit.prevent="submitQuote">
+                    <div class="px-6 mb-5">
                       <div class="grid lg:grid-cols-3 gap-y-3 mt-3 gap-x-5 w-full">
-                        <SelectInput
-                            place-holder="Select Country"
-                            class="block w-full"
-                            v-model="form.country_from"
-                            required
-                            :options="countries"
-                            v-on:change="getOriginStates"
-                        />
+                        <div>
+                          <TextInput
+                              id="quantity"
+                              type="text"
+                              class="mt-1 w-full"
+                              required
+                              autocomplete="off"
+                              readonly
+                              v-model="form.name"/>
+                        </div>
+                        <div class="">
+                          <TextInput
+                              id="quantity"
+                              type="text"
+                              class="mt-1 w-full"
+                              required
+                              autocomplete="off"
+                              readonly
+                              v-model="form.phone"/>
+                        </div>
+                        <div class="">
+                          <TextInput
+                              id="quantity"
+                              type="email"
+                              class="mt-1 w-full"
+                              autocomplete="off"
+                              readonly
+                              v-model="form.email"/>
+                        </div>
+                      </div>
+                      <div class="mt-4">
+                        <InputLabel value="Origin Location" />
+                        <div class="grid lg:grid-cols-3 gap-y-3 mt-3 gap-x-5 w-full">
+                          <SelectInput
+                              place-holder="Select Country"
+                              class="block w-full"
+                              v-model="form.country_from"
+                              required
+                              :options="countries"
+                              v-on:change="getOriginStates"
+                          />
 
-                        <SelectInput
-                            place-holder="Select State"
-                            class="block w-full"
-                            required
-                            v-model="form.state_from"
-                            :options="originStates"
-                            v-on:change="getOriginCities"
-                        />
+                          <SelectInput
+                              place-holder="Select State"
+                              class="block w-full"
+                              required
+                              v-model="form.state_from"
+                              :options="originStates"
+                              v-on:change="getOriginCities"
+                          />
 
-                        <SelectInput
-                            place-holder="Select State"
-                            class="block w-full"
+                          <SelectInput
+                              place-holder="Select State"
+                              class="block w-full"
+                              required
+                              v-model="form.city_from"
+                              :options="originCities"
+                          />
+                        </div>
+                      </div>
+                      <div class="mt-4">
+                        <InputLabel value="Destination Location" class="mb-3" />
+                        <div class="grid lg:grid-cols-3 gap-y-3 gap-x-5 w-full">
+                          <SelectInput
+                              place-holder="Select Country"
+                              class="block w-full"
+                              v-model="form.country_to"
+                              required
+                              :options="countries"
+                              v-on:change="getDestinationStates"
+                          />
+
+                          <SelectInput
+                              place-holder="Select State"
+                              class="block w-full"
+                              required
+                              v-model="form.state_to"
+                              :options="destinationStates"
+                              v-on:change="getDestinationCities"
+                          />
+
+                          <SelectInput
+                              place-holder="Select State"
+                              class="block w-full"
+                              required
+                              v-model="form.city_to"
+                              :options="destinationCities"
+                          />
+                        </div>
+                      </div>
+
+                      <div class="grid lg:grid-cols-3 gap-y-3 gap-x-5 mt-4">
+                        <TextInput
+                            id="quantity"
+                            type="number"
+                            class="mt-2 w-full"
                             required
-                            v-model="form.city_from"
-                            :options="originCities"
-                        />
+                            autocomplete="off"
+                            placeholder="Quantity"
+                            v-model="form.quantity"/>
+
+                        <TextInput
+                            id="email"
+                            type="number"
+                            class="mt-2 w-full"
+                            required
+                            autocomplete="off"
+                            placeholder="Weight"
+                            v-model="form.weight"/>
+                        <TextInput
+                            id=""
+                            type="number"
+                            class="mt-2 w-full block"
+                            required
+                            autocomplete="off"
+                            placeholder="Length"
+                            v-model="form.length"/>
+                      </div>
+                      <div class="grid lg:grid-cols-3 gap-y-3 mt-4 gap-x-5">
+                        <TextInput
+                            id=""
+                            type="number"
+                            class="mt-1 w-full"
+                            required
+                            autocomplete="off"
+                            placeholder="Width"
+                            v-model="form.width"/>
+
+                        <TextInput
+                            id=""
+                            type="number"
+                            class="mt-1 w-full"
+                            required
+                            autocomplete="off"
+                            placeholder="Height"
+                            v-model="form.height"/>
                       </div>
                     </div>
-                    <div class="mt-4">
-                      <InputLabel value="Destination Location" class="mb-3" />
-                      <div class="grid lg:grid-cols-3 gap-y-3 gap-x-5 w-full">
-                        <SelectInput
-                            place-holder="Select Country"
-                            class="block w-full"
-                            v-model="form.country_to"
-                            required
-                            :options="countries"
-                            v-on:change="getDestinationStates"
-                        />
-
-                        <SelectInput
-                            place-holder="Select State"
-                            class="block w-full"
-                            required
-                            v-model="form.state_to"
-                            :options="destinationStates"
-                            v-on:change="getDestinationCities"
-                        />
-
-                        <SelectInput
-                            place-holder="Select State"
-                            class="block w-full"
-                            required
-                            v-model="form.city_to"
-                            :options="destinationCities"
-                        />
-                      </div>
+                    <div class="flex justify-end items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+                      <PrimaryButton class="" :class="{ 'opacity-25': form.processing }" :disabled="form.processing" >Get Pricing</PrimaryButton>
                     </div>
-
-                    <div class="grid lg:grid-cols-3 gap-y-3 gap-x-5 mt-4">
-                      <TextInput
-                          id="quantity"
-                          type="number"
-                          class="mt-2 w-full"
-                          required
-                          autocomplete="off"
-                          placeholder="Quantity"
-                          v-model="form.quantity"/>
-
-                      <TextInput
-                          id="email"
-                          type="number"
-                          class="mt-2 w-full"
-                          required
-                          autocomplete="off"
-                          placeholder="Weight"
-                          v-model="form.weight"/>
-                      <TextInput
-                          id=""
-                          type="number"
-                          class="mt-2 w-full block"
-                          required
-                          autocomplete="off"
-                          placeholder="Length"
-                          v-model="form.length"/>
-                    </div>
-                    <div class="grid lg:grid-cols-3 gap-y-3 mt-4 gap-x-5">
-                      <TextInput
-                          id=""
-                          type="number"
-                          class="mt-1 w-full"
-                          required
-                          autocomplete="off"
-                          placeholder="Width"
-                          v-model="form.width"/>
-
-                      <TextInput
-                          id=""
-                          type="number"
-                          class="mt-1 w-full"
-                          required
-                          autocomplete="off"
-                          placeholder="Height"
-                          v-model="form.height"/>
-                    </div>
-                  </div>
-                  <div class="flex justify-end items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
-                    <PrimaryButton class="" :class="{ 'opacity-25': form.processing }" :disabled="form.processing" >Get Pricing</PrimaryButton>
-                  </div>
-                </form>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div id="trackingModal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full transition-transform duration-300">
+        </Modal>
+         <Modal :show="isTrackingOpen">
           <div class="relative w-full max-w-2xl max-h-full duration-300">
             <!-- Modal content -->
             <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
@@ -510,10 +528,10 @@ const trackShipment = () => {
                   <p class="text-gray-500 font-normal text-xs">Use this form to track your shipment, enter your tracking number below</p>
                 </h3>
                 <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="trackingModal">
-                  <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                  <svg @click="isTrackingOpen = false" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-red-900 cursor-pointer" fill="none" viewBox="0 0 24 24"
+                       stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                   </svg>
-                  <span class="sr-only">Close modal</span>
                 </button>
               </div>
               <!-- Modal body -->
@@ -528,7 +546,7 @@ const trackShipment = () => {
               </form>
             </div>
           </div>
-        </div>
+        </Modal>
     </AuthenticatedLayout>
 </template>
 

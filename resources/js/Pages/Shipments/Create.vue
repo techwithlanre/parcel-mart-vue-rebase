@@ -102,7 +102,6 @@ export default {
     },
 
     getDestinationCountries: function () {
-      console.log('Yah, I got here');
       axios.get('/api/allowed-countries/' + this.form.origin.country).then(function (response) {
         this.destinationCountries = response.data;
       }.bind(this));
@@ -139,6 +138,7 @@ export default {
     },
 
     populateOriginAddress: function (address) {
+      console.log(address)
       this.form.origin.address_1 = address.address;
       this.form.origin.contact_name = address.address_contacts[0].contact_name;
       this.form.origin.contact_phone = address.address_contacts[0].contact_phone;
@@ -149,7 +149,7 @@ export default {
       this.form.origin.state = address.state_id;
       this.form.origin.city = address.city_id;
       this.form.origin.postcode = address.postcode;
-      //alert(form.origin.state);
+      //alert(this.form.origin.state);
     },
 
     populateDestinationAddress: function (address) {
@@ -183,11 +183,11 @@ export default {
     },
   },
   created: function () {
-    // this.form.origin.country = this.page.props.auth.user.country_id;
-    // this.getOriginStates()
-    // this.form.destination.country = this.page.props.auth.user.country_id;
-    // this.getDestinationStates();
-    // console.log(this.page.props.countries)
+    this.form.origin.country = this.page.props.auth.user.country_id;
+    this.getOriginStates()
+    this.form.destination.country = this.page.props.auth.user.country_id;
+    this.getDestinationStates();
+    console.log(this.page.props.countries)
   }
 }
 </script>
@@ -563,6 +563,7 @@ const tabs = [
 
                 <div class="flex flex-row items-center justify-end mt-6 gap-x-10">
                   <a href="javascript:void(0)" @click="changeTab(1)" type="button" :class="twMerge('underline text-primary')">Previous</a>
+
                   <PrimaryButton type="submit" class="w-full" @click="gotoPackageDetails">
                     Next
                   </PrimaryButton>

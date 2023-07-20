@@ -17,7 +17,7 @@ class AddressServices
             'address' => $request->address,
             'country_id' => $request->country_id,
             'state_id' => $request->state_id,
-            'city_id' => $request->city,
+            'city_id' => $request->city_id,
             'landmark' => $request->landmark,
             'postcode' => $request->postcode,
         ]);

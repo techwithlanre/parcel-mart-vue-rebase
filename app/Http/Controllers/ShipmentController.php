@@ -168,9 +168,14 @@ class ShipmentController extends Controller
 
 
 
-    public function testCalculateShipment(CreateShipmentRequest $request, ShipmentServices $shipmentServices)
+    public function calculateShipment(CreateShipmentRequest $request, ShipmentServices $shipmentServices)
     {
         return $shipmentServices->calculateShipmentCost($request);
+    }
+
+    public function recalculateShipment(CreateShipmentRequest $request, ShipmentServices $shipmentServices)
+    {
+        return $shipmentServices->recalculateShipmentCost($request);
     }
 
     public function initialize(Request $request)
@@ -203,7 +208,8 @@ class ShipmentController extends Controller
         $origin_cities = City::where('state_id', $origin->state)->get();
         $destination_states = State::where('country_id', $destination->country)->get();
         $destination_cities = City::where('state_id', $destination->state)->get();
-        return Inertia::render('Shipments/Checkout', compact('countries', 'origin_states', 'origin_cities', 'destination_states', 'destination_cities','item_category','shipment', 'dhl_rate_log','origin', 'destination','insurance_options','shipping_rate_log', 'origin_location', 'destination_location'));
+        $categories = ItemCategory::all();
+        return Inertia::render('Shipments/Checkout', compact('countries', 'categories','origin_states', 'origin_cities', 'destination_states', 'destination_cities','item_category','shipment', 'dhl_rate_log','origin', 'destination','insurance_options','shipping_rate_log', 'origin_location', 'destination_location'));
     }
 
     public function bookShipment(BookShipmentRequest $request, ShipmentServices $services)

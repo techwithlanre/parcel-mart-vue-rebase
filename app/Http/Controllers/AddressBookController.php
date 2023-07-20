@@ -18,7 +18,8 @@ class AddressBookController extends Controller
     {
         $addresses = Address::where('user_id', auth()->user()->id)
             ->with('address_contacts', 'country', 'city')->paginate(10);
-        return Inertia::render('AddressBook/Index', compact('addresses'));
+        $countries = Country::all();
+        return Inertia::render('AddressBook/Index', compact('addresses', 'countries'));
     }
 
     /**

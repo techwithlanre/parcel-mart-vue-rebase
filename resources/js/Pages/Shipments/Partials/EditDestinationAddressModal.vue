@@ -18,9 +18,10 @@ const props = defineProps({
   shipment: Object,
 });
 
-const originCountries = ref(props.countries);
-const originStates = ref(props.states);
-const originCities = ref(props.cities);
+
+const destinationCountries = ref(props.countries);
+const destinationStates = ref(props.states);
+const destinationCities = ref(props.cities);
 
 console.log(props.shipment);
 
@@ -66,22 +67,23 @@ const form = useForm({
 const emit = defineEmits(['isModalOpen'])
 
 const submit = () => {
+  alert('yes');
   form.put(route('shipment.recalculate', props.shipmentId), {
     onFinish: () => emit('isModalOpen', false),
     //onSuccess: ()
   })
 }
 
-const getOriginStates = function () {
-  axios.get('/api/states/' + form.origin.country).then(function (response) {
-    originStates.value = response.data.states;
-    getDestinationCountries();
+const getDestinationStates = function () {
+  axios.get('/api/states/' + form.destination.country).then(function (response) {
+    destinationStates.value = response.data.states;
+    //getDestinationCountries();
   });
 };
-const getOriginCities = function () {
-  axios.get('/api/cities/' + form.origin.state).then(function (response) {
-    originCities.value = response.data.cities;
-    getDestinationCountries();
+const getDestinationCities = function () {
+  axios.get('/api/cities/' + form.destination.state).then(function (response) {
+    destinationCities.value = response.data.cities;
+    //getDestinationCountries();
   });
 };
 
@@ -98,11 +100,11 @@ const getDestinationCountries = function () {
   <div>
     <div class="flex flex-row justify-between items-start p-5">
       <div class="">
-        <h3>Edit Origin Address</h3>
+        <h3>Edit Destination Address</h3>
         <p class="text-sm">Use this form to edit origin address for this booking</p>
       </div>
       <div>
-        <svg @click="emit('isModalOpen', false)" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-red-900 cursor-pointer" fill="none" viewBox="0 0 24 24"
+        <svg  @click="emit('isModalOpen', false)" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-red-900 cursor-pointer" fill="none" viewBox="0 0 24 24"
              stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>
@@ -116,7 +118,7 @@ const getDestinationCountries = function () {
             <InputLabel value="Contact Name *"/>
             <TextInput
                 id="contact_name"
-                v-model="form.origin.contact_name"
+                v-model="form.destination.contact_name"
                 type="text"
                 class="mt-2 flex"
                 required
@@ -129,7 +131,7 @@ const getDestinationCountries = function () {
               <InputLabel value="Contact Phone *"/>
               <TextInput
                   id="contact_phone"
-                  v-model="form.origin.contact_phone"
+                  v-model="form.destination.contact_phone"
                   type="text"
                   class="mt-2 flex"
                   required
@@ -142,7 +144,7 @@ const getDestinationCountries = function () {
               <InputLabel value="Contact Email (Optional)"/>
               <TextInput
                   id="contact_email"
-                  v-model="form.origin.contact_email"
+                  v-model="form.destination.contact_email"
                   type="text"
                   class="mt-2 flex"
                   placeholder=""
@@ -156,7 +158,7 @@ const getDestinationCountries = function () {
             <TextInput
                 id="business_name"
                 type="text"
-                v-model="form.origin.business_name"
+                v-model="form.destination.business_name"
                 class="mt-2 flex"
                 placeholder=""
                 autocomplete="business_name"/>
@@ -170,7 +172,7 @@ const getDestinationCountries = function () {
                 type="text"
                 class="mt-2 flex"
                 maxlength="45"
-                v-model="form.origin.address_1"
+                v-model="form.destination.address_1"
                 required
                 placeholder=""
                 autocomplete="address"/>
@@ -182,7 +184,7 @@ const getDestinationCountries = function () {
                 id="landmark"
                 type="text"
                 class="mt-2 flex"
-                v-model="form.origin.landmark"
+                v-model="form.destination.landmark"
                 maxlength="45"
                 required
                 placeholder=""
@@ -196,7 +198,7 @@ const getDestinationCountries = function () {
                 type="text"
                 class="mt-2 flex"
                 maxlength="45"
-                v-model="form.origin.address_2"
+                v-model="form.destination.address_2"
                 placeholder=""
                 autocomplete="address"/>
             <InputError class="mt-2"/>
@@ -208,10 +210,10 @@ const getDestinationCountries = function () {
               <SelectInput
                   id="country"
                   class="mt-2"
-                  v-on:change="getOriginStates"
-                  :options="originCountries"
+                  v-on:change="getDestinationStates"
+                  :options="destinationCountries"
                   required
-                  v-model="form.origin.country"/>
+                  v-model="form.destination.country"/>
               <InputError class="mt-2"/>
             </div>
             <div class="w-full lg:mt-0 mt-2">
@@ -219,10 +221,10 @@ const getDestinationCountries = function () {
               <SelectInput
                   id="state"
                   class="mt-2 flex"
-                  v-on:change="getOriginCities"
-                  :options="originStates"
+                  v-on:change="getDestinationCities"
+                  :options="destinationStates"
                   required
-                  v-model="form.origin.state"/>
+                  v-model="form.destination.state"/>
               <InputError class="mt-2"/>
             </div>
             <div class="w-full lg:mt-0 mt-2">
@@ -231,9 +233,9 @@ const getDestinationCountries = function () {
                   id="city"
                   type="text"
                   class="mt-2 flex"
-                  :options="originCities"
+                  :options="destinationCities"
                   required
-                  v-model="form.origin.city"/>
+                  v-model="form.destination.city"/>
               <InputError class="mt-2"/>
             </div>
           </div>
@@ -243,7 +245,7 @@ const getDestinationCountries = function () {
                 id="postcode"
                 type="text"
                 class="mt-2 flex"
-                v-model="form.origin.postcode"
+                v-model="form.destination.postcode"
                 placeholder=""
                 autocomplete="postcode"/>
             <InputError class="mt-2"/>

@@ -9,10 +9,13 @@ import TextInput from "@/Components/TextInput.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import EditOriginAddressModal from "@/Pages/Shipments/Partials/EditOriginAddressModal.vue";
 import Modal from "@/Components/Modal.vue";
+import EditDestinationAddressModal from "@/Pages/Shipments/Partials/EditDestinationAddressModal.vue";
+import EditPackageDetailsModal from "@/Pages/Shipments/Partials/EditPackageDetailsModal.vue";
 
 const activeKey = ref(['1']);
 const isEditOriginAddressOpen  = ref(false);
 const isEditDestinationAddressOpen  = ref(false);
+const isEditPackageDetailsOpen  = ref(false);
 
 watch(activeKey, val => {
   console.log(val);
@@ -33,6 +36,7 @@ defineProps({
     destination_states: Array,
     origin_cities: Array,
     destination_cities: Array,
+    categories: Array,
 });
 
 const form  = useForm({
@@ -153,17 +157,10 @@ const today = new Date();
           <div class="sm:w-1/2 w-full">
             <a-collapse v-model:activeKey="activeKey" class="border-0 shadow-md">
               <a-collapse-panel key="1" header="Package Information">
-                <div class="relative overflow-x-auto duration-300">
-<!--                  <div class="mb-3 mt-3 flex flex-row justify-end">
-                    <button @click="isEditOriginAddressOpen = true" class="shadow p-2 rounded-full bg-primary">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-white">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
-                      </svg>
-                    </button>
-                  </div>-->
+                <div class="relative flex flex-row overflow-x-auto duration-300">
                   <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <tbody v-for="item in shipment.shipment_items" :key="item.id" >
-                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                    <tr class="bg-white dark:bg-gray-800 dark:border-gray-700">
                       <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                         Item Category
                       </th>
@@ -171,7 +168,7 @@ const today = new Date();
                         {{ item_category.name }}
                       </td>
                     </tr>
-                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                    <tr class="bg-white dark:bg-gray-800 dark:border-gray-700">
                       <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                         Value
                       </th>
@@ -179,13 +176,13 @@ const today = new Date();
                         {{ naira.format(item.value) }}
                       </td>
                     </tr>
-                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                    <tr class="bg-white dark:bg-gray-800 dark:border-gray-700">
                       <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                         Description
                       </th>
                       <td class="px-6 py-2">{{ item.description }}</td>
                     </tr>
-                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                    <tr class="bg-white dark:bg-gray-800 dark:border-gray-700">
                       <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                         Quantity
                       </th>
@@ -193,7 +190,7 @@ const today = new Date();
                         {{ item.quantity }} Nos.
                       </td>
                     </tr>
-                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                    <tr class="bg-white dark:bg-gray-800 dark:border-gray-700">
                       <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                         Weight
                       </th>
@@ -201,7 +198,7 @@ const today = new Date();
                         {{ item.weight }}kg
                       </td>
                     </tr>
-                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                    <tr class="bg-white dark:bg-gray-800 dark:border-gray-700">
                       <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                         Height
                       </th>
@@ -209,7 +206,7 @@ const today = new Date();
                         {{ item.height }}cm
                       </td>
                     </tr>
-                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                    <tr class="bg-white dark:bg-gray-800 dark:border-gray-700">
                       <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                         Length
                       </th>
@@ -219,10 +216,17 @@ const today = new Date();
                     </tr>
                     </tbody>
                   </table>
+                  <div class="mb-3 mt-3 flex flex-row justify-end h-max">
+                    <button @click="isEditPackageDetailsOpen = true" class="shadow p-2 rounded-full bg-primary">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-white">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               </a-collapse-panel>
               <a-collapse-panel key="2" header="Sender Information">
-                <div class="flex flex-row justify-between gap-x-10 shadow p-5 rounded-xl">
+                <div class="flex flex-row justify-between gap-x-10 rounded-xl">
                   <div class="card bg-white duration-300 w-full">
                     <div class="flex justify-between items-center">
                       <h3 class="text-lg font-semibold">{{ origin.contact_name }}</h3>
@@ -231,7 +235,6 @@ const today = new Date();
                       <span class="text-sm text-primary">{{ origin.contact_phone }}</span>
                       <span class="text-sm">{{ origin.contact_email}}</span>
                     </p>
-                    <hr class="mt-2">
                     <p class="mt-5"> {{ origin.address_1 }}</p>
                     <p class=""> {{ origin.landmark }}</p>
                     <div class="flex gap-x-10">
@@ -239,16 +242,16 @@ const today = new Date();
                     </div>
                   </div>
                   <div class="mb-3 mt-3 flex flex-row justify-end h-max">
-                    <button @click="isEditOriginAddressOpen = true" class="shadow p-2 rounded-full bg-primary flex flex-row justify-center items-center gap-x-3">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-background">
-                        <path d="M21.731 2.269a2.625 2.625 0 00-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 000-3.712zM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 00-1.32 2.214l-.8 2.685a.75.75 0 00.933.933l2.685-.8a5.25 5.25 0 002.214-1.32L19.513 8.2z" />
+                    <button @click="isEditOriginAddressOpen = true" class="shadow p-2 rounded-full bg-primary">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-white">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
                       </svg>
                     </button>
                   </div>
                 </div>
               </a-collapse-panel>
               <a-collapse-panel key="3" header="Receiver Information">
-                <div class="flex flex-row justify-between gap-x-10 shadow p-5 rounded-xl">
+                <div class="flex flex-row justify-between gap-x-10 rounded-xl">
                   <div class="card bg-white duration-300 w-full">
                     <div class="flex justify-between items-center">
                       <h3 class="text-lg font-semibold">{{ destination.contact_name }}</h3>
@@ -257,7 +260,7 @@ const today = new Date();
                       <span class="text-sm text-primary">{{ destination.contact_phone }}</span>
                       <span class="text-sm">{{ destination.contact_email}}</span>
                     </p>
-                    <hr class="mt-2">
+
                     <p class="mt-5"> {{ destination.address_1 }}</p>
                     <p class=""> {{ destination.landmark }}</p>
                     <div class="flex gap-x-10">
@@ -265,9 +268,9 @@ const today = new Date();
                     </div>
                   </div>
                   <div class="mb-3 mt-3 flex flex-row justify-end h-max">
-                    <button @click="isEditDestinationAddressOpen = true" class="shadow p-2 rounded-full bg-primary flex flex-row justify-center items-center gap-x-3">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-background">
-                        <path d="M21.731 2.269a2.625 2.625 0 00-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 000-3.712zM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 00-1.32 2.214l-.8 2.685a.75.75 0 00.933.933l2.685-.8a5.25 5.25 0 002.214-1.32L19.513 8.2z" />
+                    <button @click="isEditDestinationAddressOpen = true" class="shadow p-2 rounded-full bg-primary">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-white">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
                       </svg>
                     </button>
                   </div>
@@ -277,44 +280,13 @@ const today = new Date();
           </div>
         </div>
         <Modal :show="isEditOriginAddressOpen">
-          <div>
-            <div class="flex flex-row justify-between items-start p-5">
-              <div class="">
-                <h3>Edit Origin Address</h3>
-                <p class="text-sm">Use this form to edit origin address for this booking</p>
-              </div>
-              <div>
-                <svg @click="isEditOriginAddressOpen = false" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-red-900 cursor-pointer" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-              </div>
-            </div>
-            <hr>
-            <div class="p-5">
-              <EditOriginAddressModal :address="origin" :countries="countries" :states="origin_states" :cities="origin_cities" />
-            </div>
-          </div>
+          <EditOriginAddressModal @is-modal-open="(value) => isEditOriginAddressOpen = value"  :shipment-id="page.props.shipment.id"  :origin-address="origin" :destination-address="destination" :countries="countries" :states="origin_states" :cities="origin_cities" :shipment="shipment" />
         </Modal>
         <Modal :show="isEditDestinationAddressOpen">
-          <div>
-            <div class="flex flex-row justify-between items-start p-5">
-              <div class="">
-                <h3>Edit Destination Address</h3>
-                <p class="text-sm">Use this form to edit origin address for this booking</p>
-              </div>
-              <div>
-                <svg @click="isEditDestinationAddressOpen = false" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-red-900 cursor-pointer" fill="none" viewBox="0 0 24 24"
-                     stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-              </div>
-            </div>
-            <hr>
-            <div class="p-5">
-              <EditOriginAddressModal :address="destination" :countries="countries" :states="destination_states" :cities="destination_cities" />
-            </div>
-          </div>
+          <EditDestinationAddressModal @is-modal-open="(value) => isEditDestinationAddressOpen = value" :address="destination" :shipment-id="page.props.shipment.id" :countries="countries" :origin-address="origin" :destination-address="destination" :states="destination_states" :cities="destination_cities" :shipment="shipment" />
+        </Modal>
+        <Modal :show="isEditPackageDetailsOpen">
+          <EditPackageDetailsModal @is-modal-open="(value) => isEditPackageDetailsOpen = value" :categories="categories" :address="destination" :shipment-id="page.props.shipment.id" :countries="countries" :origin-address="origin" :destination-address="destination" :states="destination_states" :cities="destination_cities" :shipment="shipment" />
         </Modal>
     </AuthenticatedLayout>
 </template>

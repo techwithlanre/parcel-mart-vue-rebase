@@ -7,6 +7,7 @@ use App\Http\Requests\CreateShipmentRequest;
 use App\Http\Requests\TrackShipmentRequest;
 use App\Models\DhlShipmentLog;
 use App\Models\InsuranceOption;
+use App\Models\ItemCategory;
 use App\Models\Shipment;
 use App\Models\ShipmentItem;
 use App\Models\ShippingRateLog;
@@ -79,7 +80,6 @@ class DHLServices
     {
         $this->bookShipmentPayload($shipment, $shipmentItem, $insuranceOption, $shippingRateLog, $bookShipmentRequest);
         $result = $this->sendBookShipmentRequest();
-        dd($result);
         $dhl_shipment_log = DhlShipmentLog::create([
             'shipment_id' => $shipment->id,
             'shipment_rate_log_id' => $shippingRateLog->id,
@@ -99,12 +99,23 @@ class DHLServices
     {
         $origin = json_decode($shipment->origin_address, true);
         $destination = json_decode($shipment->origin_address, true);
-        //$product_code = (getCountry('id', $origin['country'])->iso2 == getCountry('id', $destination['country'])->iso2) ? 'DOM' : 'EXP';
+
+        $product_code = '';
+        if (getCountry('id', $origin['country'])->iso2 == 'NG') {
+            $product_code = 'N';
+        }else{
+            if (getCountry('id', $origin['country'])->iso2 != 'NG') {
+                $category = ItemCategory::find($shipmentItem->item_category_id)->name;
+                if ($category == 'Parcel') $product_code = 'P';
+                if ($category == 'Document') $product_code = 'D';
+            }
+        }
+
         $shipment_date = Carbon::create($bookShipmentRequest->shipment_date)->timezone('GMT+1');
         $shipment_date = str_replace(' ', 'T', $shipment_date->toDateTimeString()) . " GMT+01:00";
         $this->bookShipmentPayload = [
             "plannedShippingDateAndTime" => $shipment_date,
-            "productCode" => "N",
+            "productCode" => $product_code,
             "pickup" => [
                 "isRequested" => false
             ],
@@ -213,10 +224,9 @@ class DHLServices
             $response = curl_exec($curl);
             curl_close($curl);
             $result = json_decode($response, true);
-            dd($result);
             if (!isset($result['shipmentTrackingNumber'])) return false;
             return $result;
-        } catch (\Exception $e) {
+        } catch (\GuzzleHttp\Exception\TransferException $e) {
             $response = $e->getMessage();
             return false;
         }

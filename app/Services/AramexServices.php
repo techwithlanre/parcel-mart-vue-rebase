@@ -150,6 +150,7 @@ class AramexServices
             'shipment_id' => $shipment->id,
             'shipment_rate_log_id' => $shippingRateLog->id,
             'shipment_tracking_number' => $response->Shipments->ProcessedShipment->ID,
+            'aramex_id' => $response->Shipments->ProcessedShipment->ID,
             'reference' => $response->Shipments->ProcessedShipment->Reference1,
             'label_url' => $response->Shipments->ProcessedShipment->ShipmentLabel->LabelURL,
             'label_content' => $response->Shipments->ProcessedShipment->ShipmentLabel->LabelFileContents,

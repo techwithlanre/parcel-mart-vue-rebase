@@ -21,15 +21,15 @@ class CreateAddressRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'contact_name' => '',
-            'contact_email' => '',
-            'contact_phone' => '',
+            'contact_name' => 'required',
+            'contact_email' => 'required',
+            'contact_phone' => 'required',
             'business_name' => '',
-            'landmark' => '',
-            'address' => '',
-            'country_id' => '',
-            'state_id' => '',
-            'city_id' => '',
+            'landmark' => 'required|max:45|min:3',
+            'address' => 'required|max:45|min:3',
+            'country_id' => 'required',
+            'state_id' => 'required',
+            'city_id' => 'required',
             'postcode' => ''
         ];
     }

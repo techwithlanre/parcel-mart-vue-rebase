@@ -22,6 +22,7 @@ class Shipment extends Model
         'provider',
         'created_at',
         'updated_at',
+        'reference'
     ];
 
     public function shipment_items(): \Illuminate\Database\Eloquent\Relations\HasMany

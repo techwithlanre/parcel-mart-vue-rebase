@@ -91,7 +91,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('', [\App\Http\Controllers\ShipmentController::class, 'index'])->name('shipment.index');
         Route::get('filter', [\App\Http\Controllers\ShipmentController::class, 'filterShipment'])->name('shipment.filter');
         Route::get('start', [\App\Http\Controllers\ShipmentController::class, 'create'])->name('shipment.start');
-        Route::post('calculate', [\App\Http\Controllers\ShipmentController::class, 'testCalculateShipment'])->name('shipment.initialize');
+        Route::post('calculate', [\App\Http\Controllers\ShipmentController::class, 'calculateShipment'])->name('shipment.initialize');
+        Route::put('update/{id}', [\App\Http\Controllers\ShipmentController::class, 'recalculateShipment'])->name('shipment.recalculate');
         Route::get('checkout/{id}', [\App\Http\Controllers\ShipmentController::class, 'checkout'])->name('shipment.checkout');
         Route::post('book', [\App\Http\Controllers\ShipmentController::class, 'bookShipment'])->name('shipment.book');
         Route::get('details/{id}', [\App\Http\Controllers\ShipmentController::class, 'show'])->name('shipment.details');

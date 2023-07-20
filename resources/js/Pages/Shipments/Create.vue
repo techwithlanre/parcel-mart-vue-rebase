@@ -563,7 +563,6 @@ const tabs = [
 
                 <div class="flex flex-row items-center justify-end mt-6 gap-x-10">
                   <a href="javascript:void(0)" @click="changeTab(1)" type="button" :class="twMerge('underline text-primary')">Previous</a>
-
                   <PrimaryButton type="submit" class="w-full" @click="gotoPackageDetails">
                     Next
                   </PrimaryButton>

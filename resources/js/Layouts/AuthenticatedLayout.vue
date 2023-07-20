@@ -13,11 +13,9 @@ import 'flowbite';
 import {onMounted} from "vue";
 import { notification } from 'ant-design-vue';
 
-/*
 onMounted(() => {
     initFlowbite();
 });
-*/
 
 const page = usePage();
 

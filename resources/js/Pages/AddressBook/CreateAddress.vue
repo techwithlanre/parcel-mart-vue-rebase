@@ -52,7 +52,6 @@ const getStates = () => {
 </script>
 
 <template>
-    <Head title="Create Address" />
   <div class="mx-auto px-10 mb-10 bg-white">
     <form class="mt-6" @submit.prevent="submit">
       <div class="">

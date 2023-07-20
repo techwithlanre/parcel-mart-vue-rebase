@@ -81,8 +81,8 @@ const isOpenCreate = ref(false)
         <div>
           <div class="flex flex-row justify-between items-start p-5">
             <div class="">
-              <h3>Edit Origin Address</h3>
-              <p class="text-sm">Use this form to edit origin address for this booking</p>
+              <h3>Create address</h3>
+              <p class="text-sm">Use this form to create a new address</p>
             </div>
             <div>
               <button @click="isOpenCreate = false">

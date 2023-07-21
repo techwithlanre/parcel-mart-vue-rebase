@@ -168,7 +168,7 @@ const trackShipment = () => {
         <div class="flex lg:flex-row flex-col gap-x-5 gap-y-10 mt-10">
             <div class="w-full">
                 <div class="flex flex-col gap-y-10 lg:flex-row gap-x-10">
-                    <div class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
+                    <div class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-300">
                         <div class="flex gap-5 items-center">
                             <div class="h-12 w-12">
                                 <img src="../../images/shipment.png" alt="">
@@ -179,7 +179,7 @@ const trackShipment = () => {
                             </div>
                         </div>
                     </div>
-                    <div v-if="page.props.auth.role !== 'admin'" class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
+                    <div v-if="!page.props.auth.user.is_admin" class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-300">
                         <div class="flex justify-between">
                             <div class="flex gap-5 items-start">
                                 <div class="h-12 w-12">
@@ -193,7 +193,7 @@ const trackShipment = () => {
                             <div class="text-3xl"></div>
                         </div>
                     </div>
-                    <div v-if="page.props.auth.role === 'admin'" class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
+                    <div v-if="page.props.auth.user.is_admin" class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
                         <div class="flex justify-between">
                             <div class="flex gap-5 items-start">
                                 <div class="h-12 w-12">
@@ -207,7 +207,7 @@ const trackShipment = () => {
                             <div class="text-3xl"></div>
                         </div>
                     </div>
-                    <div v-if="page.props.auth.role === 'admin'" class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
+                    <div v-if="page.props.auth.user.is_admin" class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-300">
                         <div class="flex justify-between">
                             <div class="flex gap-5 items-start">
                                 <div class="h-12 w-12">
@@ -221,7 +221,7 @@ const trackShipment = () => {
                             <div class="text-3xl"></div>
                         </div>
                     </div>
-                    <div v-if="page.props.auth.user.is_admin" class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
+                    <div v-if="page.props.auth.user.is_admin" class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-300">
                         <div class="flex justify-between">
                             <div class="flex gap-5 items-start">
                                 <div class="h-12 w-12">
@@ -235,7 +235,7 @@ const trackShipment = () => {
                             <div class="text-3xl"></div>
                         </div>
                     </div>
-                    <div v-if="page.props.auth.role === 'admin'" class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
+                    <div v-if="page.props.auth.user.is_admin" class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-300">
                         <div class="flex justify-between">
                             <div class="flex gap-5 items-start">
                                 <div class="h-12 w-12">
@@ -251,8 +251,8 @@ const trackShipment = () => {
                     </div>
                 </div>
 
-                <div v-if="page.props.auth.role !== 'admin'" class="flex flex-col gap-y-10 sm:flex-row gap-x-10 mt-10">
-                    <div class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
+                <div v-if="page.props.auth.user.is_admin" class="flex flex-col gap-y-10 sm:flex-row gap-x-10 mt-10">
+                    <div class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-300">
                         <Link :href="route('shipment.start')" class="flex flex-col">
                             <div class="border bg-background/50 rounded-full h-16 w-16 flex justify-center items-center">
                                 <img src="../../images/parcel.png" alt="" class="h-10 w-10">
@@ -267,7 +267,7 @@ const trackShipment = () => {
                             </div>
                         </link>
                     </div>
-                    <div class="p-5 bg-white rounded-2xl w-full border shadow-md hover:shadow-lg duration-300">
+                    <div class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-300">
                         <a href="javascript:void(0)" id="" class="flex flex-col" @click="toggleQuote(true)">
                             <div class="border bg-background/50 rounded-full h-16 w-16 flex justify-center items-center">
                                 <img src="../../images/price-tag.png" alt="" class="h-10 w-10">
@@ -282,7 +282,7 @@ const trackShipment = () => {
                             </div>
                         </a>
                     </div>
-                    <a href="javascript:void(0)" @click="isTrackingOpen = true" class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
+                    <a href="javascript:void(0)" @click="isTrackingOpen = true" class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-300">
                         <div class="flex gap-5 items-center">
                             <div class="flex flex-col">
                                 <div class="border bg-background/50 rounded-full h-16 w-16 flex justify-center items-center">
@@ -309,7 +309,6 @@ const trackShipment = () => {
                             <th scope="col" class="px-6 py-3">Destination</th>
                             <th scope="col" class="px-6 py-3">Number</th>
                             <th scope="col" class="px-6 py-3">Status</th>
-                            <th scope="col" class="px-6 py-3">Action</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -329,12 +328,12 @@ const trackShipment = () => {
                             <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                 {{ item.number }}
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-6 py-4" >
+                              <span
+                                  class="px-3 py-1 rounded-full text-white font-medium"
+                                  :class="{'bg-orange-400' : item.status ==='processing', 'bg-yellow-400' : item.status ==='pending', 'bg-green-400' : item.status ==='delivered'}">
                                 {{ item.status}}
-                            </td>
-                            <td class="px-6 py-4">
-                                <Link :href="route('shipment.checkout', item.id)" v-if="item.status === 'pending'" class="text-primary font-medium hover:text-green-600">Checkout</Link>
-                                <Link :href="route('shipment.details', item.id)" v-else class="text-primary font-medium hover:text-green-600">View</Link>
+                              </span>
                             </td>
                         </tr>
                         <tr v-else>
@@ -373,8 +372,8 @@ const trackShipment = () => {
                         <div>
                           <TextInput
                               id="quantity"
-                              type="text"
                               class="mt-1 w-full"
+                              hidden=""
                               required
                               autocomplete="off"
                               readonly
@@ -383,8 +382,8 @@ const trackShipment = () => {
                         <div class="">
                           <TextInput
                               id="quantity"
-                              type="text"
                               class="mt-1 w-full"
+                              hidden=""
                               required
                               autocomplete="off"
                               readonly
@@ -393,7 +392,7 @@ const trackShipment = () => {
                         <div class="">
                           <TextInput
                               id="quantity"
-                              type="email"
+                              hidden=""
                               class="mt-1 w-full"
                               autocomplete="off"
                               readonly
@@ -401,115 +400,151 @@ const trackShipment = () => {
                         </div>
                       </div>
                       <div class="mt-4">
-                        <InputLabel value="Origin Location" />
+
                         <div class="grid lg:grid-cols-3 gap-y-3 mt-3 gap-x-5 w-full">
-                          <SelectInput
-                              place-holder="Select Country"
-                              class="block w-full"
-                              v-model="form.country_from"
-                              required
-                              :options="countries"
-                              v-on:change="getOriginStates"
-                          />
-
-                          <SelectInput
-                              place-holder="Select State"
-                              class="block w-full"
-                              required
-                              v-model="form.state_from"
-                              :options="originStates"
-                              v-on:change="getOriginCities"
-                          />
-
-                          <SelectInput
-                              place-holder="Select State"
-                              class="block w-full"
-                              required
-                              v-model="form.city_from"
-                              :options="originCities"
-                          />
+                          <div>
+                            <InputLabel value="Origin Country" class="mb-2" />
+                            <SelectInput
+                                place-holder="Select Country"
+                                class="block w-full"
+                                v-model="form.country_from"
+                                required
+                                :options="countries"
+                                v-on:change="getOriginStates"
+                            />
+                          </div>
+                          <div>
+                            <InputLabel value="Origin State" class="mb-2" />
+                            <SelectInput
+                                place-holder="Select State"
+                                class="block w-full"
+                                required
+                                v-model="form.state_from"
+                                :options="originStates"
+                                v-on:change="getOriginCities"
+                            />
+                          </div>
+                          <div>
+                            <InputLabel value="Origin City" class="mb-2" />
+                            <SelectInput
+                                place-holder="Select City"
+                                class="block w-full"
+                                required
+                                v-model="form.city_from"
+                                :options="originCities"
+                            />
+                          </div>
                         </div>
                       </div>
                       <div class="mt-4">
-                        <InputLabel value="Destination Location" class="mb-3" />
                         <div class="grid lg:grid-cols-3 gap-y-3 gap-x-5 w-full">
-                          <SelectInput
-                              place-holder="Select Country"
-                              class="block w-full"
-                              v-model="form.country_to"
-                              required
-                              :options="countries"
-                              v-on:change="getDestinationStates"
-                          />
+                          <div>
+                            <InputLabel value="Destination Country" class="mb-2" />
+                            <SelectInput
+                                place-holder="Select Country"
+                                class="block w-full"
+                                v-model="form.country_to"
+                                required
+                                :options="countries"
+                                v-on:change="getDestinationStates"
+                            />
+                          </div>
 
-                          <SelectInput
-                              place-holder="Select State"
-                              class="block w-full"
-                              required
-                              v-model="form.state_to"
-                              :options="destinationStates"
-                              v-on:change="getDestinationCities"
-                          />
+                          <div>
+                            <InputLabel value="Destination City" class="mb-2" />
+                            <SelectInput
+                                place-holder="Select State"
+                                class="block w-full"
+                                required
+                                v-model="form.state_to"
+                                :options="destinationStates"
+                                v-on:change="getDestinationCities"
+                            />
+                          </div>
 
-                          <SelectInput
-                              place-holder="Select State"
-                              class="block w-full"
-                              required
-                              v-model="form.city_to"
-                              :options="destinationCities"
-                          />
+                          <div>
+                            <InputLabel value="Destination City" class="mb-2" />
+                            <SelectInput
+                                place-holder="Select City"
+                                class="block w-full"
+                                required
+                                v-model="form.city_to"
+                                :options="destinationCities"
+                            />
+                          </div>
                         </div>
                       </div>
 
                       <div class="grid lg:grid-cols-3 gap-y-3 gap-x-5 mt-4">
-                        <TextInput
-                            id="quantity"
-                            type="number"
-                            class="mt-2 w-full"
-                            required
-                            autocomplete="off"
-                            placeholder="Quantity"
-                            v-model="form.quantity"/>
+                        <div>
+                          <InputLabel value="Quantity" class="mb-2" />
+                          <TextInput
+                              id="quantity"
+                              type="number"
+                              class="mt-2 w-full"
+                              required
+                              autocomplete="off"
+                              placeholder="Quantity"
+                              v-model="form.quantity"/>
+                        </div>
 
-                        <TextInput
-                            id="email"
-                            type="number"
-                            class="mt-2 w-full"
-                            required
-                            autocomplete="off"
-                            placeholder="Weight"
-                            v-model="form.weight"/>
-                        <TextInput
-                            id=""
-                            type="number"
-                            class="mt-2 w-full block"
-                            required
-                            autocomplete="off"
-                            placeholder="Length"
-                            v-model="form.length"/>
+                        <div>
+                          <InputLabel value="Weight" class="mb-2" />
+                          <TextInput
+                              id="email"
+                              type="number"
+                              class="mt-2 w-full"
+                              required
+                              autocomplete="off"
+                              placeholder="Weight"
+                              v-model="form.weight"/>
+                        </div>
+
+                        <div>
+                          <InputLabel value="Length" class="mb-2" />
+                          <TextInput
+                              id=""
+                              type="number"
+                              class="mt-2 w-full block"
+                              required
+                              autocomplete="off"
+                              placeholder="Length"
+                              v-model="form.length"/>
+                        </div>
                       </div>
                       <div class="grid lg:grid-cols-3 gap-y-3 mt-4 gap-x-5">
-                        <TextInput
-                            id=""
-                            type="number"
-                            class="mt-1 w-full"
-                            required
-                            autocomplete="off"
-                            placeholder="Width"
-                            v-model="form.width"/>
-
-                        <TextInput
-                            id=""
-                            type="number"
-                            class="mt-1 w-full"
-                            required
-                            autocomplete="off"
-                            placeholder="Height"
-                            v-model="form.height"/>
+                        <div>
+                          <InputLabel value="Width" class="mb-2" />
+                          <TextInput
+                              id=""
+                              type="number"
+                              class="mt-1 w-full"
+                              required
+                              autocomplete="off"
+                              placeholder="Width"
+                              v-model="form.width"/>
+                        </div>
+                        <div>
+                          <InputLabel value="Height" class="mb-2" />
+                          <TextInput
+                              id=""
+                              type="number"
+                              class="mt-1 w-full"
+                              required
+                              autocomplete="off"
+                              placeholder="Height"
+                              v-model="form.height"/>
+                        </div>
                       </div>
                     </div>
                     <div class="flex justify-end items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
-                      <PrimaryButton class="" :class="{ 'opacity-25': form.processing }" :disabled="form.processing" >Get Pricing</PrimaryButton>
+                      <button
+                          type="submit"
+                          class="inline-flex justify-center rounded-md border border-transparent bg-background px-4 py-2 text-sm font-medium text-primary hover:text-white
+                                         hover:bg-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-all duration-300"
+                          :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+                        Get Pricing
+                      </button>
                     </div>
                   </form>
                 </div>
@@ -536,12 +571,19 @@ const trackShipment = () => {
               </div>
               <!-- Modal body -->
               <form @submit.prevent="trackShipment">
-                <div class="p-6 space-y-6">
-                  <TextInput v-model="trackForm.number" required type="text" class="mt-3" placeholder="Enter tracking number" />
+                <div class="p-6">
+                  <InputLabel value="Tracking Number" />
+                  <TextInput v-model="trackForm.number" required type="text" class="mt-2" placeholder="Enter tracking number" />
                 </div>
                 <!-- Modal footer -->
                 <div class="flex justify-end items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
-                  <PrimaryButton class="" >Track</PrimaryButton>
+                  <button
+                      type="submit"
+                      class="inline-flex justify-center rounded-md border border-transparent bg-background px-4 py-2 text-sm font-medium text-primary hover:text-white
+                                         hover:bg-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-all duration-300"
+                      :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+                    Continue
+                  </button>
                 </div>
               </form>
             </div>

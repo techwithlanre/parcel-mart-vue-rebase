@@ -60,6 +60,11 @@ const pay = () => {
       form.errors.insurance = 'Select a insurance option';
     }
 
+    if (form.shipment_date.length === 0) {
+      hasError = true;
+      form.errors.shipment_date = 'Select a shipment date';
+    }
+
     if (!hasError) {
       form.post(route('shipment.book'), {
 
@@ -95,7 +100,7 @@ const today = new Date();
           <form @submit.prevent="pay" class="card sm:p-10 p-5 bg-white shadow hover:shadow-lg duration-300 sm:w-1/2 w-full">
             <div >
               <h1 class="font-bold text-md">Shipment Options</h1>
-              <div class="grid sm:grid-cols-2 grid-col-1 gap-5 mb-10">
+              <div class="grid sm:grid-cols-1 grid-col-1 gap-5 mb-10">
                 <div v-for="item in shipping_rate_log" class="card shadow">
                   <label class="cursor-pointer">
                     <div class="p-4 font-bold flex flex-row justify-between bg-gray-50 rounded-t-xl">
@@ -104,8 +109,8 @@ const today = new Date();
                     </div>
                     <hr>
                     <div class="p-4">
-                      <p class="text-sm">Amount: {{ item.amount_before_tax }}</p>
-                      <p class="text-sm">Tax: {{ item.tax }}</p>
+                      <p class="text-sm">Amount: {{ naira.format(parseFloat(item.amount_before_tax.replace(',', ''))) }}</p>
+                      <p class="text-sm">Tax: {{ naira.format(parseFloat(item.tax.replace(',', ''))) }}</p>
                     </div>
                     <hr>
                     <div class="p-4">
@@ -125,7 +130,7 @@ const today = new Date();
 
               <div class="mt-5">
                 <InputLabel value="Planned Shipment Date" />
-                <TextInput type="date" v-model="form.shipment_date" class="mt-3" required :min='today' :max="2023-12-31" />
+                <TextInput type="date" v-model="form.shipment_date" class="mt-3" :min='today' :max="2023-12-31" />
                 <InputError :message="form.errors.shipment_date" />
               </div>
 
@@ -146,7 +151,6 @@ const today = new Date();
                 <p>Insurance: <span v-if="form.insurance.length > 0">{{ naira.format(insurance_options[form.insurance - 1].amount) }}</span><span v-else>0.00</span> </p>
               </div>
               <input type="hidden" v-model="form.option_id">
-
               <div class="mt-10">
                 <PrimaryButton  type="submit" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
                   Pay

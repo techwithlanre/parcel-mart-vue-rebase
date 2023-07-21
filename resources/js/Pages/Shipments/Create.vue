@@ -211,9 +211,9 @@ const changeTab = (index) => {
 }
 
 const tabs = [
-  {name: 'Origin Address', index: 1, content: ""},
-  {name: 'Destination Address', index: 2, content: ""},
-  {name: 'Shipping Item', index: 3, content: ""}
+  {name: 'Origin Address', index: 1, content: "", disabled: false},
+  {name: 'Destination Address', index: 2, content: "", disabled: true},
+  {name: 'Shipping Item', index: 3, content: "", disabled: true}
 ];
 </script>
 
@@ -227,11 +227,11 @@ const tabs = [
           <ul class="flex mb-0 list-none flex-wrap gap-y-3 flex-row rounded-md">
             <li v-for="tab in tabs"
                 class="-mb-px mr-5 last:mr-0 flex-auto text-center rounded-lg bg-white shadow cursor-pointer">
-              <a class="text-xs font-bold uppercase px-5 py-3 rounded block leading-normal hover:text-gray-900 no-underline duration-300"
+              <button :disabled="tab.disabled" class="text-xs w-full font-bold uppercase px-5 py-3 rounded block leading-normal hover:text-gray-900 no-underline duration-300"
                  @click="toggleTabs(tab.index)"
-                 v-bind:class="{'text-gray-500 bg-white': currentTab !== tab.index, 'text-white text-opacity-90 bg-primary hover:text-background': currentTab === tab.index}">
+                 v-bind:class="{'text-gray-500 bg-white': currentTab !== tab.index, 'text-primary bg-background hover:text-background': currentTab === tab.index}">
                 {{ tab.index }}. {{ tab.name }}
-              </a>
+              </button>
             </li>
           </ul>
         </div>

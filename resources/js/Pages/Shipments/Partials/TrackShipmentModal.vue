@@ -1,26 +1,24 @@
 <script setup>
-import { ref } from 'vue'
-import {
-  TransitionRoot,
-  TransitionChild,
-  Dialog,
-  DialogPanel,
-  DialogTitle, DialogDescription,
-} from '@headlessui/vue'
+
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import {useForm} from "@inertiajs/vue3";
 
-const emits = defineEmits(['closeModal']);
-const form = useForm({
-  amount: ''
-});
+const trackForm = useForm({
+  number: ''
+})
 
-const submit = () => {
-  form.post(route('wallet.initialize'), {
-    onFinish: emits('closeModal', false)
-  });
+const trackShipment = () => {
+  trackForm.post(route('shipment.track'), {
+    onFinish: () => trackForm.reset(),
+  })
 }
+
+
+const emits = defineEmits(['closeModal']);
+
+
 
 </script>
 
@@ -31,8 +29,8 @@ const submit = () => {
       <!-- Modal header -->
       <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
         <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-          Fund Wallet
-          <p class="text-gray-500 font-normal text-xs">Use this form to fund your wallet</p>
+          Track Shipment
+          <p class="text-gray-500 font-normal text-xs">Use this form to track your shipment, enter your tracking number below</p>
         </h3>
         <button type="button" class="text-gray-400 bg-transparent duration-300 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="getQuoteModal">
           <svg @click="emits('closeModal', false)" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-red-900 cursor-pointer" fill="none" viewBox="0 0 24 24"
@@ -41,23 +39,15 @@ const submit = () => {
           </svg>
         </button>
       </div>
-      <form @submit.prevent="submit">
-        <div class="mt-2 px-6 mb-5">
-          <div>
-            <InputLabel value="Amount"/>
-            <TextInput v-model="form.amount" class="mt-3 " required type="number" min="0" placeholder="Enter the amount you want add to your wallet"/>
-          </div>
+      <!-- Modal body -->
+      <form @submit.prevent="trackShipment">
+        <div class="p-6 space-y-6">
+          <InputLabel  value="Tracking Number"/>
+          <TextInput v-model="trackForm.number" required type="text" />
         </div>
-
-        <hr>
-        <div class="p-6">
-          <button
-              type="submit"
-              class="inline-flex justify-center rounded-md border border-transparent bg-background px-4 py-2 text-sm font-medium text-primary hover:text-white
-                                         hover:bg-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-all duration-300"
-              :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-            Continue
-          </button>
+        <!-- Modal footer -->
+        <div class="flex justify-end items-center px-6 mb-6 space-x-2 border-gray-200 rounded-b dark:border-gray-600">
+          <PrimaryButton class="" :class="{ 'opacity-25': trackForm.processing }" :disabled="trackForm.processing">Track</PrimaryButton>
         </div>
       </form>
     </div>

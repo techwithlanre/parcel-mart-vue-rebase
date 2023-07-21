@@ -24,7 +24,7 @@ class WalletController extends Controller
         $transactions = Transaction::where([
             'payable_id' => $user->id,
             'confirmed' => 1
-        ])->where('amount', '>', 0)->orderBy('created_at', 'desc')->paginate(10);
+        ])->orderBy('created_at', 'desc')->paginate(10);
         $overdraft_wallet_balance = 0;
         if (auth()->user()->user_type == 'business') {
             $overdraft_wallet = WalletOverdraft::where('user_id', auth()->user()->id)->first();
@@ -40,7 +40,7 @@ class WalletController extends Controller
         $transactions = Transaction::where([
             'payable_id' => auth()->user()->id,
             'confirmed' => 1
-        ])->where('amount', '>', 0)->where(function ($query) use ($request) {
+        ])->where(function ($query) use ($request) {
             $query->when($request->filled('type'), function ($query) use ($request) {
                 return $request->type == 'all'
                     ? $query

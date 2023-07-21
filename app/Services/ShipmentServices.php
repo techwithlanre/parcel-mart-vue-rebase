@@ -87,17 +87,23 @@ class ShipmentServices
             $aramex = new AramexServices($request);
             try {
                 $response = $aramex->calculateShippingRate();
+
                 if ($response) {
-                    $shippingRateLog = ShippingRateLog::where([
+                    ShippingRateLog::updateOrCreate([
                         'user_id' => auth()->user()->id,
                         'shipment_id'=>$shipment_id,
                         'courier_api_provider_id' => $check_aramex->value('id'),
                         'provider_code' => 'aramex',
-                        ])->first();
-                    $shippingRateLog->total_amount = $response->TotalAmount->Value;
-                    $shippingRateLog->amount_before_tax = $response->RateDetails->TotalAmountBeforeTax;
-                    $shippingRateLog->tax = $response->RateDetails->TaxAmount;
-                    $shippingRateLog->save();
+                    ], [
+                        'product_name' => 'Aramex Shipping',
+                        'currency' => $response->TotalAmount->CurrencyCode,
+                        'total_amount' => $response->TotalAmount->Value,
+                        'amount_before_tax' => $response->RateDetails->TotalAmountBeforeTax,
+                        'tax' => $response->RateDetails->TaxAmount,
+                        'provider_code' => 'aramex',
+                        'created_at' => now()
+                    ]);
+
                     $aramex_rate_found = true;
                 }
                 if (!$aramex_rate_found) {
@@ -138,7 +144,7 @@ class ShipmentServices
                                 $shippingRateLog->product_name = 'DHL - ' . $product['productName'];
                                 $shippingRateLog->product_code = $product['productCode'];
                                 $shippingRateLog->local_product_code = $product['localProductCode'];
-                                $shippingRateLog->network_type_code = 'DHL - ' . $product['productName'];
+                                $shippingRateLog->network_type_code = $product['networkTypeCode'];
                                 $shippingRateLog->total_amount = number_format(($product['totalPrice'][0]['price'] * 0.925) + ($product['totalPrice'][0]['price'] * 0.075), 2);
                                 $shippingRateLog->amount_before_tax = number_format($product['totalPrice'][0]['price'] * 0.925, 2);
                                 $shippingRateLog->tax = number_format($product['totalPrice'][0]['price'] * 0.075, 2);
@@ -329,13 +335,8 @@ class ShipmentServices
                 auth()->user()->withdraw($current_balance);
             }
 
-            if (auth()->user()->user_type === 'business' && auth()->user()->balance >= $total_amount) {
-                auth()->user()->withdraw($total_amount);
-            }
-
-            if (auth()->user()->user_type === 'individual') {
-                auth()->user()->withdraw($total_amount);
-            }
+            if (auth()->user()->user_type === 'business' && auth()->user()->balance >= $total_amount)  auth()->user()->withdraw($total_amount);
+            if (auth()->user()->user_type === 'individual') auth()->user()->withdraw($total_amount);
 
             $shipment->provider_id = $rate->courier_api_provider_id;
             $shipment->shipping_rate_log_id  = $rate->id;

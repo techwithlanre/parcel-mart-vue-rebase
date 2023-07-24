@@ -48,7 +48,7 @@ export default {
 <template>
     <Head title="Register" />
     <GuestLayout title="Get Started" subtitle="Create an account to get started">
-        <div class="mb-10 px-2 rounded-md py-2 border-2">
+        <div class="mb-10 px-2 rounded-md py-2 border-2 border-background">
             <ul class="flex mb-0 list-none flex-wrap flex-row">
 
                 <li class="-mb-px mr-2 last:mr-0 flex-auto text-center">

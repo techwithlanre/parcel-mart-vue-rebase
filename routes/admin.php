@@ -5,7 +5,13 @@ use \App\Http\Controllers\Admin\UserController;
 use \App\Http\Controllers\Admin\ShipmentController;
 
 Route::prefix('admin')->middleware('check.admin.user')->group(function () {
-    Route::resource('users', UserController::class);
+    Route::prefix('users')->group(function () {
+        Route::get('', [UserController::class, 'index'])->name('users.index');
+        Route::get('create', [UserController::class, 'create'])->name('users.create');
+        Route::put('set-credit-limit/{user_id}', [UserController::class, 'setCreditLimit'])->name('users.set-credit-limit');
+    });
+
+    //Route::resource('users', UserController::class);
     Route::resource('shipments', ShipmentController::class);
     Route::resource('shipment-locations', \App\Http\Controllers\Admin\ShipmentLocationsController::class);
     Route::resource('roles', \App\Http\Controllers\Admin\RoleController::class)->middleware('role:admin');

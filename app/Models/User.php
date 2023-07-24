@@ -30,6 +30,12 @@ class User extends Authenticatable implements Wallet, MustVerifyEmail
         'country_id',
         'currency_id',
         'user_type',
+        'business_name',
+        'credit_limit',
+        'ref_code',
+        'ref_by_id',
+        'point',
+        'firebase_token',
     ];
 
     /**

@@ -29,9 +29,12 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function setCreditLimit(Request $request, $user_id)
     {
-        //
+        $user = User::find($user_id);
+        $user->credit_limit = $request->amount;
+        $user->save();
+        return redirect(route('users.index'))->with('message', 'Credit limit has been set for this business account');
     }
 
     /**

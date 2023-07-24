@@ -30,7 +30,8 @@ class RegisteredBusinessController extends Controller
             'email' => $request['email'],
             'password' => Hash::make($request['password']),
             'user_type' => 'business',
-            'country_id' => $request['country']
+            'country_id' => $request['country'],
+            'credit_limit' => '30000'
         ]);
 
         event(new Registered($user));

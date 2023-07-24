@@ -193,7 +193,7 @@ const trackShipment = () => {
                             <div class="text-3xl"></div>
                         </div>
                     </div>
-                    <div v-if="page.props.auth.user.is_admin" class="p-5 bg-white rounded-2xl w-full border shadow-sm hover:shadow-lg duration-300">
+                    <div v-if="page.props.auth.user.is_admin" class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-300">
                         <div class="flex justify-between">
                             <div class="flex gap-5 items-start">
                                 <div class="h-12 w-12">
@@ -251,7 +251,7 @@ const trackShipment = () => {
                     </div>
                 </div>
 
-                <div v-if="page.props.auth.user.is_admin" class="flex flex-col gap-y-10 sm:flex-row gap-x-10 mt-10">
+                <div v-if="!page.props.auth.user.is_admin" class="flex flex-col gap-y-10 sm:flex-row gap-x-10 mt-10">
                     <div class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-300">
                         <Link :href="route('shipment.start')" class="flex flex-col">
                             <div class="border bg-background/50 rounded-full h-16 w-16 flex justify-center items-center">

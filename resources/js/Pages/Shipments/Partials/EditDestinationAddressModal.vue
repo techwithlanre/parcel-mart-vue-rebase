@@ -67,7 +67,6 @@ const form = useForm({
 const emit = defineEmits(['isModalOpen'])
 
 const submit = () => {
-  alert('yes');
   form.put(route('shipment.recalculate', props.shipmentId), {
     onFinish: () => emit('isModalOpen', false),
     //onSuccess: ()

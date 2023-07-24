@@ -521,7 +521,7 @@ const tabs = [
                         type="text"
                         class="mt-2"
                         v-on:change="getDestinationStates"
-                        :options="destinationCountries"
+                        :options="countries"
                         required
                         v-model="form.destination.country"/>
                     <InputError class="mt-2"/>

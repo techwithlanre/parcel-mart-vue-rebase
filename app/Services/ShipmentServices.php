@@ -127,7 +127,7 @@ class ShipmentServices
             try {
                 $response = $dhl->calculateRate();
                 $data = json_decode($response, true);
-                if ($data) {
+                if ($data && array_key_exists('products', $data)) {
                     $products = $data['products'];
                     foreach ($products as $product) {
                         if ($product['totalPrice'][0]['price'] > 0) {
@@ -217,7 +217,7 @@ class ShipmentServices
                     $rate_found = true;
                 }
             } catch (\Exception $e) {
-                return Redirect::back()->with('error', 'No shipment rate found for your package: ' . $e->getMessage());
+                //return Redirect::back()->with('error', 'No shipment rate found for your package: ' . $e->getMessage());
             }
 
         }
@@ -228,7 +228,7 @@ class ShipmentServices
             try {
                 $response = $dhl->calculateRate();
                 $data = json_decode($response, true);
-                if ($data) {
+                if ($data && array_key_exists('products', $data)) {
                     $products = $data['products'];
                     foreach ($products as $product) {
                         if ($product['totalPrice'][0]['price'] > 0) {
@@ -272,7 +272,7 @@ class ShipmentServices
                     }
                 }
             } catch (\Exception $e) {
-                return Redirect::back()->with('error', 'No shipment rate found for your package: ' . $e->getMessage());
+                return Redirect::back()->with('error', 'No shipment rate found for your package');
             }
         }
 

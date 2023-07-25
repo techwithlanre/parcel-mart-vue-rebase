@@ -76,14 +76,14 @@ class DHLServices
                     "addressLine1" => $this->request->origin['address_1'],
                     "postalCode" => $this->request->origin['postcode'],
                     "cityName" => getCity('id', $this->request->origin['city'])->name,
-                    "countyName" => getCity('id', $this->request->origin['city'])->state_code,
+                    ///"countyName" => getCity('id', $this->request->origin['city'])->name,
                     "countryCode" => getCountry('id', $this->request->origin['country'])->iso2
                 ],
                 "receiverDetails" => [
                     "addressLine1" => $this->request->destination['address_1'],
                     "postalCode" => $this->request->destination['postcode'],
                     "cityName" => getCity('id', $this->request->destination['city'])->name,
-                    "countyName" => getCity('id', $this->request->destination['city'])->state_code,
+                    "countyName" => getCity('id', $this->request->destination['city'])->name,
                     "countryCode" => getCountry('id', $this->request->destination['country'])->iso2
                 ]
             ],
@@ -143,7 +143,7 @@ class DHLServices
         $type = $this->isInternational($origin, $destination);
         if ($type == "D") $product_code = 'N';
         if ($type == "I")  {
-            $category = ItemCategory::find($shipmentItem['category'])->name;
+            $category = ItemCategory::find($shipmentItem['category'])->name ?? "Parcel";
             if ($category == 'Parcel') $product_code = 'P';
             if ($category == 'Document') $product_code = 'D';
         }
@@ -156,7 +156,7 @@ class DHLServices
     private function bookShipmentPayload(Shipment $shipment, ShipmentItem $shipmentItem, InsuranceOption $insuranceOption, ShippingRateLog $shippingRateLog, BookShipmentRequest $bookShipmentRequest)
     {
         $origin = json_decode($shipment->origin_address, true);
-        $destination = json_decode($shipment->origin_address, true);
+        $destination = json_decode($shipment->destination_address, true);
 
         $product_code = $this->productCode($origin, $destination, $shipment);
         $type = $this->isInternational($origin, $destination);
@@ -243,7 +243,9 @@ class DHLServices
                 "isCustomsDeclarable" => $type == 'I',
                 "description" => "Content Description 70characters",
                 "incoterm" => "DAP",
-                "unitOfMeasurement" => "metric"
+                "unitOfMeasurement" => "metric",
+                "declaredValueCurrency" => "NGN",
+                "declaredValue" => (int) $shipmentItem->value
             ]
         ];
     }
@@ -273,6 +275,7 @@ class DHLServices
             $response = curl_exec($curl);
             curl_close($curl);
             $result = json_decode($response, true);
+            dd($result);
             if (!isset($result['shipmentTrackingNumber'])) return false;
             return $result;
         } catch (\GuzzleHttp\Exception\TransferException $e) {
@@ -286,7 +289,6 @@ class DHLServices
     private function call(): bool|string
     {
         $curl = curl_init();
-
         curl_setopt_array($curl, array(
             CURLOPT_URL => 'https://express.api.dhl.com/mydhlapi/test/rates',
             CURLOPT_RETURNTRANSFER => true,

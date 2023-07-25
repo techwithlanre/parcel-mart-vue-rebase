@@ -87,7 +87,6 @@ class ShipmentServices
             $aramex = new AramexServices($request);
             try {
                 $response = $aramex->calculateShippingRate();
-
                 if ($response) {
                     ShippingRateLog::updateOrCreate([
                         'user_id' => auth()->user()->id,

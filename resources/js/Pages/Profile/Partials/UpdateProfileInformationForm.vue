@@ -17,7 +17,10 @@ defineProps({
 const user = usePage().props.auth.user;
 
 const form = useForm({
-    name: user.name,
+    first_name: user.first_name,
+    last_name: user.last_name,
+    phone: user.phone,
+    name: user.first_name,
     email: user.email,
 });
 </script>
@@ -34,20 +37,48 @@ const form = useForm({
 
         <form @submit.prevent="form.patch(route('profile.update'))" class="mt-6 space-y-6">
             <div>
-                <InputLabel for="name" value="Name" />
-
+                <InputLabel for="name" value="First Name" />
                 <TextInput
                     id="name"
                     type="text"
                     class="mt-1 block w-full"
-                    v-model="form.name"
+                    v-model="form.first_name"
                     required
                     autofocus
                     autocomplete="name"
                 />
 
-                <InputError class="mt-2" :message="form.errors.name" />
+                <InputError class="mt-2" :message="form.errors.first_name" />
             </div>
+          <div>
+            <InputLabel for="name" value="Last Name" />
+            <TextInput
+                id="name"
+                type="text"
+                class="mt-1 block w-full"
+                v-model="form.last_name"
+                required
+                autofocus
+                autocomplete="name"
+            />
+
+            <InputError class="mt-2" :message="form.errors.last_name" />
+          </div>
+
+          <div>
+            <InputLabel for="name" value="Name" />
+            <TextInput
+                id="name"
+                type="text"
+                class="mt-1 block w-full"
+                v-model="form.phone"
+                required
+                autofocus
+                autocomplete="name"
+            />
+
+            <InputError class="mt-2" :message="form.errors.phone" />
+          </div>
 
             <div>
                 <InputLabel for="email" value="Email" />
@@ -65,7 +96,7 @@ const form = useForm({
             </div>
 
             <div v-if="mustVerifyEmail && user.email_verified_at === null">
-                <p class="text-sm mt-2 text-gray-800">
+                <p class="text-sm mt-2 text-orange-600">
                     Your email address is unverified.
                     <Link
                         :href="route('verification.send')"

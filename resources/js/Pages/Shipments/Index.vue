@@ -82,8 +82,8 @@ const handleFilter = () => {
                     </div>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                      <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <table class="w-full text-sm text-left text-gray-500 sdark:text-gray-400">
+                      <thead class="text-xs text-gray-700 uppercase bg-gray-50 sdark:bg-gray-700 sdark:text-gray-400">
                         <tr>
                             <th class="text-left p-6 font-medium">Origin</th>
                             <th class="text-left p-6 font-medium">Destination</th>
@@ -93,7 +93,7 @@ const handleFilter = () => {
                         </tr>
                         </thead>
                         <tbody>
-                        <tr v-if="log.length > 0" v-for="item in log" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                        <tr v-if="log.length > 0" v-for="item in log" class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700 hover:bg-gray-50 sdark:hover:bg-gray-600">
                             <td class="px-6 py-4">
                                 <div class="font-bold">{{ item.origin['name']}}</div>
                                 <span class="text-gray-600">{{ item.origin['phone'] }}</span>
@@ -106,7 +106,7 @@ const handleFilter = () => {
   <!--                                <div>{{ item.destination['address_1']}}</div>-->
                                 <div>{{item.destination['city']}}, {{ item.destination['country']}}</div>
                             </td>
-                            <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                            <td class="px-6 py-4 font-medium text-gray-900 sdark:text-white">
                                 {{ item.number }}
                             </td>
                             <td class="px-6 py-4">

@@ -162,56 +162,56 @@ const today = new Date();
             <a-collapse v-model:activeKey="activeKey" class="border-0 shadow-md">
               <a-collapse-panel key="1" header="Package Information">
                 <div class="relative flex flex-row overflow-x-auto duration-300">
-                  <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                  <table class="w-full text-sm text-left text-gray-500 sdark:text-gray-400">
                     <tbody v-for="item in shipment.shipment_items" :key="item.id" >
-                    <tr class="bg-white dark:bg-gray-800 dark:border-gray-700">
-                      <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    <tr class="bg-white sdark:bg-gray-800 sdark:border-gray-700">
+                      <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                         Item Category
                       </th>
                       <td class="px-6 py-2">
                         {{ item_category.name }}
                       </td>
                     </tr>
-                    <tr class="bg-white dark:bg-gray-800 dark:border-gray-700">
-                      <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    <tr class="bg-white sdark:bg-gray-800 sdark:border-gray-700">
+                      <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                         Value
                       </th>
                       <td class="px-6 py-2">
                         {{ naira.format(item.value) }}
                       </td>
                     </tr>
-                    <tr class="bg-white dark:bg-gray-800 dark:border-gray-700">
-                      <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    <tr class="bg-white sdark:bg-gray-800 sdark:border-gray-700">
+                      <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                         Description
                       </th>
                       <td class="px-6 py-2">{{ item.description }}</td>
                     </tr>
-                    <tr class="bg-white dark:bg-gray-800 dark:border-gray-700">
-                      <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    <tr class="bg-white sdark:bg-gray-800 sdark:border-gray-700">
+                      <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                         Quantity
                       </th>
                       <td class="px-6 py-2">
                         {{ item.quantity }} Nos.
                       </td>
                     </tr>
-                    <tr class="bg-white dark:bg-gray-800 dark:border-gray-700">
-                      <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    <tr class="bg-white sdark:bg-gray-800 sdark:border-gray-700">
+                      <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                         Weight
                       </th>
                       <td class="px-6 py-2">
                         {{ item.weight }}kg
                       </td>
                     </tr>
-                    <tr class="bg-white dark:bg-gray-800 dark:border-gray-700">
-                      <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    <tr class="bg-white sdark:bg-gray-800 sdark:border-gray-700">
+                      <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                         Height
                       </th>
                       <td class="px-6 py-2">
                         {{ item.height }}cm
                       </td>
                     </tr>
-                    <tr class="bg-white dark:bg-gray-800 dark:border-gray-700">
-                      <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    <tr class="bg-white sdark:bg-gray-800 sdark:border-gray-700">
+                      <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                         Length
                       </th>
                       <td class="px-6 py-2">

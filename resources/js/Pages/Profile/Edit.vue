@@ -23,23 +23,23 @@ defineProps({
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Profile</h2>
         </template>
 
-        <div class="py-12">
-            <div class="mx-auto space-y-6">
-                <div class="p-4 max-w-2xl sm:p-8 bg-white rounded-2xl border">
+        <div class="flex flex-col items-center justify-center w-2/5 mx-auto">
+            <div class="mx-auto space-y-6 w-full">
+                <div class="p-4 w-full sm:p-8 bg-white rounded-2xl border">
                     <UpdateProfileInformationForm
                         :must-verify-email="mustVerifyEmail"
                         :status="status"
-                        class="max-w-xl"
+                        class="w-full"
                     />
                 </div>
 
-                <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                    <UpdatePasswordForm class="max-w-xl" />
+                <div class="p-4 w-full sm:p-8 bg-white shadow sm:rounded-lg">
+                    <UpdatePasswordForm class="max-w-4xl" />
                 </div>
 
-                <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
+<!--                <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
                     <DeleteUserForm class="max-w-xl" />
-                </div>
+                </div>-->
             </div>
         </div>
     </AuthenticatedLayout>

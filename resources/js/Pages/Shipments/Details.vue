@@ -76,58 +76,58 @@ const pay = () => {
                 <h1 class="font-bold text-xl">Contact Information</h1>
                 <h3>Sender Information</h3>
                 <div class="relative overflow-x-auto border rounded-2xl mt-5">
-                    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                    <table class="w-full text-sm text-left text-gray-500 sdark:text-gray-400">
                         <tbody>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
+                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                                 Contact Name
                             </th>
                             <td class="px-6 py-2">
                                 {{ origin.contact_name }}
                             </td>
                         </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
+                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                                 Contact Phone
                             </th>
                             <td class="px-6 py-2">
                                 {{ origin.contact_phone }}
                             </td>
                         </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
+                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                                 Contact Email
                             </th>
                             <td class="px-6 py-2">
                                 {{ origin.contact_email }}
                             </td>
                         </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
+                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                                 Address 1
                             </th>
                             <td class="px-6 py-2">
                                 {{ origin.address_1 }}
                             </td>
                         </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
+                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                                 Landmark
                             </th>
                             <td class="px-6 py-2">
                                 {{ origin.landmark }}
                             </td>
                         </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
+                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                                 Address 2
                             </th>
                             <td class="px-6 py-2">
                                 {{ origin.address_2 }}
                             </td>
                         </tr>
-                        <tr class="bg-white dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <tr class="bg-white sdark:bg-gray-800 sdark:border-gray-700">
+                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                                 Location
                             </th>
                             <td class="px-6 py-2">
@@ -140,58 +140,58 @@ const pay = () => {
 
                 <h3 class="mt-10">Receiver Information</h3>
                 <div class="relative overflow-x-auto border rounded-2xl mt-">
-                    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                    <table class="w-full text-sm text-left text-gray-500 sdark:text-gray-400">
                         <tbody>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
+                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                                 Contact Name
                             </th>
                             <td class="px-6 py-2">
                                 {{ origin.contact_name }}
                             </td>
                         </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
+                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                                 Contact Phone
                             </th>
                             <td class="px-6 py-2">
                                 {{ origin.contact_phone }}
                             </td>
                         </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
+                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                                 Contact Email
                             </th>
                             <td class="px-6 py-2">
                                 {{ origin.contact_email }}
                             </td>
                         </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
+                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                                 Address 1
                             </th>
                             <td class="px-6 py-2">
                                 {{ origin.address_1 }}
                             </td>
                         </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
+                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                                 Landmark
                             </th>
                             <td class="px-6 py-2">
                                 {{ origin.landmark }}
                             </td>
                         </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
+                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                                 Address 2
                             </th>
                             <td class="px-6 py-2">
                                 {{ origin.address_2 }}
                             </td>
                         </tr>
-                        <tr class="bg-white dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <tr class="bg-white sdark:bg-gray-800 sdark:border-gray-700">
+                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                                 Location
                             </th>
                             <td class="px-6 py-2">
@@ -205,58 +205,58 @@ const pay = () => {
             <div class="card p-5  w-full bg-white">
                 <h1 class="font-bold text-xl mb-10">Shipment Information</h1>
                 <div class="relative overflow-x-auto border rounded-2xl mt-">
-                    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                    <table class="w-full text-sm text-left text-gray-500 sdark:text-gray-400">
                         <tbody v-for="item in shipment.shipment_items" :key="item.id" >
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
+                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                                 Item Category
                             </th>
                             <td class="px-6 py-2">
 <!--                                {{ item_category.name }}-->
                             </td>
                         </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
+                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                                 Value
                             </th>
                             <td class="px-6 py-2">
                                 {{ item.value }}
                             </td>
                         </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
+                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                                 Description
                             </th>
                             <td class="px-6 py-2">
                                 {{ item.description }}
                             </td>
                         </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
+                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                                 Quantity
                             </th>
                             <td class="px-6 py-2">
                                 {{ item.quantity }} Nos.
                             </td>
                         </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
+                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                                 Weight
                             </th>
                             <td class="px-6 py-2">
                                 {{ item.weight }}cm
                             </td>
                         </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
+                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                                 Height
                             </th>
                             <td class="px-6 py-2">
                                 {{ item.height }}cm
                             </td>
                         </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
+                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                                 Length
                             </th>
                             <td class="px-6 py-2">

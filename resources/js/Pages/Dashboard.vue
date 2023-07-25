@@ -302,8 +302,8 @@ const trackShipment = () => {
             <div class="mt-20">
                 <h1 class="text-lg">Recent Shipments</h1>
                 <div class="relative overflow-x-auto shadow sm:rounded-lg">
-                    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <table class="w-full text-sm text-left text-gray-500 sdark:text-gray-400">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 sdark:bg-gray-700 sdark:text-gray-400">
                         <tr>
                             <th scope="col" class="px-6 py-3">Origin</th>
                             <th scope="col" class="px-6 py-3">Destination</th>
@@ -312,7 +312,7 @@ const trackShipment = () => {
                         </tr>
                         </thead>
                         <tbody>
-                        <tr v-if="log.length > 0" v-for="item in log" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                        <tr v-if="log.length > 0" v-for="item in log" class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700 hover:bg-gray-50 sdark:hover:bg-gray-600">
                             <td class="px-6 py-4">
                                 <div class="font-bold">{{ item.origin['name']}}</div>
                                 <span class="text-gray-600">{{ item.origin['phone'] }}</span>
@@ -325,7 +325,7 @@ const trackShipment = () => {
                                 <div>{{ item.destination['address_1']}}</div>
                                 <div>{{item.destination['city']}}, {{ item.destination['country']}}</div>
                             </td>
-                            <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                            <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
                                 {{ item.number }}
                             </td>
                             <td class="px-6 py-4" >
@@ -350,14 +350,14 @@ const trackShipment = () => {
           <div class="">
             <div class="relative w-full max-w-2xl max-h-full duration-300">
               <!-- Modal content -->
-              <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+              <div class="relative bg-white rounded-lg shadow sdark:bg-gray-700">
                 <!-- Modal header -->
-                <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
-                  <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                <div class="flex items-start justify-between p-4 border-b rounded-t sdark:border-gray-600">
+                  <h3 class="text-xl font-semibold text-gray-900 sdark:text-white">
                     Get Pricing
                     <p class="text-gray-500 font-normal text-xs mt-2">Use this form to get request for a quote</p>
                   </h3>
-                  <button type="button" class="text-gray-400 bg-transparent duration-300 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="getQuoteModal">
+                  <button type="button" class="text-gray-400 bg-transparent duration-300 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center sdark:hover:bg-gray-600 sdark:hover:text-white" data-modal-hide="getQuoteModal">
                     <svg @click="isQuoteOpen = false" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-red-900 cursor-pointer" fill="none" viewBox="0 0 24 24"
                          stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -537,7 +537,7 @@ const trackShipment = () => {
                         </div>
                       </div>
                     </div>
-                    <div class="flex justify-end items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+                    <div class="flex justify-end items-center p-6 space-x-2 border-t border-gray-200 rounded-b sdark:border-gray-600">
                       <button
                           type="submit"
                           class="inline-flex justify-center rounded-md border border-transparent bg-background px-4 py-2 text-sm font-medium text-primary hover:text-white
@@ -555,14 +555,14 @@ const trackShipment = () => {
          <Modal :show="isTrackingOpen">
           <div class="relative w-full max-w-2xl max-h-full duration-300">
             <!-- Modal content -->
-            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <div class="relative bg-white rounded-lg shadow sdark:bg-gray-700">
               <!-- Modal header -->
-              <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
-                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+              <div class="flex items-start justify-between p-4 border-b rounded-t sdark:border-gray-600">
+                <h3 class="text-xl font-semibold text-gray-900 sdark:text-white">
                   Track Shipment
                   <p class="text-gray-500 font-normal text-xs">Use this form to track your shipment, enter your tracking number below</p>
                 </h3>
-                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="trackingModal">
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center sdark:hover:bg-gray-600 sdark:hover:text-white" data-modal-hide="trackingModal">
                   <svg @click="isTrackingOpen = false" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-red-900 cursor-pointer" fill="none" viewBox="0 0 24 24"
                        stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -576,7 +576,7 @@ const trackShipment = () => {
                   <TextInput v-model="trackForm.number" required type="text" class="mt-2" placeholder="Enter tracking number" />
                 </div>
                 <!-- Modal footer -->
-                <div class="flex justify-end items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+                <div class="flex justify-end items-center p-6 space-x-2 border-t border-gray-200 rounded-b sdark:border-gray-600">
                   <button
                       type="submit"
                       class="inline-flex justify-center rounded-md border border-transparent bg-background px-4 py-2 text-sm font-medium text-primary hover:text-white

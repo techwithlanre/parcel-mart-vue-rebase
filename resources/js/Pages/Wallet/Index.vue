@@ -113,8 +113,8 @@ let naira = new Intl.NumberFormat('en-US', {
             </div>
 
             <div class="overflow-x-auto border-x border-t rounded-xl">
-              <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+              <table class="w-full text-sm text-left text-gray-500 sdark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 sdark:bg-gray-700 sdark:text-gray-400">
                     <tr class="bg-gray-100">
                         <th class="text-left p-4 font-medium">Amount</th>
                         <th class="text-left p-4 font-medium">Type</th>

@@ -25,7 +25,7 @@ defineProps({
 
         <div class="flex flex-col items-center justify-center w-2/5 mx-auto">
             <div class="mx-auto space-y-6 w-full">
-                <div class="p-4 w-full sm:p-8 bg-white rounded-2xl border">
+                <div class="p-4 w-full sm:p-8 bg-white rounded-2xl shadow shadow-background">
                     <UpdateProfileInformationForm
                         :must-verify-email="mustVerifyEmail"
                         :status="status"
@@ -33,7 +33,7 @@ defineProps({
                     />
                 </div>
 
-                <div class="p-4 w-full sm:p-8 bg-white shadow sm:rounded-lg">
+                <div class="p-4 w-full sm:p-8 bg-white rounded-2xl shadow shadow-background">
                     <UpdatePasswordForm class="max-w-4xl" />
                 </div>
 

@@ -40,10 +40,9 @@ const pay = () => {
     <AuthenticatedLayout page-title="Shipment Checkout">
         <Head title="Shipment Checkout"/>
         <div class="flex lg:flex-row flex-col justify-between gap-10 mt-10">
-            <div class="card p-5 border bg-white w-full">
+            <div class="card p-5 rounded-xl shadow shadow-background/50 bg-white w-full">
                 <h1 class="font-bold text-xl">Shipment Status</h1>
                 <div>Tracking Number: <span class="font-bold text-primary">{{ shipment.number }}</span></div>
-
                 <div>
                     <h2 class="sr-only">Steps</h2>
                     <div class="mt-10">
@@ -67,229 +66,151 @@ const pay = () => {
                 </div>
 
             </div>
-            <div class="card p-5 border bg-white w-full">
-                <h1 class="font-bold text-xl">History</h1>
+          <div class="flex lg:flex-row flex-col justify-between gap-10 w-full">
+            <div class="shadow shadow-background/50 w-full bg-white rounded-xl">
+              <div>
+                <div class="card mt-5">
+                  <h1 class="font-bold text-xl px-5">Payment Summary</h1>
+                  <hr>
+                  <div class="px-5 text-gray-600 text-sm mt-5">
+                    <p>Amount: {{ shipping_rate_log.amount_before_tax }}</p>
+                    <p>Tax: {{ shipping_rate_log.tax }}</p>
+                    <p>Insurance: {{ insurance_options[0].amount }}</p>
+                  </div>
+
+                  <div class="p-4">
+                    <div class="font-bold">Total Shipment Amount:  {{ shipping_rate_log.total_amount }}</div>
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
         </div>
-        <div class="flex lg:flex-row flex-col justify-between gap-10 mt-10">
-            <div class="w-full card bg-white p-5">
-                <h1 class="font-bold text-xl">Contact Information</h1>
-                <h3>Sender Information</h3>
-                <div class="relative overflow-x-auto border rounded-2xl mt-5">
-                    <table class="w-full text-sm text-left text-gray-500 sdark:text-gray-400">
-                        <tbody>
-                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
-                                Contact Name
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ origin.contact_name }}
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
-                                Contact Phone
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ origin.contact_phone }}
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
-                                Contact Email
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ origin.contact_email }}
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
-                                Address 1
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ origin.address_1 }}
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
-                                Landmark
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ origin.landmark }}
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
-                                Address 2
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ origin.address_2 }}
-                            </td>
-                        </tr>
-                        <tr class="bg-white sdark:bg-gray-800 sdark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
-                                Location
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ origin_location.city }}, {{ origin_location.state }}, {{ origin_location.country }}
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+      <div class="flex sm:flex-row flex-col gap-10 w-full mt-10">
+        <div class="card shadow shadow-background/50 rounded-xl p-5 w-full ">
+          <div>
+            <div class="border-l border-dashed">
+              <div>
+                <div class="flex flex-row gap-x-3">
+                  <div class="p-0.5 bg-red-500 h-5 w-5 -ml-2.5"></div>
+                  <h3 class="text-sm">Pickup From</h3>
                 </div>
-
-                <h3 class="mt-10">Receiver Information</h3>
-                <div class="relative overflow-x-auto border rounded-2xl mt-">
-                    <table class="w-full text-sm text-left text-gray-500 sdark:text-gray-400">
-                        <tbody>
-                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
-                                Contact Name
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ origin.contact_name }}
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
-                                Contact Phone
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ origin.contact_phone }}
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
-                                Contact Email
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ origin.contact_email }}
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
-                                Address 1
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ origin.address_1 }}
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
-                                Landmark
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ origin.landmark }}
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
-                                Address 2
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ origin.address_2 }}
-                            </td>
-                        </tr>
-                        <tr class="bg-white sdark:bg-gray-800 sdark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
-                                Location
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ destination_location.city }}, {{ destination_location.state }}, {{ destination_location.country }}
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="card p-5  w-full bg-white">
-                <h1 class="font-bold text-xl mb-10">Shipment Information</h1>
-                <div class="relative overflow-x-auto border rounded-2xl mt-">
-                    <table class="w-full text-sm text-left text-gray-500 sdark:text-gray-400">
-                        <tbody v-for="item in shipment.shipment_items" :key="item.id" >
-                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
-                                Item Category
-                            </th>
-                            <td class="px-6 py-2">
-<!--                                {{ item_category.name }}-->
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
-                                Value
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ item.value }}
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
-                                Description
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ item.description }}
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
-                                Quantity
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ item.quantity }} Nos.
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
-                                Weight
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ item.weight }}cm
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
-                                Height
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ item.height }}cm
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700">
-                            <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
-                                Length
-                            </th>
-                            <td class="px-6 py-2">
-                                {{ item.length }}cm
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <form @submit.prevent="pay" class="card p-5 w-full bg-white">
-                <div>
-                    <h1 class="font-bold text-xl">Summary</h1>
-
-
-                    <div class="card mt-5 border">
-                        <div class="p-4 font-bold flex flex-row justify-between">
-                            <div>Payment Summary</div>
-                        </div>
-                        <hr>
-                        <div class="p-4">
-                            <p>Amount: {{ shipping_rate_log.amount_before_tax }}</p>
-                            <p>Tax: {{ shipping_rate_log.tax }}</p>
-                            <p>Insurance: {{ insurance_options[0].amount }}</p>
-                        </div>
-                        <hr>
-                        <div class="p-4">
-                            <div class="font-bold">Shipment Amount:  {{ shipping_rate_log.total_amount }}</div>
-                        </div>
+                <div class="flex flex-row justify-between gap-x-10 rounded-xl ml-5 mt-5">
+                  <div class="card bg-white duration-300 w-full">
+                    <div class="flex justify-between items-center">
+                      <h3 class="font-semibold text-sm">{{ origin.contact_name }}</h3>
                     </div>
+                    <p class="flex gap-x-10">
+                      <span class="text-sm text-primary">{{ origin.contact_phone }}</span>
+                      <span class="text-sm">{{ origin.contact_email}}</span>
+                    </p>
+                    <p class="mt-3 text-sm"> {{ origin.address_1 }}</p>
+                    <!--                        <p class="text-sm"> {{ origin.landmark }}</p>-->
+                    <div class="flex gap-x-10">
+                      <div class="text-primary font-bold text-sm">{{ origin_location.city }}, {{ origin_location.state }}, {{ origin_location.country }}</div>
+                    </div>
+                  </div>
                 </div>
-            </form>
+              </div>
+              <div class="mt-10">
+                <div class="flex flex-row gap-x-3">
+                  <div class="p-0.5 bg-green-400 h-5 w-5 -ml-2.5"></div>
+                  <h3 class="text-sm">Deliver To</h3>
+                </div>
+                <div class="flex flex-row justify-between gap-x-10 rounded-xl ml-5 mt-5">
+                  <div class="card bg-white duration-300 w-full">
+                    <div class="flex justify-between items-center">
+                      <h3 class="text-sm font-semibold">{{ destination.contact_name }}</h3>
+                    </div>
+                    <p class="flex gap-x-10">
+                      <span class="text-sm text-primary">{{ destination.contact_phone }}</span>
+                      <span class="text-sm">{{ destination.contact_email}}</span>
+                    </p>
+                    <p class="mt-3 text-sm"> {{ destination.address_1 }}</p>
+                    <!--                        <p class="text-sm"> {{ destination.landmark }}</p>-->
+                    <div class="flex gap-x-10">
+                      <div class="text-primary text-sm font-bold">{{ destination_location.city }}, {{ destination_location.state }}, {{ destination_location.country }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+        <div class="card rounded-xl shadow shadow-background/50 w-full bg-white">
+          <h1 class="font-bold text-xl p-5">Shipment Information</h1>
+          <div class="relative overflow-x-auto rounded-2xl">
+            <table class="w-full text-sm text-left text-gray-500">
+              <tbody v-for="item in shipment.shipment_items" :key="item.id" >
+              <tr class="bg-white">
+                <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
+                  Item Category
+                </th>
+                <td class="px-6 py-2">
+                  {{ item_category.name }}
+                </td>
+              </tr>
+              <tr class="bg-white">
+                <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
+                  Value
+                </th>
+                <td class="px-6 py-2">
+                  {{ item.value }}
+                </td>
+              </tr>
+              <tr class="bg-white">
+                <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
+                  Description
+                </th>
+                <td class="px-6 py-2">
+                  {{ item.description }}
+                </td>
+              </tr>
+              <tr class="bg-white">
+                <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
+                  Quantity
+                </th>
+                <td class="px-6 py-2">
+                  {{ item.quantity }} Nos.
+                </td>
+              </tr>
+              <tr class="">
+                <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
+                  Weight
+                </th>
+                <td class="px-6 py-2">
+                  {{ item.weight }}cm
+                </td>
+              </tr>
+              <tr class="">
+                <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
+                  Height
+                </th>
+                <td class="px-6 py-2">
+                  {{ item.height }}cm
+                </td>
+              </tr>
+              <tr class="">
+                <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap">
+                  Length
+                </th>
+                <td class="px-6 py-2">
+                  {{ item.length }}cm
+                </td>
+              </tr>
+              <tr class="">
+                <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap">
+                  Pickup Number
+                </th>
+                <td class="px-6 py-2">
+                  {{ shipping_rate_log.pickup_number }}
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </AuthenticatedLayout>
 </template>
 

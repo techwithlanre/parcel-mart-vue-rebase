@@ -10,6 +10,7 @@ export default {
         './resources/views/**/*.blade.php',
         './resources/js/**/*.vue',
         'node_modules/preline/dist/*.js',
+        './node_modules/tw-elements/dist/js/**/*.js',
     ],
 
     theme: {
@@ -64,5 +65,6 @@ export default {
     plugins: [
         forms,
         require('preline/plugin'),
+        require('tw-elements/dist/plugin.cjs')
     ],
 };

@@ -12,8 +12,10 @@ use App\Models\InsuranceOption;
 use App\Models\Shipment;
 use App\Models\ShipmentItem;
 use App\Models\ShippingRateLog;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Octw\Aramex\Aramex;
+use Carbon\Carbon;
 
 class AramexServices
 {
@@ -26,7 +28,7 @@ class AramexServices
     public string $userCountryCode = '';
     public string $shippingCurrency = '';
 
-    public function __construct(CreateShipmentRequest | BookShipmentRequest $request)
+    public function __construct(CreateShipmentRequest | BookShipmentRequest | Request $request)
     {
         $this->request = $request;
     }
@@ -85,7 +87,7 @@ class AramexServices
         $this->shippingCurrency = (getCountry('id', auth()->user()->country_id)->iso2 == 'NG') ? 'NGN' : 'USD';
     }
 
-    public function  bookShipment(Shipment $shipment, ShipmentItem $shipmentItem, InsuranceOption $insuranceOption, ShippingRateLog $shippingRateLog): bool
+    public function  bookShipment(Shipment $shipment, ShipmentItem $shipmentItem, InsuranceOption $insuranceOption, ShippingRateLog $shippingRateLog, $pickup_guid = null): bool
     {
         $origin = json_decode($shipment->origin_address, true);
         $destination = json_decode($shipment->origin_address, true);
@@ -113,14 +115,14 @@ class AramexServices
                 'city' => getCity('id', $destination['city'])->name,
                 'zip_code' => $destination['postcode'],
                 'line1' => $destination['address_1'],
-                'line2' => !empty($destination['address_2']) ? $destination['address_2'] : $destination['landmark'],
+                'line2' => $destination['address_2'] ?? $destination['landmark'],
                 'line3' => $destination['landmark']
             ],
-            'shipping_date_time' => time() + 50000, // shipping date
-            'due_date' => time() + 60000,  // due date of the shipment
+            'shipping_date_time' => strtotime($this->request->shipment_date) + 50000, // shipping date
+            'due_date' => strtotime($this->request->shipment_date) + 60000,  // due date of the shipment
             'comments' => '', // ,comments
             'pickup_location' => 'at reception', // location as pickup
-            'pickup_guid' => '', // GUID taken from createPickup method (optional)
+            'pickup_guid' => $pickup_guid, // GUID taken from createPickup method (optional)
             'weight' => $shipmentItem->weight, // weight
             'goods_country' => null, // optional
             'number_of_pieces' => $shipmentItem->quantity,  // number of items
@@ -156,7 +158,39 @@ class AramexServices
             'label_content' => $response->Shipments->ProcessedShipment->ShipmentLabel->LabelFileContents,
             'details' => json_encode($response->Shipments->ProcessedShipment->ShipmentDetails)
         ]);
+
         //Mail::to(auth()->user()->email)->send(new OrderConfirmation($shipment_data));
         return true;
+    }
+
+    public function createPickup(BookShipmentRequest $bookShipmentRequest, Shipment $shipment, ShipmentItem $shipment_item)
+    {
+        try {
+            $origin = json_decode($shipment->origin_address, true);
+            $destination = json_decode($shipment->destination_address, true);
+            return Aramex::createPickup([
+                "name" => $origin['contact_name'], // User’s Name, Sent By or in the case of the consignee, to the Attention of.
+                "cell_phone" => $origin['contact_phone'], // Phone Number
+                "phone" => $origin['contact_phone'], // Phone Number
+                "email" => $origin['contact_email'],
+                "country_code" => getCountry('id', $origin['country'])->iso2, // ISO 3166-1 Alpha-2 Code
+                "city" => getCity('id', $origin['city'])->name, // City Name
+                "zip_code" => $origin['postcode'] ,// Postal Code
+                "line1" => $origin['address_1'],
+                "line2" => $origin['address_2'] ?? $origin['address_1'],
+                "pickup_date" => strtotime($bookShipmentRequest->shipment_date), // time parameter describe the date of the pickup
+                "ready_time" => strtotime($bookShipmentRequest->shipment_date),// time parameter describe the ready pickup date
+                "last_pickup_time" => strtotime($bookShipmentRequest->shipment_date),// time parameter
+                "closing_time" => time() ,// time parameter
+                "status" => 'Ready', // or Pending
+                "pickup_location" => 'at companys reception', // location details
+                "weight" => $shipment_item->weight,// wieght of the pickup (in KG)
+                "volume" => 80, // volume of the pickup  (in CM^3)
+            ]);
+        } catch (\Throwable $e) {
+            dd($e->getMessage());
+
+            return false;
+        }
     }
 }

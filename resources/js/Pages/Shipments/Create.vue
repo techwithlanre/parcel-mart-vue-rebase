@@ -584,7 +584,7 @@ const tabs = [
                                  place-holder="" class="mt-2 w-full"/>
                   </div>
                   <div class="w-full">
-                    <InputLabel value="Item value" class="font-normal"/>
+                    <InputLabel value="Item value (NGN)" class="font-normal"/>
                     <TextInput required type="number" v-model="form.shipment.value" min="1"
                                placeholder="" class="mt-2"/>
                   </div>

@@ -12,6 +12,8 @@ import DateFormat from '@voidsolutions/vue-dateformat';
 import('preline');
 import Antd from "ant-design-vue";
 import 'ant-design-vue/dist/reset.css';
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
 
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
 
@@ -25,6 +27,7 @@ createInertiaApp({
             .use(DateFormat)
             .use(VueAnimateOnScroll)
             .use(Antd)
+            .use('VueDatePicker', VueDatePicker)
             /*.use(TawkMessengerVue, {
                 propertyId : '60c6342465b7290ac635bafa',
                 widgetId : '1f833nce0'

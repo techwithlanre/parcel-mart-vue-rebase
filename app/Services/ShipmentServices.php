@@ -17,6 +17,7 @@ use App\Models\ShippingRateLog;
 use App\Models\TrackingLog;
 use App\Models\WalletOverdraft;
 use App\Models\WalletOverdraftLog;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
 use Octw\Aramex\Aramex;
@@ -217,9 +218,8 @@ class ShipmentServices
                     $rate_found = true;
                 }
             } catch (\Exception $e) {
-                //return Redirect::back()->with('error', 'No shipment rate found for your package: ' . $e->getMessage());
+                return Redirect::back()->with('error', 'No shipment rate found for your package');
             }
-
         }
 
         $check_dhl = CourierApiProvider::where('alias', 'dhl');
@@ -303,7 +303,15 @@ class ShipmentServices
         $book_aramex = $book_dhl = false;
         if ($provider == 'aramex') {
             $aramex = new AramexServices($bookShipmentRequest);
-            $book_aramex = $aramex->bookShipment($shipment, $shipment_item, $insurance, $rate);
+            $pickup = $aramex->createPickup($bookShipmentRequest, $shipment, $shipment_item);
+            if (!$pickup) return false;
+            //dd($pickup);
+            $result = $pickup;
+            if ($result->error == 0) {
+                $rate->pickup_number = $pickup->pickupGUID;
+                $rate->save();
+                $book_aramex = $aramex->bookShipment($shipment, $shipment_item, $insurance, $rate, $pickup->pickupGUID);
+            }
         }
 
         if ($provider == 'dhl') {
@@ -449,6 +457,28 @@ class ShipmentServices
             return redirect()->back()->with('message', 'We are working on tracking info. Please check back later');
         } catch (\Exception $exception) {
             return redirect()->back()->with('error', 'We are working on tracking info. Please check back later');
+        }
+    }
+
+    public function calculatePickup(BookShipmentRequest $request, ShippingRateLog $rate_log)
+    {
+        $shipment = Shipment::find($rate_log->shipment_id);
+        $shipment_items = ShipmentItem::where('shipment_id', $rate_log->shipment_id)->first();
+        if ($rate_log->shipment_number == NULL && $rate_log->provider_code == 'dhl') {
+            $dhl = new DHLServices($request);
+            $pickup = $dhl->calculatePickup($shipment, $shipment_items, $request);
+            $rate_log->pickup_number = $pickup['dispatchConfirmationNumbers'][0];
+            dd($rate_log);
+            $rate_log->save();
+            return;
+        }
+
+        if ($rate_log->shipment_number == NULL && $rate_log->provider_code == 'aramex') {
+            $dhl = new AramexServices($request);
+            $pickup = $dhl->createPickup($shipment, $shipment_items, $request);
+            $rate_log->pickup_number = $pickup['dispatchConfirmationNumbers'][0];
+            $rate_log->save();
+            return;
         }
     }
 }

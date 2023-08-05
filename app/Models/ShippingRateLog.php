@@ -22,7 +22,8 @@ class ShippingRateLog extends Model
         'amount_before_tax',
         'tax',
         'created_at',
-        'provider_code'
+        'provider_code',
+        'pickup_number'
     ];
 
     public function courier_api_provider(): \Illuminate\Database\Eloquent\Relations\BelongsTo

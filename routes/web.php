@@ -98,6 +98,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('details/{id}', [\App\Http\Controllers\ShipmentController::class, 'show'])->name('shipment.details');
         Route::post('track', [\App\Http\Controllers\ShipmentController::class, 'trackShipment'])->name('shipment.track');
         Route::get('tracking-details/{shipment_id}', [\App\Http\Controllers\ShipmentController::class, 'trackingDetails'])->name('shipment.track.details');
+        Route::get('pickup', [\App\Http\Controllers\ShipmentController::class, 'calculatePickup'])->name('shipment.calculate.pickup');
     });
 
     /*Wallet*/

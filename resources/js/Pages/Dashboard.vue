@@ -42,7 +42,9 @@ export default {
                 weight: "",
                 width: "",
                 height: "",
-                length: ""
+                length: "",
+                commercial_invoice: "",
+                parking_list: "",
             })
         }
     },
@@ -534,6 +536,26 @@ const trackShipment = () => {
                               autocomplete="off"
                               placeholder="Height"
                               v-model="form.height"/>
+                        </div>
+                      </div>
+                      <div class="grid lg:grid-cols-2 gap-y-3 mt-4 gap-x-5">
+                        <div>
+                          <InputLabel value="Commercial Invoice" class="mb-2" />
+                          <TextInput
+                              id=""
+                              type="file"
+                              class="mt-1 w-full"
+                              required
+                              v-model="form.commercial_invoice"/>
+                        </div>
+                        <div>
+                          <InputLabel value="Parking List" class="mb-2" />
+                          <TextInput
+                              id=""
+                              type="file"
+                              class="mt-1 w-full"
+                              required
+                              v-model="form.parking_list"/>
                         </div>
                       </div>
                     </div>

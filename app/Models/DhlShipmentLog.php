@@ -17,5 +17,7 @@ class DhlShipmentLog extends Model
         'document_content',
         'package_details',
         'type_code',
+        'cancel_pickup_url',
+        'dispatch_confirmation_number',
     ];
 }

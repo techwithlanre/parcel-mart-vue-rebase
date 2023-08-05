@@ -26,9 +26,6 @@ use Inertia\Inertia;
 
 class ShipmentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         //Mail::to(auth()->user()->email)->send(new OrderConfirmation(''));
@@ -74,9 +71,11 @@ class ShipmentController extends Controller
         ));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    public function calculatePickup(Request $request, ShipmentServices $services)
+    {
+        return $services->calculatePickup($request);
+    }
+
     public function create()
     {
         $addresses = Address::where('user_id', auth()->user()->id)

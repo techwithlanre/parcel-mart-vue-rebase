@@ -546,7 +546,8 @@ const trackShipment = () => {
                               type="file"
                               class="mt-1 w-full"
                               required
-                              v-model="form.commercial_invoice"/>
+                              @input="form.commercial_invoice = $event.target.files[0]"
+                              />
                         </div>
                         <div>
                           <InputLabel value="Parking List" class="mb-2" />
@@ -555,7 +556,8 @@ const trackShipment = () => {
                               type="file"
                               class="mt-1 w-full"
                               required
-                              v-model="form.parking_list"/>
+                              @input="form.parking_list = $event.target.files[0]"
+                              />
                         </div>
                       </div>
                     </div>

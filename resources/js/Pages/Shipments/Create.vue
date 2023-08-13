@@ -95,6 +95,7 @@ export default {
   methods: {
     twMerge,
     getOriginStates: function () {
+
       axios.get('/api/states/' + this.form.origin.country).then(function (response) {
         this.originStates = response.data.states;
         this.getDestinationCountries();
@@ -139,6 +140,7 @@ export default {
 
     populateOriginAddress: function (address) {
       console.log(address)
+      this.getOriginStates();
       this.form.origin.address_1 = address.address;
       this.form.origin.contact_name = address.address_contacts[0].contact_name;
       this.form.origin.contact_phone = address.address_contacts[0].contact_phone;
@@ -147,12 +149,15 @@ export default {
       this.form.origin.landmark = address.landmark;
       this.form.origin.country = address.country_id;
       this.form.origin.state = address.state_id;
-      this.form.origin.city = address.city_id;
       this.form.origin.postcode = address.postcode;
-      //alert(this.form.origin.state);
+      if (this.originStates.length > 0) {
+        this.getOriginCities();
+        this.form.origin.city = address.city_id;
+      }
     },
 
     populateDestinationAddress: function (address) {
+      this.getDestinationStates();
       this.form.destination.address_1 = address.address;
       this.form.destination.contact_name = address.address_contacts[0].contact_name;
       this.form.destination.contact_phone = address.address_contacts[0].contact_phone;
@@ -161,8 +166,11 @@ export default {
       this.form.destination.landmark = address.landmark;
       this.form.destination.country = address.country_id;
       this.form.destination.state = address.state_id;
-      this.form.destination.city = address.city_id;
       this.form.destination.postcode = address.postcode;
+      if (this.destinationStates.length > 0) {
+        this.getDestinationCities();
+        this.form.destination.city = address.city_id;
+      }
     },
 
     backToOrigin: function () {
@@ -221,13 +229,13 @@ const tabs = [
 
   <AuthenticatedLayout page-title="Create Shipment">
     <Head title="Start Shipment"/>
-    <div class="w-full sm:px-[400px] mt-10">
+    <div class="flex flex-row justify-center items-center sm:w-max mt-10 mx-auto">
       <div class="flex flex-col gap-x-10 gap-y-10">
         <div class="mb-10 rounded-md">
           <ul class="flex mb-0 list-none flex-wrap gap-y-3 flex-row rounded-md">
             <li v-for="tab in tabs"
                 class="-mb-px mr-5 last:mr-0 flex-auto text-center rounded-lg bg-white shadow cursor-pointer">
-              <button :disabled="tab.disabled" class="text-xs w-full font-bold uppercase px-5 py-3 rounded block leading-normal hover:text-gray-900 no-underline duration-300"
+              <button :disabled="tab.disabled" class="text-xs w-full font-bold uppercase px-5 py-3 rounded-lg block leading-normal hover:text-gray-900 no-underline duration-300"
                  @click="toggleTabs(tab.index)"
                  v-bind:class="{'text-gray-500 bg-white': currentTab !== tab.index, 'text-primary bg-background hover:text-background': currentTab === tab.index}">
                 {{ tab.index }}. {{ tab.name }}
@@ -236,7 +244,7 @@ const tabs = [
           </ul>
         </div>
         <div class="tab-content tab-space">
-          <div v-show="currentTab === 1" class="card shadow-lg bg-white">
+          <div v-show="currentTab === 1" class="card shadow-sm shadow-background duration-300 hover:shadow-l border border-gray-50 bg-white rounded-xl">
             <h3 class="p-5 text-lg">Enter origin address details</h3>
             <div class="p-0">
               <hr class="p-0">

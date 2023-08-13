@@ -18,8 +18,6 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
-use League\Flysystem\Config;
-use GuzzleHttp\Psr7;
 use Illuminate\Support\Str;
 
 class DHLServices
@@ -28,6 +26,7 @@ class DHLServices
     protected String $env;
     protected String $base_url;
     protected String $account_number;
+    protected String $import_account_number;
     protected String $username;
     protected String $password;
     protected array $calculateRatePayload;
@@ -43,6 +42,7 @@ class DHLServices
         $this->env = \config('dhl.ENV');
         $this->base_url = \config('dhl.'.$this->env.'.baseUrl');
         $this->account_number = \config('dhl.'.$this->env.'.accountNumber');
+        $this->import_account_number = \config('dhl.'.$this->env.'.importAccountNumber');
         $this->username = \config('dhl.'.$this->env.'.username');
         $this->password = \config('dhl.'.$this->env.'.password');
     }
@@ -60,8 +60,13 @@ class DHLServices
         if (!$product_code) return false;
         $type = $this->isInternational($this->request->origin, $this->request->destination);
         if (!$type) return false;
+        $account_number = $type == "I" ? $this->import_account_number : $this->account_number;
+        $date = new DateTime();
+        $shipment_date = $date->modify('+1 weekday')->format('Y-m-d 10:00:00');
+        $shipment_date = str_replace(' ', 'T', $shipment_date) . " GMT+0100";
+
         $this->calculateRatePayload = [
-            "plannedShippingDateAndTime" => "2023-08-08T17:10:09 GMT+0100",
+            "plannedShippingDateAndTime" => $shipment_date ,
             "productCode" => $product_code,
             "payerCountryCode" => "NG",
             "unitOfMeasurement" => "metric",
@@ -69,7 +74,7 @@ class DHLServices
             "nextBusinessDay" => true,
             "accounts" => [
                 [
-                    "number" => $this->account_number,
+                    "number" => $account_number,
                     "typeCode" => "shipper"
                 ]
             ],
@@ -129,6 +134,8 @@ class DHLServices
 
         $shippingRateLog->pickup_number = $result['dispatchConfirmationNumber'];
         $shippingRateLog->save();
+        $shipment->number = $result['shipmentTrackingNumber'];
+        $shipment->save();
         //Mail::to(auth()->user()->email)->send(new OrderConfirmation($shipment_data));
         return true;
     }
@@ -189,10 +196,11 @@ class DHLServices
         if (!$product_code) return false;
         $type = $this->isInternational($origin, $destination);
         if (!$type) return false;
+        $account_number = $type == "I" ? $this->import_account_number : $this->account_number;
         $shipment_date = Carbon::create($bookShipmentRequest->shipment_date)->timezone('GMT+1');
         $shipment_date = str_replace(' ', 'T', $shipment_date->toDateTimeString()) . " GMT+01:00";
         $this->bookShipmentPayload = [
-            "plannedShippingDateAndTime" => "2023-08-09T10:00:00 GMT+01:00",
+            "plannedShippingDateAndTime" => $shipment_date,
             "productCode" => $product_code,
             "pickup" =>  [
                 "isRequested" => true,
@@ -217,7 +225,7 @@ class DHLServices
             ],
             "accounts" => [
                 [
-                    "number" => $this->account_number,
+                    "number" => $account_number,
                     "typeCode" => "shipper"
                 ]
             ],
@@ -387,8 +395,8 @@ class DHLServices
             $response = $client->get($dhlShipmentLog->tracking_url . '?trackingView=all-checkpoints&levelOfDetail=all');
             if ($response->getStatusCode() == 200)  return $response->getBody()->getContents();
             return false;
-        } catch (GuzzleException $e) {
-            $response = $e->getResponse();
+        } catch (\Throwable $e) {
+            $response = $e->getMessage();
             //$responseBodyAsString = $response->getBody()->getContents();
             return redirect()->back()->with('error', 'We are working on tracking info. Please check back later');
 
@@ -397,10 +405,7 @@ class DHLServices
 
     public function hello()
     {
-
-
         $curl = curl_init();
-
         curl_setopt_array($curl, [
             CURLOPT_URL => "$this->base_url.'/shipments?strictValidation=false&bypassPLTError=false&validateDataOnly=false'",
             CURLOPT_RETURNTRANSFER => true,
@@ -550,7 +555,7 @@ class DHLServices
             $result = json_decode($response, true);
             if (!isset($result['dispatchConfirmationNumbers'])) return false;
             return $result;
-        } catch (\GuzzleHttp\Exception\TransferException $e) {
+        } catch (\Throwable $e) {
             $response = $e->getMessage();
             return false;
         }

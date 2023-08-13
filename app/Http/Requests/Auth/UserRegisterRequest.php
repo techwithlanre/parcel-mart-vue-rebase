@@ -16,14 +16,21 @@ class UserRegisterRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
+        $rules = [
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'phone' => 'required|string|max:255|unique:users',
             'email' => 'required|string|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'country' => ['required']
+            'country' => ['required'],
+            'ref_by' => ['nullable', 'exists:users,ref_code'],
         ];
+
+        /*if ($this->request->has('ref_by')) {
+            $rules['ref_by'] = [];
+        }*/
+
+        return $rules;
     }
 
     public function messages(): array

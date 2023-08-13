@@ -4,6 +4,7 @@ import {Head, useForm, usePage} from '@inertiajs/vue3';
 import {toast} from "vue3-toastify";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SelectInput from "@/Components/SelectInput.vue";
+import {computed} from "vue";
 
 const page = usePage()
 defineProps({
@@ -34,6 +35,16 @@ const pay = () => {
     });
 }
 
+const image = computed(() => {
+  if (page.props.shipment.provider === 'aramex') return "https://www.aramex.com/Sitefinity/WebsiteTemplates/aramex/App_Themes/aramex/Images/Aramex%20logo%20English.webp";
+  if (page.props.shipment.provider === 'dhl') return "https://www.dhl.com/content/dam/dhl/global/core/images/logos/dhl-logo.svg";
+})
+
+let naira = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'NGN'
+});
+
 </script>
 
 <template>
@@ -42,7 +53,10 @@ const pay = () => {
         <div class="flex lg:flex-row flex-col justify-between gap-10 mt-10">
             <div class="card p-5 rounded-xl shadow shadow-background/50 bg-white w-full">
                 <h1 class="font-bold text-xl">Shipment Status</h1>
-                <div>Tracking Number: <span class="font-bold text-primary">{{ shipment.number }}</span></div>
+                <div class="flex flex-row space-x-4">
+                  <div>Tracking Number: <span class="font-bold text-primary">{{ shipment.number }}</span></div>
+                  <img :src="image" class="h-5" alt="">
+                </div>
                 <div>
                     <h2 class="sr-only">Steps</h2>
                     <div class="mt-10">
@@ -73,13 +87,13 @@ const pay = () => {
                   <h1 class="font-bold text-xl px-5">Payment Summary</h1>
                   <hr>
                   <div class="px-5 text-gray-600 text-sm mt-5">
-                    <p>Amount: {{ shipping_rate_log.amount_before_tax }}</p>
-                    <p>Tax: {{ shipping_rate_log.tax }}</p>
-                    <p>Insurance: {{ insurance_options[0].amount }}</p>
+                    <p>Amount: {{ naira.format(shipping_rate_log.amount_before_tax) }}</p>
+                    <p>Tax: {{ naira.format(shipping_rate_log.tax) }}</p>
+                    <p>Insurance: {{ naira.format(insurance_options[0].amount) }}</p>
                   </div>
 
                   <div class="p-4">
-                    <div class="font-bold">Total Shipment Amount:  {{ shipping_rate_log.total_amount }}</div>
+                    <div class="font-bold">Total Shipment Amount:  {{ naira.format(shipping_rate_log.total_amount) }}</div>
                   </div>
                 </div>
               </div>
@@ -155,7 +169,7 @@ const pay = () => {
                   Value
                 </th>
                 <td class="px-6 py-2">
-                  {{ item.value }}
+                  {{ naira.format(item.value) }}
                 </td>
               </tr>
               <tr class="bg-white">

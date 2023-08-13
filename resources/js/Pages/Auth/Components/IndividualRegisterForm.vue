@@ -17,6 +17,7 @@ export default {
                 phone: '',
                 country: '0',
                 password_confirmation: '',
+                ref_by: ''
             })
         }
     },
@@ -134,6 +135,18 @@ export default {
 
                 <InputError class="mt-2" :message="form.errors.country" />
             </div>
+        </div>
+
+        <div class="mt-4">
+          <TextInput
+              id="ref_by"
+              type="text"
+              class="mt-1 block w-full"
+              v-model="form.ref_by"
+              placeholder="Referral Code (Optional)"
+              autocomplete="ref_by" />
+
+          <InputError class="mt-2" :message="form.errors.ref_by" />
         </div>
 
         <div class="flex flex-col items-center justify-end mt-6">

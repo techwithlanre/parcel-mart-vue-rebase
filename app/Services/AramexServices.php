@@ -84,7 +84,8 @@ class AramexServices
 
     private function setShippingCurrency(): void
     {
-        $this->shippingCurrency = (getCountry('id', auth()->user()->country_id)->iso2 == 'NG') ? 'NGN' : 'USD';
+        //$this->shippingCurrency = (getCountry('id', auth()->user()->country_id)->iso2 == 'NG') ? 'NGN' : 'USD';
+        $this->shippingCurrency = 'NGN';
     }
 
     public function  bookShipment(Shipment $shipment, ShipmentItem $shipmentItem, InsuranceOption $insuranceOption, ShippingRateLog $shippingRateLog, $pickup_guid = null): bool
@@ -159,6 +160,8 @@ class AramexServices
             'details' => json_encode($response->Shipments->ProcessedShipment->ShipmentDetails)
         ]);
 
+        $shipment->number = $response->Shipments->ProcessedShipment->ID;
+        $shipment->save();
         //Mail::to(auth()->user()->email)->send(new OrderConfirmation($shipment_data));
         return true;
     }
@@ -167,7 +170,10 @@ class AramexServices
     {
         try {
             $origin = json_decode($shipment->origin_address, true);
-            $destination = json_decode($shipment->destination_address, true);
+            //$cities = Aramex::fetchCities('NG');
+            //dd($cities);
+            //dd($shipment_item);
+            $volume = $shipment_item->height * $shipment_item->length * $shipment_item->width;
             return Aramex::createPickup([
                 "name" => $origin['contact_name'], // User’s Name, Sent By or in the case of the consignee, to the Attention of.
                 "cell_phone" => $origin['contact_phone'], // Phone Number
@@ -185,11 +191,10 @@ class AramexServices
                 "status" => 'Ready', // or Pending
                 "pickup_location" => 'at companys reception', // location details
                 "weight" => $shipment_item->weight,// wieght of the pickup (in KG)
-                "volume" => 80, // volume of the pickup  (in CM^3)
+                "volume" => $volume, // volume of the pickup  (in CM^3)
             ]);
         } catch (\Throwable $e) {
             dd($e->getMessage());
-
             return false;
         }
     }

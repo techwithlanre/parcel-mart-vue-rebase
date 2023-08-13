@@ -51,6 +51,8 @@ Route::get('tracking', function () {
 Route::post('contact', [\App\Http\Controllers\ContactController::class, 'send'])->name('contact.send');
 
 Route::post('/send-quote-form', function(\Illuminate\Http\Request $request) {
+    $path = $request->file('commercial_invoice')->store('quotes');
+    $path = $request->file('commercial_invoice')->store('quotes');
     Mail::to('quotes@parcelsmartsolution.com')->send(new \App\Mail\QuoteForm($request));
     return redirect(\route('dashboard'))->with('message', 'Your request has been sent');
 })->name('send.quote.form');
@@ -132,6 +134,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('invite', [\App\Http\Controllers\InviteController::class, 'index'])->name('invite.index');
 });
 
 Route::get('verify-email', EmailVerificationPromptController::class)->name('verification.notice');
@@ -162,3 +166,5 @@ Route::get('workbench/{id}', function (\Illuminate\Http\Request $request) {
    print_r($data);
    exit;
 });
+
+Route::get('workbench', [\App\Http\Controllers\WorkbenchController::class, 'index']);

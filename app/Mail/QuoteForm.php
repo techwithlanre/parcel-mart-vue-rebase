@@ -53,6 +53,8 @@ class QuoteForm extends Mailable
                 'width'=>$this->request->width,
                 'height'=>$this->request->height,
                 'metric'=>$this->request->metric,
+                'commercial_invoice' => $this->request->file('commercial_invoice')->store('quote', 'public'),
+                'parking_list' => $this->request->file('parking_list')->store('quote', 'public'),
             ]
         );
     }

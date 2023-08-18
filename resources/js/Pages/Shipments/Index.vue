@@ -13,6 +13,7 @@ import InputLabel from "@/Components/InputLabel.vue";
 import {twMerge} from "tailwind-merge";
 import Modal from "@/Components/Modal.vue";
 import TrackShipmentModal from "@/Pages/Shipments/Partials/TrackShipmentModal.vue";
+import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 
 const activeKey = ref('1');
 const trackShipmentOpen = ref(false);
@@ -51,7 +52,7 @@ const handleFilter = () => {
 </script>
 
 <template>
-    <AuthenticatedLayout page-title="Shipments">
+    <DashboardLayout page-title="Shipments">
         <Head title="Start Shipment" />
         <div class="flex flex-col w-full gap-5 mt-10">
             <div class="flex flex-row gap-5 justify-end items-end">
@@ -133,7 +134,7 @@ const handleFilter = () => {
                 </div>
             </div>
         </div>
-    </AuthenticatedLayout>
+    </DashboardLayout>
 </template>
 
 <style scoped>

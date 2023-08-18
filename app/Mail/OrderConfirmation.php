@@ -40,8 +40,8 @@ class OrderConfirmation extends Mailable
         return new Content(
             view: 'mail.order-confirmation',
             with: [
-                'shipment' => $this->shipment_data,
-                'user' => auth()->user()
+                'data' => $this->shipment_data,
+                'user' => auth()->user(),
             ]
         );
     }

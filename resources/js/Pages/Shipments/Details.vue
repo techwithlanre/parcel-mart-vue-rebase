@@ -5,6 +5,7 @@ import {toast} from "vue3-toastify";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SelectInput from "@/Components/SelectInput.vue";
 import {computed} from "vue";
+import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 
 const page = usePage()
 defineProps({
@@ -48,7 +49,7 @@ let naira = new Intl.NumberFormat('en-US', {
 </script>
 
 <template>
-    <AuthenticatedLayout page-title="Shipment Checkout">
+    <DashboardLayout page-title="Shipment Checkout">
         <Head title="Shipment Checkout"/>
         <div class="flex lg:flex-row flex-col justify-between gap-10 mt-10">
             <div class="card p-5 rounded-xl shadow shadow-background/50 bg-white w-full">
@@ -93,7 +94,7 @@ let naira = new Intl.NumberFormat('en-US', {
                   </div>
 
                   <div class="p-4">
-                    <div class="font-bold">Total Shipment Amount:  {{ naira.format(shipping_rate_log.total_amount) }}</div>
+                    <div class="font-bold">Total Shipment Amount:  {{ shipping_rate_log.total_amount }}</div>
                   </div>
                 </div>
               </div>
@@ -225,7 +226,7 @@ let naira = new Intl.NumberFormat('en-US', {
           </div>
         </div>
       </div>
-    </AuthenticatedLayout>
+    </DashboardLayout>
 </template>
 
 <style scoped>

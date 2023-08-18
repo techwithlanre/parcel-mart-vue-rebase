@@ -136,7 +136,6 @@ class DHLServices
         $shippingRateLog->save();
         $shipment->number = $result['shipmentTrackingNumber'];
         $shipment->save();
-        //Mail::to(auth()->user()->email)->send(new OrderConfirmation($shipment_data));
         return true;
     }
 

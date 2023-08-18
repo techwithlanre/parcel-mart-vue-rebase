@@ -1,6 +1,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import {ref} from "vue";
+import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 
 const props = defineProps({
   code: String
@@ -24,10 +25,10 @@ const copy = () => {
 </script>
 
 <template>
-  <AuthenticatedLayout page-title="Invite & Earn">
+  <DashboardLayout page-title="Invite & Earn">
     <div class="flex flex-col p-6 lg:px-[250px]">
       <h1 class="text-3xl lg:text-5xl font-bold text-center">Your <br>Referral Code</h1>
-      <p class="text-center text-sm mb-10">Don't just take our words, hear from our customers</p>
+<!--      <p class="text-center text-sm mb-10">Don't just take our words, hear from our customers</p>-->
       <div class="flex gap-x-20">
         <div class="flex flex-col bg-white w-full">
           <div class="text-center flex flex-col items-center">
@@ -44,7 +45,7 @@ const copy = () => {
         </div>
       </div>
     </div>
-  </AuthenticatedLayout>
+  </DashboardLayout>
 </template>
 
 <style scoped>

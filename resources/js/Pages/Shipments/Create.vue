@@ -202,6 +202,7 @@ export default {
 
 <script setup>
 import {ref} from "vue";
+import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 
 const currentTab = ref(1);
 
@@ -227,7 +228,7 @@ const tabs = [
 
 <template>
 
-  <AuthenticatedLayout page-title="Create Shipment">
+  <DashboardLayout page-title="Create Shipment">
     <Head title="Start Shipment"/>
     <div class="flex flex-row justify-center items-center sm:w-max mt-10 mx-auto">
       <div class="flex flex-col gap-x-10 gap-y-10">
@@ -640,7 +641,7 @@ const tabs = [
         </div>
       </div>
     </div>
-  </AuthenticatedLayout>
+  </DashboardLayout>
 </template>
 
 <style scoped>

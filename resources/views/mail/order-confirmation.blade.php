@@ -1,3 +1,13 @@
+<?php
+$origin = json_decode($data['shipment']['origin_address'], true);
+$destination = json_decode($data['shipment']['destination_address'], true);
+
+$item = json_decode($data['shipment_item'], true);
+
+
+
+?>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
@@ -6,7 +16,7 @@
     <meta name="x-apple-disable-message-reformatting">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="telephone=no" name="format-detection">
-    <title>Shipment Confirmation</title><!--[if (mso 16)]>
+    <title>Order Confirmation</title><!--[if (mso 16)]>
     <style type="text/css">
     a {text-decoration: none;}
     </style>
@@ -106,7 +116,7 @@
                                                 <td valign="top" align="center" style="padding:0;Margin:0;width:560px">
                                                     <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                                                         <tr>
-                                                            <td align="center" style="padding:0;Margin:0;padding-bottom:10px"><h1 style="Margin:0;line-height:36px;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;font-size:30px;font-style:normal;font-weight:bold;color:#212121">Shipment Confirmation<br></h1></td>
+                                                            <td align="center" style="padding:0;Margin:0;padding-bottom:10px"><h1 style="Margin:0;line-height:36px;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;font-size:30px;font-style:normal;font-weight:bold;color:#212121">Order Confirmation</h1></td>
                                                         </tr>
                                                     </table></td>
                                             </tr>
@@ -126,13 +136,10 @@
                                                 <td valign="top" align="center" style="padding:0;Margin:0;width:560px">
                                                     <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                                                         <tr>
-                                                            <td class="es-m-txt-c" align="left" style="padding:0;Margin:0;padding-bottom:5px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#1e277b;font-size:16px">Order <span class="p_order">47586921</span></p></td>
+                                                            <td class="es-m-txt-c" align="left" style="padding:0;Margin:0"><h1 style="Margin:0;line-height:36px;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;font-size:30px;font-style:normal;font-weight:bold;color:#212121;text-align:left">Hello, {{ auth()->user()->first_name }}</h1></td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="es-m-txt-c" align="left" style="padding:0;Margin:0"><h1 style="Margin:0;line-height:36px;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;font-size:30px;font-style:normal;font-weight:bold;color:#212121;text-align:left">Hello, {{ $user->first_name }}</h1></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="es-m-txt-c" align="left" style="padding:0;Margin:0;padding-top:20px;padding-bottom:20px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:27px;color:#999999;font-size:18px" class="p_description">Thank you for your order. Below are your order details</p></td>
+                                                            <td class="es-m-txt-c" align="left" style="padding:0;Margin:0;padding-top:20px;padding-bottom:20px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:27px;color:#999999;font-size:18px" class="p_description">Thank you for your shipment&nbsp;order. Below are the order details</p></td>
                                                         </tr>
                                                     </table></td>
                                             </tr>
@@ -156,13 +163,27 @@
                                                                 </table></td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="es-m-txt-c" align="left" style="padding:0;Margin:0"><p class="p_order" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#131313;font-size:16px">{{ $shipment_data }}</p></td>
+                                                            <td class="es-m-txt-c" align="left" style="padding:0;Margin:0"><p class="p_order" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#131313;font-size:16px">{{ $data['shipment']['number'] }}</p></td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="es-m-txt-c" align="left" style="padding:0;Margin:0;padding-top:20px;padding-bottom:20px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#131313;font-size:16px"><strong>Sender address</strong></p></td>
+                                                            <td class="es-m-txt-c" align="left" style="padding:0;Margin:0;padding-top:20px;padding-bottom:20px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#131313;font-size:16px"><strong>Origin</strong></p></td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="es-m-txt-c" align="left" style="padding:0;Margin:0"><p class="p_s_address" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#131313;font-size:16px">Martinsburg,<br>4540 Hall Valley Drive<br>West Virginia</p></td>
+                                                            <td class="es-m-txt-c" align="left" style="padding:0;Margin:0"><p class="p_s_address" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#131313;font-size:16px">
+                                                                <div>
+                                                                    <p>
+                                                                        {{ $origin['contact_name'] }} |
+                                                                        {{ $origin['contact_phone'] }} |
+                                                                        {{ $origin['contact_email'] }}
+                                                                    </p>
+                                                                    <p>
+                                                                        {{ $origin['address_1'] }} <br>
+                                                                        {{ $origin['landmark'] }} <br>
+                                                                        {{ getCity('id', $origin['city'])->name }}, {{ getState('id', $origin['state'])->name }}, {{ getCountry('id', $origin['country'])->name }} <br>
+                                                                        {{ $origin['postcode'] }}
+                                                                    </p>
+                                                                </div>
+                                                            </td>
                                                         </tr>
                                                     </table></td>
                                             </tr>
@@ -183,13 +204,27 @@
                                                                 </table></td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="es-m-txt-c" align="left" style="padding:0;Margin:0"><p class="p_date" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#131313;font-size:16px">12 Jun 2019</p></td>
+                                                            <td class="es-m-txt-c" align="left" style="padding:0;Margin:0"><p class="p_date" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#131313;font-size:16px">{{ $data['shipment'] }}</p></td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="es-m-txt-c" align="left" style="padding:0;Margin:0;padding-top:20px;padding-bottom:20px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#131313;font-size:16px"><strong>Receiver address</strong></p></td>
+                                                            <td class="es-m-txt-c" align="left" style="padding:0;Margin:0;padding-top:20px;padding-bottom:20px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#131313;font-size:16px"><strong>Destination</strong></p></td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="es-m-txt-c" align="left" style="padding:0;Margin:0"><p class="p_b_address" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#131313;font-size:16px">Martinsburg,<br>4540 Hall Valley Drive<br>West Virginia</p></td>
+                                                            <td class="es-m-txt-c" align="left" style="padding:0;Margin:0"><p class="p_b_address" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#131313;font-size:16px">
+                                                                <div>
+                                                                    <p>
+                                                                        {{ $destination['contact_name'] }} |
+                                                                        {{ $destination['contact_phone'] }} |
+                                                                        {{ $destination['contact_email'] }}
+                                                                    </p>
+                                                                    <p>
+                                                                        {{ $destination['address_1'] }} <br>
+                                                                        {{ $destination['landmark'] }} <br>
+                                                                        {{ getCity('id', $destination['city'])->name }}, {{ getState('id', $destination['state'])->name }}, {{ getCountry('id', $destination['country'])->name }} <br>
+                                                                        {{ $destination['postcode'] }}
+                                                                    </p>
+                                                                </div>
+                                                            </td>
                                                         </tr>
                                                     </table></td>
                                             </tr>
@@ -218,7 +253,7 @@
                                                             <td align="left" style="padding:0;Margin:0;width:270px">
                                                                 <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                                                                     <tr>
-                                                                        <td align="left" style="padding:0;Margin:0"><h4 style="Margin:0;line-height:120%;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif"><a target="_blank" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:none;color:#333333;font-size:16px" class="p_name" href="https://viewstripo.email">category}} </a><br type="_moz"></h4><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#999999;font-size:16px"><span class="p_option">Width:</span><br type="_moz"></p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#999999;font-size:16px"><span class="p_option">Length:</span><br type="_moz"></p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#999999;font-size:16px"><span class="p_option">Height:</span><br type="_moz"></p></td>
+                                                                        <td align="left" style="padding:0;Margin:0"><h4 style="Margin:0;line-height:120%;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif"><a target="_blank" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:none;color:#333333;font-size:16px" class="p_name" href="link_here">{{ $data['shipment']['number'] }} </a></h4><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#999999;font-size:16px"><span class="p_option"></span>Pickup Number: {{ $data['shipment']['pickup_number'] }}<br></p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#999999;font-size:16px"><span class="p_option">Width:</span> {{ $item['width'] }}cm</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#999999;font-size:16px"><span class="p_option">Length:</span>{{ $item['length'] }}cm</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#999999;font-size:16px"><span class="p_option">Height:</span> {{ $item['height'] }}cm</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#999999;font-size:16px"><span class="p_option">Weight:</span> {{ $item['weight'] }}kg</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#999999;font-size:16px">Quantity: {{ $item['quantity'] }}<br></p></td>
                                                                     </tr>
                                                                 </table></td>
                                                         </tr>

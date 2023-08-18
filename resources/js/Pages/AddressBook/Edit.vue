@@ -6,6 +6,7 @@ import {Head, useForm, usePage} from "@inertiajs/vue3";
 import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SelectInput from "@/Components/SelectInput.vue";
+import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 
 const page = usePage()
 
@@ -37,7 +38,7 @@ const submit = () => {
 
 <template>
     <Head title="Edit Address" />
-    <AuthenticatedLayout page-title="Edit Address">
+    <DashboardLayout page-title="Edit Address">
         <div >
             <div class="mx-auto lg:mt-17 mt max-w-2xl p-10 bg-white  rounded-2xl border">
                 <div>
@@ -174,7 +175,7 @@ const submit = () => {
                 </form>
             </div>
         </div>
-    </AuthenticatedLayout>
+    </DashboardLayout>
 </template>
 
 <style scoped>

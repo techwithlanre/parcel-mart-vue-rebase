@@ -134,6 +134,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::put('upgrade', [ProfileController::class, 'upgrade'])->name('profile.upgrade');
 
     Route::get('invite', [\App\Http\Controllers\InviteController::class, 'index'])->name('invite.index');
 });

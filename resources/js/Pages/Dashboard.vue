@@ -11,7 +11,7 @@ import InputError from "@/Components/InputError.vue";
 import Parcel from "../../images/parcel.png";
 import Pagination from "@/Components/Pagination.vue";
 import { notification } from 'ant-design-vue';
-
+import {onMounted} from "vue";
 
 export default {
     data() {
@@ -142,6 +142,8 @@ import {useForm} from "@inertiajs/vue3";
 import Modal from "@/Components/Modal.vue";
 import {ref} from "vue";
 import {notification} from "ant-design-vue";
+import DashboardLayout from "@/Layouts/DashboardLayout.vue";
+import TestLayout from "@/Layouts/TestLayout.vue";
 
 const isTrackingOpen = ref(false);
 
@@ -166,7 +168,7 @@ const trackShipment = () => {
 
 <template>
     <Head title="Dashboard" />
-    <AuthenticatedLayout page-title="Dashboard">
+    <DashboardLayout page-title="Dashboard">
         <div class="flex lg:flex-row flex-col gap-x-5 gap-y-10 mt-10">
             <div class="w-full">
                 <div class="flex flex-col gap-y-10 lg:flex-row gap-x-10">
@@ -327,10 +329,10 @@ const trackShipment = () => {
                                 <div>{{ item.destination['address_1']}}</div>
                                 <div>{{item.destination['city']}}, {{ item.destination['country']}}</div>
                             </td>
-                            <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
+                            <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                                 {{ item.number }}
                             </td>
-                            <td class="px-6 py-4" >
+                            <td class="px-6 py-4">
                               <span
                                   class="px-3 py-1 rounded-full text-white font-medium"
                                   :class="{'bg-orange-400' : item.status ==='processing', 'bg-yellow-400' : item.status ==='pending', 'bg-green-400' : item.status ==='delivered'}">
@@ -613,7 +615,7 @@ const trackShipment = () => {
             </div>
           </div>
         </Modal>
-    </AuthenticatedLayout>
+    </DashboardLayout>
 </template>
 
 <style>

@@ -9,6 +9,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Modal from "@/Components/Modal.vue";
 import CreateAddress from "@/Pages/AddressBook/CreateAddress.vue";
 import EditOriginAddressModal from "@/Pages/Shipments/Partials/EditOriginAddressModal.vue";
+import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 
 defineProps({
   addresses: Object,
@@ -20,7 +21,7 @@ const isOpenCreate = ref(false)
 
 <template>
     <Head title="Address Book" />
-    <AuthenticatedLayout page-title="Address Book">
+    <DashboardLayout page-title="Address Book">
         <div>
             <div  v-if="addresses.data.length > 0" class="flex flex-col justify-end items-end">
                 <a @click="isOpenCreate = true"
@@ -99,7 +100,7 @@ const isOpenCreate = ref(false)
           </div>
         </div>
       </Modal>
-    </AuthenticatedLayout>
+    </DashboardLayout>
 </template>
 
 <style scoped>

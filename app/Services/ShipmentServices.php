@@ -6,6 +6,7 @@ namespace App\Services;
 use App\Http\Requests\BookShipmentRequest;
 use App\Http\Requests\CreateShipmentRequest;
 use App\Http\Requests\TrackShipmentRequest;
+use App\Mail\OrderConfirmation;
 use App\Models\AramexShipmentLog;
 use App\Models\CourierApiProvider;
 use App\Models\DhlRateLog;
@@ -18,6 +19,7 @@ use App\Models\TrackingLog;
 use App\Models\WalletOverdraft;
 use App\Models\WalletOverdraftLog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
 use Octw\Aramex\Aramex;
@@ -69,14 +71,6 @@ class ShipmentServices
         return $shipment;
     }
 
-    private function updateShipmentLog(Shipment $shipment, $response)
-    {
-        $shipment->provider_cost = $response->RateDetails->TotalAmountBeforeTax;
-        $shipment->tax = $response->RateDetails->TaxAmount;
-        $shipment->price = $response->TotalAmount->Value * 1.2;
-        $shipment->save();
-    }
-
     public function recalculateShipmentCost(CreateShipmentRequest $request): bool|\Illuminate\Http\RedirectResponse
     {
         $shipment_id = request()->id;
@@ -118,9 +112,7 @@ class ShipmentServices
                     ])->delete();
                 }
             } catch (\Throwable $e) {
-                //dd($e->getMessage());
-                //return Redirect::back()->with('error', 'No shipment rate found for your package: ' . $e->getMessage());
-                //return Redirect::back()->with('error', 'No shipment rate found for your package at the moment. Please try again.');
+                return Redirect::back()->with('error', 'No shipment rate found for your package at the moment. Please try again.');
             }
 
         }
@@ -291,7 +283,7 @@ class ShipmentServices
         return $rate_found ? Redirect::route('shipment.checkout', $shipment->id) : Redirect::back()->with('error', 'No shipment rate found for your package');
     }
 
-    public function bookShipment(BookShipmentRequest $bookShipmentRequest)
+    public function bookShipment(BookShipmentRequest $bookShipmentRequest): \Illuminate\Foundation\Application|false|\Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
         $request = $bookShipmentRequest->validated();
         $shipment = Shipment::whereId($request['shipment_id'])->first();
@@ -306,14 +298,29 @@ class ShipmentServices
             return redirect(route('shipment.checkout', $request['shipment_id']))->with('error', 'Insufficient balance');
         }
 
+
+        if (auth()->user()->user_type === 'business') {
+            $current_balance = auth()->user()->balance;
+            $current_overdraft_amount = $total_amount - $current_balance; // loan amount at the moment
+            $overdraft_wallet = WalletOverdraft::where('user_id', auth()->user()->id)->first();
+            $previous_overdraft = $overdraft_wallet->balance;
+            $total_overdraft = $current_overdraft_amount + $previous_overdraft;
+            if ($total_overdraft > auth()->user()->credit_limit) {
+                return redirect()->back()->with('error', 'Insufficient balance: Order amount is above your credit limit');
+            }
+        }
+
         $provider = $rate->provider_code;
         $book_aramex = $book_dhl = false;
         if ($provider == 'aramex') {
             $aramex = new AramexServices($bookShipmentRequest);
             $pickup = $aramex->createPickup($bookShipmentRequest, $shipment, $shipment_item);
-            if (!$pickup) return false;
+            if (!$pickup) {
+                return redirect()->back()->with('error', 'We were not able to process your pickup. Please try again later');
+            }
+
             if ($pickup->error == 0) {
-                $rate->pickup_number = $pickup->pickupGUID;
+                $rate->pickup_number = $pickup->pickupID;
                 $rate->save();
                 $book_aramex = $aramex->bookShipment($shipment, $shipment_item, $insurance, $rate, $pickup->pickupGUID);
             }
@@ -329,15 +336,8 @@ class ShipmentServices
                 $current_balance = auth()->user()->balance;
                 $overdraft_amount = $total_amount - $current_balance;
                 $overdraft_wallet = WalletOverdraft::where('user_id', auth()->user()->id)->first();
-                if (!$overdraft_wallet) {
-                    WalletOverdraft::create([
-                        'user_id' => auth()->user()->id,
-                        'balance' => $overdraft_amount
-                    ]);
-                } else {
-                    $overdraft_wallet->balance += $overdraft_amount;
-                    $overdraft_wallet->save();
-                }
+                $overdraft_wallet->balance += $overdraft_amount;
+                $overdraft_wallet->save();
 
                 WalletOverdraftLog::create([
                     'user_id' => auth()->user()->id,
@@ -353,27 +353,29 @@ class ShipmentServices
             $shipment->provider_id = $rate->courier_api_provider_id;
             $shipment->shipping_rate_log_id  = $rate->id;
             $shipment->provider = $provider;
-            //$shipment->number = random_int(1000000000, 9999999999);
             $shipment->status = 'processing';
             $shipment->save();
+            $shipment_data = [
+                'shipment' => $shipment,
+                'shipment_item' => $shipment_item,
+            ];
+
+            Mail::to(auth()->user()->email)->send(new OrderConfirmation($shipment_data));
         }
 
         if (!$book_dhl && !$book_aramex) {
             return redirect(route('shipment.checkout', $request['shipment_id']))->with('error', 'Shipment booking failed at this time. Please try again later');
         }
 
-
         return \redirect(route('shipment.details', $shipment->id));
-        //refund
-        //book shipment with selected rate
     }
 
-    private function bookWithAramex(BookShipmentRequest $bookShipmentRequest)
+    private function bookWithAramex($bookShipmentRequest, $shipment, $shipment_item)
     {
 
     }
 
-    public function trackShipment(TrackShipmentRequest $request)
+    public function trackShipment(TrackShipmentRequest $request): \Illuminate\Foundation\Application|\Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
         $shipment_number = trim($request->number);
         $shipment = Shipment::where([
@@ -387,7 +389,7 @@ class ShipmentServices
         return redirect()->back()->with('error', 'An error occurred. Please try again later');
     }
 
-    private function trackAramex(Shipment $shipment)
+    private function trackAramex(Shipment $shipment): \Illuminate\Foundation\Application|\Illuminate\Routing\Redirector|\Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse
     {
         $aramex_shipment = AramexShipmentLog::where('shipment_id', $shipment->id)->first();
         $response = Aramex::trackShipments([$aramex_shipment->aramex_id]);
@@ -423,7 +425,7 @@ class ShipmentServices
         return redirect()->back()->with('error', 'We are working on tracking info. Please check back later');
     }
 
-    private function trackDhl(TrackShipmentRequest $request, Shipment $shipment)
+    private function trackDhl(TrackShipmentRequest $request, Shipment $shipment): \Illuminate\Foundation\Application|\Illuminate\Routing\Redirector|\Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse
     {
         $dhl_shipment = DhlShipmentLog::where('shipment_id', $shipment->id)->first();
         if (!$dhl_shipment) return redirect()->back()->with('error', 'An error occurred. Please try again later');
@@ -432,7 +434,7 @@ class ShipmentServices
             $response = $dhl->trackShipment($dhl_shipment);
             $tracking_data = json_decode($response, true);
             $tracking_log = false;
-            foreach ($tracking_data['shipments'] as $td) {                //dd($td);
+            foreach ($tracking_data['shipments'] as $td) {
                 if (isset($td['events']) && count($td['events']) > 0) {
                     foreach ($td['events'] as $event) {
                         $check = TrackingLog::where([
@@ -473,7 +475,6 @@ class ShipmentServices
             $dhl = new DHLServices($request);
             $pickup = $dhl->calculatePickup($shipment, $shipment_items, $request);
             $rate_log->pickup_number = $pickup['dispatchConfirmationNumbers'][0];
-            //dd($rate_log);
             $rate_log->save();
             return;
         }

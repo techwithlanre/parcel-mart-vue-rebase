@@ -9,7 +9,6 @@ import FAQ from "../../images/icons/_faq.svg";
 import InviteIcon from "../../images/icons/_invite.svg";
 import LogoutIcon from "../../images/icons/_logout.svg";
 import ShoppingBagIcon from "../../images/icons/shopping-bag.svg";
-import {computed} from "vue";
 
 
 const page = usePage();
@@ -45,8 +44,8 @@ const sidebar = [
     { name: "Shipments", icon: TruckIcon, route: "/shipments", admin: false },
     { name: "Wallet", icon: WalletIcon, route: "/wallet", admin: false },
     { name: "Address Book", icon: LocationIcon, route: '/address-book', admin: false  },
-    { name: "FAQs", icon: FAQ, route: '/faq', admin: false  },
-    { name: "Invite & Earn", icon: InviteIcon, route: '/invite', admin: false  },
+    { name: "FAQs", icon: FAQ, route: route('faq.index'), admin: false  },
+    { name: "Invite & Earn", icon: InviteIcon, route: route('invite.index'), admin: false  },
     { name: "Logout", icon: LogoutIcon, route: route('logout'), admin: false },
   ],
 ];
@@ -80,10 +79,6 @@ const setup = () => {
     is_dark: getTheme(),
   }
 }
-
-const menuType = computed(() => {
-  return page.props.auth.user.is_admin === 0 ? "User" : "Admin";
-});
 </script>
 
 
@@ -93,15 +88,22 @@ const menuType = computed(() => {
   <div>
     <div class="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased bg-white">
       <!-- Header -->
-      <div class="fixed w-full flex items-center justify-between text-white border-b">
+      <div class="fixed w-full flex items-center justify-between h-14 text-white z-10 border-b">
         <div class="flex items-center justify-start pl-3 w-14 md:w-64 h-14">
           <img src="../../images/logo.png" alt="parcel-mart-logo" class="w-28 rounded-full">
         </div>
-        <div class="flex justify-between items-center header-right">
+        <div class="flex justify-between items-center h-14 header-right">
           <ul class="flex items-center">
+
             <li>
-              <Link :href="route('profile.edit')" class="flex items-center mr-4 text-gray-700 hover:text-blue-100">
-                {{ page.props.auth.user.first_name + " " + page.props.auth.user.last_name }}
+              <div class="block w-px h-6 mx-3 bg-gray-400 _dark:bg-gray-700"></div>
+            </li>
+            <li>
+              <Link href="#" class="flex items-center mr-4 hover:text-blue-100">
+                <span class="inline-flex mr-1">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                </span>
+                Logout
               </Link>
             </li>
           </ul>
@@ -112,16 +114,30 @@ const menuType = computed(() => {
       <!-- Sidebar -->
       <div class="fixed flex flex-col top-14 left-0 w-14 hover:w-64 md:w-64 bg-primary h-full text-white transition-all duration-300 border-none z-10 sidebar">
         <div class="overflow-y-auto overflow-x-hidden flex flex-col justify-between flex-grow">
+<!--          <ul class="flex flex-col py-4 space-y-1" v-for="group  in sidebar">
+            <li v-if="page.props.auth.user.is_admin === 0" v-for="item in group" class="">
+              <Link :href="item.route" class="" :class="{'text-white bg-primary group font-bold rounded-md py-2 hover:text-primary hover:bg-background': $page.url.startsWith(item.route)}">
+                <Component :is="item.icon" class="w-6 h-6 text-gray-400" />
+                <span class="ml-3">{{ item.name }}</span>
+              </Link>
+            </li>
+            <li v-if="page.props.auth.user.is_admin === 1" v-for="item in adminMenu" class="">
+              <Link :href="item.route" class="flex items-center p-2 hover:text-primary text-gray-900 rounded-lg s_dark:text-white hover:bg-gray-100 s_dark:hover:bg-gray-700 group">
+                <Component :is="item.icon" class="w-6 h-6 fill-current" />
+                <span class="flex-1 ml-3 whitespace-nowrap">{{ item.name }}</span>
+              </Link>
+            </li>
+          </ul>-->
           <ul class="flex flex-col py-4 space-y-1" v-for="group  in sidebar">
             <li class="px-5 hidden md:block">
               <div class="flex flex-row items-center h-8">
-                <div class="text-sm font-light tracking-wide text-white uppercase">{{ menuType }} Menu</div>
+                <div class="text-sm font-light tracking-wide text-gray-400 uppercase">Main</div>
               </div>
             </li>
             <li v-if="page.props.auth.user.is_admin === 0" v-for="item in group">
               <Link :href="item.route"
                     :class="{'text-primary bg-[#004e4f] border-l border-white outline-non group font-bold hover:text-primary hover:bg-background': $page.url.startsWith(item.route)}"
-                    class="relative flex flex-row items-center h-11 focus:outline-none  text-white hover:text-white border-l-4 border-transparent hover:bg-[#008083]/50 hover:border-background pr-6 duration-300">
+                    class="relative flex flex-row items-center h-11 focus:outline-none  text-white hover:text-white border-l-4 border-transparent hover:bg-[#008083]/50 hover:border-background pr-6">
                 <span class="inline-flex justify-center items-center sm:ml-4 ml-2.5">
                   <Component :is="item.icon" />
                 </span>
@@ -129,26 +145,24 @@ const menuType = computed(() => {
               </Link>
             </li>
             <li v-if="page.props.auth.user.is_admin === 1" v-for="item in adminMenu">
-              <Link :href="item.route"
-                    :class="{'text-primary bg-[#004e4f] border-l border-white outline-non group font-bold hover:text-primary hover:bg-background': $page.url.startsWith(item.route)}"
-                    class="relative flex flex-row items-center h-11 focus:outline-none  text-white hover:text-white border-l-4 border-transparent hover:bg-[#008083]/50 hover:border-background pr-6 duration-300">
+              <Link :href="item.route" class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 _dark:hover:bg-gray-600 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 _dark:hover:border-gray-800 pr-6">
                 <span class="inline-flex justify-center items-center sm:ml-4 ml-2.5">
                   <Component :is="item.icon" />
                 </span>
                 <span class="ml-2 text-sm tracking-wide truncate">{{ item.name }}</span>
               </Link>
             </li>
-            <!--            <li>
-                          <Link href="wallet" class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 _dark:hover:bg-gray-600 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 _dark:hover:border-gray-800 pr-6">
-                            <span class="inline-flex justify-center items-center ml-4">
-                              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
-                            </span>
-                            <span class="ml-2 text-sm tracking-wide truncate">Board</span>
-                            <span class="hidden md:block px-2 py-0.5 ml-auto text-xs font-medium tracking-wide text-blue-500 bg-indigo-50 rounded-full">New</span>
-                          </Link>
-                        </li>-->
+<!--            <li>
+              <Link href="wallet" class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 _dark:hover:bg-gray-600 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 _dark:hover:border-gray-800 pr-6">
+                <span class="inline-flex justify-center items-center ml-4">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                </span>
+                <span class="ml-2 text-sm tracking-wide truncate">Board</span>
+                <span class="hidden md:block px-2 py-0.5 ml-auto text-xs font-medium tracking-wide text-blue-500 bg-indigo-50 rounded-full">New</span>
+              </Link>
+            </li>-->
           </ul>
-          <p class="mb-14 px-5 py-3 hidden md:block text-left text-xs">Copyright @ 2023</p>
+          <p class="mb-14 px-5 py-3 hidden md:block text-center text-xs">Copyright @2021</p>
         </div>
       </div>
       <!-- ./Sidebar -->

@@ -162,19 +162,16 @@ class AramexServices
 
         $shipment->number = $response->Shipments->ProcessedShipment->ID;
         $shipment->save();
-        //Mail::to(auth()->user()->email)->send(new OrderConfirmation($shipment_data));
         return true;
     }
 
     public function createPickup(BookShipmentRequest $bookShipmentRequest, Shipment $shipment, ShipmentItem $shipment_item)
     {
+        //dd($bookShipmentRequest->all());
         try {
             $origin = json_decode($shipment->origin_address, true);
-            //$cities = Aramex::fetchCities('NG');
-            //dd($cities);
-            //dd($shipment_item);
             $volume = $shipment_item->height * $shipment_item->length * $shipment_item->width;
-            return Aramex::createPickup([
+            $create_pickup = Aramex::createPickup([
                 "name" => $origin['contact_name'], // User’s Name, Sent By or in the case of the consignee, to the Attention of.
                 "cell_phone" => $origin['contact_phone'], // Phone Number
                 "phone" => $origin['contact_phone'], // Phone Number
@@ -187,14 +184,15 @@ class AramexServices
                 "pickup_date" => strtotime($bookShipmentRequest->shipment_date), // time parameter describe the date of the pickup
                 "ready_time" => strtotime($bookShipmentRequest->shipment_date),// time parameter describe the ready pickup date
                 "last_pickup_time" => strtotime($bookShipmentRequest->shipment_date),// time parameter
-                "closing_time" => time() ,// time parameter
+                "closing_time" => strtotime($bookShipmentRequest->shipment_date),// time parameter
                 "status" => 'Ready', // or Pending
-                "pickup_location" => 'at companys reception', // location details
+                "pickup_location" => 'at reception', // location details
                 "weight" => $shipment_item->weight,// wieght of the pickup (in KG)
                 "volume" => $volume, // volume of the pickup  (in CM^3)
             ]);
+            return $create_pickup;
         } catch (\Throwable $e) {
-            dd($e->getMessage());
+            //dd($e->getMessage());
             return false;
         }
     }

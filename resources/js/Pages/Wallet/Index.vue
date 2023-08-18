@@ -1,23 +1,13 @@
 <script setup>
-
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import {Head, useForm, usePage} from "@inertiajs/vue3";
 import {PlusIcon} from "@heroicons/vue/24/outline/index.js";
 import { ref } from 'vue'
-import {
-    TransitionRoot,
-    TransitionChild,
-    Dialog,
-    DialogPanel,
-    DialogTitle, DialogDescription,
-} from '@headlessui/vue'
 import InputLabel from "@/Components/InputLabel.vue";
-import TextInput from "@/Components/TextInput.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Pagination from "@/Components/Pagination.vue";
 import {twMerge} from "tailwind-merge";
 import AddFundModal from "@/Pages/Wallet/AddFundModal.vue";
 import Modal from "@/Components/Modal.vue";
+import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 
 
 const form = useForm({
@@ -74,7 +64,7 @@ let naira = new Intl.NumberFormat('en-US', {
 
 <template>
     <Head title="Dashboard" />
-    <AuthenticatedLayout page-title="Wallet">
+    <DashboardLayout page-title="Wallet">
         <div class="grid sm:grid-cols-2 gap-10 mt-10">
             <div class="flex rounded-xl p-5 shadow bg-white w-full gap-x-36 justify-between items-center ">
                 <div>
@@ -87,9 +77,12 @@ let naira = new Intl.NumberFormat('en-US', {
                 </button>
             </div>
 
-            <div v-if="page.props.auth.user.user_type === 'business'" class="flex rounded-xl p-5 border bg-white w-full gap-x-36 justify-between items-center">
+            <div v-if="page.props.auth.user.user_type === 'business'" class="rounded-xl p-5 border bg-white w-full gap-x-36 justify-between items-center">
                 <div>
-                    <h3 class="text-sm">Overdraft Wallet</h3>
+                    <div class="flex flex-row justify-between items-center">
+                      <h3 class="text-sm">Overdraft Wallet</h3>
+                      <div v-if="page.props.auth.user.user_type === 'business' " class="text-sm px-3 py-1 bg-orange-50 text-orange-500 rounded-full"><span>Credit Limit</span>: <span class="font-bold">{{ page.props.auth.user.credit_limit }}</span></div>
+                    </div>
                     <div class="text-2xl font-bold">{{ overdraft_wallet_balance }}</div>
                 </div>
             </div>
@@ -134,11 +127,10 @@ let naira = new Intl.NumberFormat('en-US', {
             </div>
         </div>
         <Pagination :links="transactions.links"/>
-      {{isOpen}}
       <Modal :show="isOpen">
         <AddFundModal @close-modal="(value) => isOpen = value" />
       </Modal>
-    </AuthenticatedLayout>
+    </DashboardLayout>
 </template>
 
 <style scoped>

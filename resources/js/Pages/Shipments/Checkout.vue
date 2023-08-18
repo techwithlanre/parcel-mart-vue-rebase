@@ -13,6 +13,7 @@ import EditDestinationAddressModal from "@/Pages/Shipments/Partials/EditDestinat
 import EditPackageDetailsModal from "@/Pages/Shipments/Partials/EditPackageDetailsModal.vue";
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
+import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 
 
 const activeKey = ref(['1']);
@@ -105,7 +106,7 @@ const tenDays = date.setDate(date.getDate() + 10);
 </script>
 
 <template>
-    <AuthenticatedLayout page-title="Shipment Checkout">
+    <DashboardLayout page-title="Shipment Checkout">
         <Head title="Shipment Checkout"/>
         <h1 class="mt-5 font-bold text-xl">Complete Shipment</h1>
         <div class="flex sm:flex-row-reverse flex-col-reverse justify-between gap-10 mt-10">
@@ -331,7 +332,7 @@ const tenDays = date.setDate(date.getDate() + 10);
         <Modal :show="isEditPackageDetailsOpen">
           <EditPackageDetailsModal @is-modal-open="(value) => isEditPackageDetailsOpen = value" :categories="categories" :address="destination" :shipment-id="page.props.shipment.id" :countries="countries" :origin-address="origin" :destination-address="destination" :states="destination_states" :cities="destination_cities" :shipment="shipment" />
         </Modal>
-    </AuthenticatedLayout>
+    </DashboardLayout>
 </template>
 
 <style scoped>

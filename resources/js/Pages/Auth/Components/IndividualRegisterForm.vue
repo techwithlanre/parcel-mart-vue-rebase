@@ -129,7 +129,7 @@ export default {
                 <SelectInput
                     place-holder="Select Country"
                     class="block w-full"
-                    :model-value="form.country"
+                    v-model="form.country"
                     :options="countries"
                 />
 

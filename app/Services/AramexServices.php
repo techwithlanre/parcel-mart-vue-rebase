@@ -91,7 +91,7 @@ class AramexServices
     public function  bookShipment(Shipment $shipment, ShipmentItem $shipmentItem, InsuranceOption $insuranceOption, ShippingRateLog $shippingRateLog, $pickup_guid = null): bool
     {
         $origin = json_decode($shipment->origin_address, true);
-        $destination = json_decode($shipment->origin_address, true);
+        $destination = json_decode($shipment->destination_address, true);
         $product_group = (getCountry('id', $origin['country'])->iso2 == getCountry('id', $destination['country'])->iso2) ? 'DOM' : 'EXP';
         $product_type = (getCountry('id', $origin['country'])->iso2 == getCountry('id', $destination['country'])->iso2) ? 'OND' : 'PPX';
         $shipment_data = [
@@ -113,7 +113,7 @@ class AramexServices
                 'phone'      => $destination['contact_phone'],
                 'cell_phone' => $destination['contact_phone'],
                 'country_code' => getCountry('id', $destination['country'])->iso2,
-                'city' => getCity('id', $destination['city'])->name,
+                'city' => 'LOS',
                 'zip_code' => $destination['postcode'],
                 'line1' => $destination['address_1'],
                 'line2' => $destination['address_2'] ?? $destination['landmark'],
@@ -135,7 +135,7 @@ class AramexServices
             //'cash_on_delivery_amount' => 10.32, // in case of CODS (in USD only "as they want")
             'insurance_amount' => $insuranceOption->amount, // optional
             //'collect_amount' => 0, // optional
-            //'customs_value_amount' => 0, //optional (required for express shipping)
+            'customs_value_amount' => 25000, //optional (required for express shipping) TODO
             //'cash_additional_amount' => 0, // optional
             //'cash_additional_amount_description' => 'Something here',
             'product_group' => $product_group, // or EXP (defined in config file, if you don't pass it will take the config value)
@@ -144,7 +144,10 @@ class AramexServices
             //'payment_option' => null, // refer to the official documentation (defined in config file, if you dont pass it will take the    value)
         ];
 
+        //dd($shipment_data);
+
         $response = Aramex::createShipment($shipment_data);
+        dd($response);
         if (!empty($response->error)) {
             return false;
         }

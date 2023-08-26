@@ -42,22 +42,26 @@ class RegisteredUserController extends Controller
         $ref_by = $userRegisterRequest->has('ref_by')
             ? User::where('ref_code', $request['ref_by'])->value('id')
             : NULL;
+
         $user = User::create([
             'first_name' => $request['first_name'],
             'last_name' => $request['last_name'],
             'phone' => $request['phone'],
             'email' => $request['email'],
+            'country_id' => $request['country'],
             'password' => Hash::make($request['password']),
             'user_type' => 'individual',
             'ref_code' => Str::lower(Str::random(8)),
             'ref_by_id' => $ref_by
         ]);
 
-        ReferralLog::create([
-            'user_id' => $user->id,
-            'referred_by_id' => $ref_by,
-            'is_paid' => 0,
-        ]);
+        if ($ref_by != NULL) {
+            ReferralLog::create([
+                'user_id' => $user->id,
+                'referred_by_id' => $ref_by,
+                'is_paid' => 0,
+            ]);
+        }
 
         event(new Registered($user));
 

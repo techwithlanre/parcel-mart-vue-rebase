@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Auth;
 use App\Events\BusinessRegistered;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\BusinessRegisterRequest;
+use App\Models\ReferralLog;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class RegisteredBusinessController extends Controller
 {
@@ -19,9 +21,13 @@ class RegisteredBusinessController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(BusinessRegisterRequest $request): RedirectResponse
+    public function store(BusinessRegisterRequest $businessRegisterRequest): RedirectResponse
     {
-        $request = $request->validated();
+        $request = $businessRegisterRequest->validated();
+        $ref_by = $businessRegisterRequest->has('ref_by')
+            ? User::where('ref_code', $request['ref_by'])->value('id')
+            : NULL;
+
         $user = User::create([
             'business_name' => $request['business_name'],
             'first_name' => $request['first_name'],
@@ -31,8 +37,18 @@ class RegisteredBusinessController extends Controller
             'password' => Hash::make($request['password']),
             'user_type' => 'business',
             'country_id' => $request['country'],
-            'credit_limit' => '30000'
+            'credit_limit' => 0,
+            'ref_code' => Str::lower(Str::random(8)),
+            'ref_by_id' => $ref_by
         ]);
+
+        if ($ref_by != NULL) {
+            ReferralLog::create([
+                'user_id' => $user->id,
+                'referred_by_id' => $ref_by,
+                'is_paid' => 0,
+            ]);
+        }
 
         event(new Registered($user));
         event(new BusinessRegistered($user));

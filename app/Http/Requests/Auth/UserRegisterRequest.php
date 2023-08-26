@@ -17,12 +17,12 @@ class UserRegisterRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'phone' => 'required|string|max:255|unique:users',
-            'email' => 'required|string|email|max:255|unique:'.User::class,
+            'first_name' => 'required|string|max:255|alpha',
+            'last_name' => 'required|string|max:255|alpha',
+            'phone' => 'required|string|min:11|max:255|unique:users',
+            'email' => 'required|string|email:rfc,dns|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'country' => ['required'],
+            'country' => ['required', 'exists:countries,id'],
             'ref_by' => ['nullable', 'exists:users,ref_code'],
         ];
 
@@ -36,8 +36,7 @@ class UserRegisterRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'first_name.required'=>'OTP is required.',
-            'last_name.required'=>'OTP is required.'
+
         ];
     }
 }

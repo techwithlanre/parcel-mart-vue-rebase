@@ -108,19 +108,19 @@ class WalletServices
                 $overdraft = WalletOverdraft::where('user_id', $user->id)->first();
                 if ($overdraft) {
                     $overdraft_balance = $overdraft->balance;
-                    $new_overdraft_balance = 0;
+                    $new_overdraft_balance = $overdraft_balance;
                     if ($overdraft_balance > 0) {
                         if ($overdraft_balance >= $funding_amount) {
                             $new_overdraft_balance = $overdraft_balance - $funding_amount;
                         }
 
                         if ($funding_amount >= $overdraft_balance) {
-                            $new_funding_amount = $funding_amount - $overdraft_balance;
+                            $funding_amount = $funding_amount - $overdraft_balance;
                             $new_overdraft_balance = 0;
                         }
                     }
 
-                    $transaction->amount = $new_funding_amount;
+                    $transaction->amount = $funding_amount;
                     $transaction->save();
                     $overdraft->balance = $new_overdraft_balance;
                     $overdraft->save();

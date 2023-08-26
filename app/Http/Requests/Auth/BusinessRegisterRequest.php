@@ -15,13 +15,14 @@ class BusinessRegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'business_name' => 'required|string|max:255',
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'phone' => 'required|string|max:255|unique:users',
-            'email' => 'required|string|email|max:255|unique:'.User::class,
+            'business_name' => 'required|string|max:255|alpha',
+            'first_name' => 'required|string|max:255|alpha',
+            'last_name' => 'required|string|max:255|alpha',
+            'phone' => 'required|string|min:11|max:255|unique:users',
+            'email' => 'required|string|email:rfc,dns|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'country' => ['required']
+            'country' => ['required', 'exists:countries,id'],
+            'ref_by' => ['nullable', 'exists:users,ref_code'],
         ];
     }
 

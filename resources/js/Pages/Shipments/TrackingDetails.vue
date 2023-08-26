@@ -13,7 +13,6 @@ defineProps({
 <template>
     <Head title="Tracking Details" />
     <DashboardLayout page-title="Tracking Details">
-
         <div class="card bg-white p-10 border rounded-xl">
             <ol class="relative border-l border-gray-200 sdark:border-gray-700">
                 <li class="mb-10 ml-4" v-for="item in tracking_log">
@@ -27,7 +26,6 @@ defineProps({
                 </li>
             </ol>
         </div>
-
     </DashboardLayout>
 </template>
 

@@ -16,7 +16,8 @@ defineProps({
     shipping_rate_log: Object,
     origin_location: Array,
     destination_location: Array,
-    item_category: Object
+    item_category: Object,
+    tracking_log: Array
 });
 
 const form  = useForm({

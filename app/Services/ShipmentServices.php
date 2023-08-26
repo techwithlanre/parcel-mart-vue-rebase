@@ -363,8 +363,12 @@ class ShipmentServices
             Mail::to(auth()->user()->email)->send(new OrderConfirmation($shipment_data));
         }
 
-        if (!$book_dhl && !$book_aramex) {
-            return redirect(route('shipment.checkout', $request['shipment_id']))->with('error', 'Shipment booking failed at this time. Please try again later');
+        if ($provider == 'dhl' && !$book_dhl) {
+            return redirect(route('shipment.checkout', $request['shipment_id']))->with('error', 'DHL shipment is not available for selected locations at the moment. Please try again later');
+        }
+
+        if ($provider == 'aramex'  && !$book_aramex) {
+            return redirect(route('shipment.checkout', $request['shipment_id']))->with('error', 'Aramex shipment is not available for selected locations at the moment. Please try again later');
         }
 
         return \redirect(route('shipment.details', $shipment->id));

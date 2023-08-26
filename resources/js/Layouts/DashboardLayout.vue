@@ -21,7 +21,7 @@ const openNotificationWithIcon = (type, message) => {
   });
 };
 
-if (page.props.flash.message) {
+/*if (page.props.flash.message) {
   openNotificationWithIcon('success', page.props.flash.message);
   //toast.success(page.props.flash.message);
   page.props.flash.message = "";
@@ -33,7 +33,7 @@ if (page.props.flash.error) {
   openNotificationWithIcon('error', page.props.flash.error);
   //toast.error(page.props.flash.error);
   page.props.flash.error = "";
-}
+}*/
 
 defineProps({
   pageTitle: String

@@ -2,6 +2,8 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import {ref} from "vue";
 import DashboardLayout from "@/Layouts/DashboardLayout.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import {useForm} from "@inertiajs/vue3";
 
 const props = defineProps({
   code: String
@@ -22,6 +24,14 @@ const copy = () => {
       }
   );
 }
+
+const form = useForm({
+
+});
+
+const generateCode = () => {
+  form.get(route('invite.generate'))
+}
 </script>
 
 <template>
@@ -30,8 +40,8 @@ const copy = () => {
       <h1 class="text-3xl lg:text-5xl font-bold text-center">Your <br>Referral Code</h1>
 <!--      <p class="text-center text-sm mb-10">Don't just take our words, hear from our customers</p>-->
       <div class="flex gap-x-20">
-        <div class="flex flex-col bg-white w-full">
-          <div class="text-center flex flex-col items-center">
+        <div class="flex flex-col bg-white w-full ">
+          <div v-if="code != null" class="text-center flex flex-col items-center">
             <button @click="copy" class="mx-auto w-max  rounded-full px-5 py-2 text-white font-semibold items-center gap-x-2 flex flex-row text-center bg-primary">
               <span ref="ref_code">{{ code }}</span>
               <button type="button" class="p-1 rounded-full bg-white">
@@ -42,6 +52,7 @@ const copy = () => {
             </button>
             <div v-if="copyMessage.length > 0" class="duration-300 transition-all ease-in-out text-center mt-5 text-sm px-3 py-1 border rounded-full w-max">{{ copyMessage }}</div>
           </div>
+          <PrimaryButton v-else :class="{ 'opacity-25': form.processing }" :disabled="form.processing" class="w-max flex justify-center items-center mx-auto mt-10" @click="generateCode">Generate Referral Code</PrimaryButton>
         </div>
       </div>
     </div>

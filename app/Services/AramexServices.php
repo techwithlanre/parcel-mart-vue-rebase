@@ -14,6 +14,7 @@ use App\Models\ShipmentItem;
 use App\Models\ShippingRateLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Octw\Aramex\Aramex;
 use Carbon\Carbon;
 
@@ -94,6 +95,7 @@ class AramexServices
         $destination = json_decode($shipment->destination_address, true);
         $product_group = (getCountry('id', $origin['country'])->iso2 == getCountry('id', $destination['country'])->iso2) ? 'DOM' : 'EXP';
         $product_type = (getCountry('id', $origin['country'])->iso2 == getCountry('id', $destination['country'])->iso2) ? 'OND' : 'PPX';
+
         $shipment_data = [
             'shipper' => [
                 'name' => $origin['contact_name'],
@@ -113,7 +115,7 @@ class AramexServices
                 'phone'      => $destination['contact_phone'],
                 'cell_phone' => $destination['contact_phone'],
                 'country_code' => getCountry('id', $destination['country'])->iso2,
-                'city' => 'LOS',
+                'city' => getCity('id', $destination['city'])->name,
                 'zip_code' => $destination['postcode'],
                 'line1' => $destination['address_1'],
                 'line2' => $destination['address_2'] ?? $destination['landmark'],
@@ -129,13 +131,13 @@ class AramexServices
             'number_of_pieces' => $shipmentItem->quantity,  // number of items
             'description' => $shipment->description, // description
             'reference' => 'pm-'.time().str_shuffle(time()), // reference to print on shipment report (policy)
-            //'shipper_reference' => '19191', // optional
-            //'consignee_reference' => '010101', // optional
+            'shipper_reference' => 'shipper_' . Str::uuid(), // optional
+            'consignee_reference' => 'shipper_' . Str::uuid(), // optional
             //'services' => 'CODS,FIRST,FRDM', // ',' seperated string, refer to services in the official documentation
             //'cash_on_delivery_amount' => 10.32, // in case of CODS (in USD only "as they want")
             'insurance_amount' => $insuranceOption->amount, // optional
             //'collect_amount' => 0, // optional
-            'customs_value_amount' => 25000, //optional (required for express shipping) TODO
+            'customs_value_amount' => (int) $shipmentItem->weight, //optional (required for express shipping) TODO
             //'cash_additional_amount' => 0, // optional
             //'cash_additional_amount_description' => 'Something here',
             'product_group' => $product_group, // or EXP (defined in config file, if you don't pass it will take the config value)
@@ -147,7 +149,6 @@ class AramexServices
         //dd($shipment_data);
 
         $response = Aramex::createShipment($shipment_data);
-        dd($response);
         if (!empty($response->error)) {
             return false;
         }

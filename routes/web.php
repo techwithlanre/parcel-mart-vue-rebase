@@ -137,6 +137,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('upgrade', [ProfileController::class, 'upgrade'])->name('profile.upgrade');
 
     Route::get('invite', [\App\Http\Controllers\InviteController::class, 'index'])->name('invite.index');
+    Route::get('invite/generate', [\App\Http\Controllers\InviteController::class, 'generate'])->name('invite.generate');
 });
 
 Route::get('verify-email', EmailVerificationPromptController::class)->name('verification.notice');

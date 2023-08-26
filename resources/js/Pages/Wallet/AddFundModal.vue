@@ -18,7 +18,7 @@ const form = useForm({
 
 const submit = () => {
   form.post(route('wallet.initialize'), {
-    onFinish: emits('closeModal', false)
+    onFinish: () => emits('closeModal', false)
   });
 }
 
@@ -51,9 +51,7 @@ const submit = () => {
 
         <hr>
         <div class="p-6">
-          <button
-              type="submit"
-              class="inline-flex justify-center rounded-md border border-transparent bg-background px-4 py-2 text-sm font-medium text-primary hover:text-white
+          <button type="submit" class="inline-flex justify-center rounded-md border border-transparent bg-background px-4 py-2 text-sm font-medium text-primary hover:text-white
                                          hover:bg-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-all duration-300"
               :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
             Continue

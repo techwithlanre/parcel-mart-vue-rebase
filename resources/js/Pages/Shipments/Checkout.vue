@@ -4,8 +4,7 @@ import {Head, useForm, usePage} from '@inertiajs/vue3';
 import SelectInput from "@/Components/SelectInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import InputError from "@/Components/InputError.vue";
-import {onMounted, ref, watch} from 'vue';
-import TextInput from "@/Components/TextInput.vue";
+import {ref, watch} from 'vue';
 import InputLabel from "@/Components/InputLabel.vue";
 import EditOriginAddressModal from "@/Pages/Shipments/Partials/EditOriginAddressModal.vue";
 import Modal from "@/Components/Modal.vue";
@@ -14,6 +13,8 @@ import EditPackageDetailsModal from "@/Pages/Shipments/Partials/EditPackageDetai
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
 import DashboardLayout from "@/Layouts/DashboardLayout.vue";
+import {notification} from "ant-design-vue";
+import {toast} from "vue3-toastify";
 
 
 const activeKey = ref(['1']);
@@ -29,7 +30,8 @@ watch(activeKey, val => {
   console.log(val);
 });
 
-const page = usePage()
+const page = usePage();
+
 defineProps({
     shipment: Array,
     origin: Object,
@@ -76,7 +78,7 @@ const pay = () => {
 
     if (!hasError) {
       form.post(route('shipment.book'), {
-
+        onFinish: () => toast.error(page.props.flash.error)
       });
     }
 }

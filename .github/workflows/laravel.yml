@@ -27,5 +27,5 @@ jobs:
         server: ${{ secrets.SERVER}}
         username: ${{ secrets.USERNAME}}
         password: ${{ secrets.PASSWORD}}
-        server-dir: /staging.parcelsmartsolution.com/
+        server-dir: /ship.parcelsmartsolution.com/
         protocol: ftps

@@ -7,21 +7,25 @@ import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SelectInput from "@/Components/SelectInput.vue";
 import DashboardLayout from "@/Layouts/DashboardLayout.vue";
+import {toast} from "vue3-toastify";
 
 const page = usePage()
 
 defineProps({
     countries: Array,
+    states: Array,
+    cities: Array,
     address: Object
 })
 
 const form = useForm({
-    address: page.props.address.address,
+    address_1: page.props.address.address,
+    address_2: page.props.address.address_2,
     landmark: page.props.address.landmark,
     country_id: page.props.address.country_id,
     state_id: page.props.address.state_id,
     city_id: page.props.address.city_id,
-    business_name: page.props.address.address_contacts[0].contact_name,
+    business_name: page.props.address.address_contacts[0].business_name,
     contact_name: page.props.address.address_contacts[0].contact_name,
     contact_email: page.props.address.address_contacts[0].contact_email,
     contact_phone: page.props.address.address_contacts[0].contact_phone,
@@ -30,7 +34,7 @@ const form = useForm({
 
 const submit = () => {
     form.put(route('address-book.update', page.props.address.id), {
-        onFinish: () => form.reset(),
+        onSuccess: () => toast.success('Address updated successfully')
     })
 }
 
@@ -56,7 +60,7 @@ const submit = () => {
                             placeholder="Enter Contact Name"
                             autocomplete="contact_name" />
 
-                        <InputError class="mt-2" />
+                        <InputError :message="form.errors.contact_name" class="mt-2" />
                     </div>
                     <div class="mt-3 flex gap-x-5 justify-between lg:flex-row flex-col">
                         <div class="w-full">
@@ -70,7 +74,7 @@ const submit = () => {
                                 placeholder="Enter Contact Phone"
                                 autocomplete="contact_email" />
 
-                            <InputError class="mt-2" />
+                          <InputError :message="form.errors.contact_phone" class="mt-2" />
                         </div>
                         <div class="w-full lg:mt-0 mt-3">
                             <InputLabel value="Contact Email (Optional)"  />
@@ -81,7 +85,7 @@ const submit = () => {
                                 class="mt-2 flex"
                                 placeholder="Enter Contact Email"
                                 autocomplete="contact_email" />
-                            <InputError class="mt-2" />
+                          <InputError :message="form.errors.contact_email" class="mt-2" />
                         </div>
                     </div>
 
@@ -95,7 +99,7 @@ const submit = () => {
                             placeholder="Enter Business Name"
                             autocomplete="business_name" />
 
-                        <InputError class="mt-2" />
+                      <InputError :message="form.errors.business_name" class="mt-2" />
                     </div>
                     <div class="mt-3">
                         <InputLabel value="Address Line 1 *"  />
@@ -103,13 +107,26 @@ const submit = () => {
                             id="address"
                             type="text"
                             class="mt-2 flex"
-                            v-model="form.address"
+                            v-model="form.address_1"
                             required
                             autofocus
                             placeholder="Start typing address"
                             autocomplete="address" />
-                        <InputError class="mt-2" />
+                      <InputError :message="form.errors.address_1" class="mt-2" />
                     </div>
+                  <div class="mt-3">
+                    <InputLabel value="Address Line 2 *"  />
+                    <TextInput
+                        id="address"
+                        type="text"
+                        class="mt-2 flex"
+                        v-model="form.address_2"
+                        required
+                        autofocus
+                        placeholder="Start typing address"
+                        autocomplete="address" />
+                    <InputError :message="form.errors.address_2" class="mt-2" />
+                  </div>
                     <div class="mt-3">
                         <InputLabel value="Nearest Landmark"  />
                         <TextInput
@@ -132,7 +149,7 @@ const submit = () => {
                                 class="mt-3"
                                 :options="countries"
                                 v-model="form.country_id"/>
-                            <InputError class="mt-2" />
+                          <InputError :message="form.errors.country_id" class="mt-2" />
                         </div>
                         <div class="w-full lg:mt-0 mt-3">
                             <InputLabel value="State"  />
@@ -140,8 +157,9 @@ const submit = () => {
                                 id="state"
                                 type="text"
                                 class="mt-2 flex"
+                                :options="states"
                                 v-model="form.state_id"/>
-                            <InputError class="mt-2" />
+                          <InputError :message="form.errors.state_id" class="mt-2" />
                         </div>
                         <div class="w-full lg:mt-0 mt-3">
                             <InputLabel value="City"  />
@@ -149,8 +167,9 @@ const submit = () => {
                                 id="city"
                                 type="text"
                                 class="mt-2 flex"
-                                v-model="form.city"/>
-                            <InputError class="mt-2" />
+                                :options="cities"
+                                v-model="form.city_id"/>
+                          <InputError :message="form.errors.city_id" class="mt-2" />
                         </div>
                     </div>
                     <div class="mt-3">
@@ -163,7 +182,7 @@ const submit = () => {
                             autofocus
                             placeholder="Enter postcode"
                             autocomplete="postcode" />
-                        <InputError class="mt-2" />
+                      <InputError :message="form.errors.postcode" class="mt-2" />
                     </div>
 
 

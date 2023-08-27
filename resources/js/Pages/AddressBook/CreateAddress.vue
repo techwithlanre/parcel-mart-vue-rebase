@@ -16,7 +16,7 @@ const states = ref([]);
 const cities = ref([]);
 
 const form = useForm({
-    address: '',
+    address_1: '',
     address_2: '',
     landmark: '',
     country_id: '',
@@ -113,12 +113,24 @@ const getStates = () => {
             id="address"
             type="text"
             class="mt-2 flex"
-            v-model="form.address"
+            v-model="form.address_1"
             required
             maxlength="45"
             placeholder=""
             autocomplete="address" />
-        <InputError :message="form.errors.address" class="mt-2" />
+        <InputError :message="form.errors.address_1" class="mt-2" />
+      </div>
+      <div class="mt-3">
+        <InputLabel value="Address Line 2"  />
+        <TextInput
+            id="address_2"
+            type="text"
+            class="mt-2 flex"
+            v-model="form.address_2"
+            maxlength="45"
+            placeholder=""
+            autocomplete="address" />
+        <InputError :message="form.errors.address_2" class="mt-2" />
       </div>
       <div class="mt-3">
         <InputLabel value="Nearest Landmark"  />
@@ -133,19 +145,6 @@ const getStates = () => {
             autocomplete="address" />
         <InputError :message="form.errors.landmark" class="mt-2" />
       </div>
-      <div class="mt-3">
-        <InputLabel value="Address Line 2"  />
-        <TextInput
-            id="address_2"
-            type="text"
-            class="mt-2 flex"
-            v-model="form.address_2"
-            maxlength="45"
-            placeholder=""
-            autocomplete="address" />
-        <InputError :message="form.errors.address_2" class="mt-2" />
-      </div>
-
       <div class="mt-3 flex justify-between gap-x-5 lg:flex-row flex-col">
         <div class="w-full">
           <InputLabel value="Country"  />

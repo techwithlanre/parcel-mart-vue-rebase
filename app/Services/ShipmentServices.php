@@ -26,6 +26,8 @@ use Octw\Aramex\Aramex;
 
 class ShipmentServices
 {
+    protected array $errors = [];
+
     public function logShipment(CreateShipmentRequest $request)
     {
         $shipment = Shipment::create([
@@ -112,7 +114,15 @@ class ShipmentServices
                     ])->delete();
                 }
             } catch (\Throwable $e) {
-                return Redirect::back()->with('error', 'No shipment rate found for your package at the moment. Please try again.');
+                activity()
+                    ->performedOn(new Shipment())
+                    ->causedBy(\request()->user())
+                    ->withProperties([
+                        'method' => __FUNCTION__,
+                        'action' => 'Aramex Recalculate Rate'
+                    ])
+                    ->log($e->getMessage());
+                $this->errors[] = 'Aramex shipment is not available at the moment. ';
             }
 
         }
@@ -172,8 +182,20 @@ class ShipmentServices
                     }
                 }
             } catch (\Throwable $e) {
-                return Redirect::back()->with('error', 'No shipment rate found for your package');
+                activity()
+                    ->performedOn(new Shipment())
+                    ->causedBy(\request()->user())
+                    ->withProperties([
+                        'method' => __FUNCTION__,
+                        'action' => 'DHL Recalculate Rate'
+                        ])
+                    ->log($e->getMessage());
+                $this->errors[] = 'DHL shipment is not available at the moment.';
             }
+        }
+
+        if (count($this->errors) > 0) {
+            return Redirect::back()->with('error', implode("|", $this->errors));
         }
 
         if (!$aramex_rate_found && !$dhl_rate_found) {
@@ -216,7 +238,15 @@ class ShipmentServices
                     $rate_found = true;
                 }
             } catch (\Throwable $e) {
-                return Redirect::back()->with('error', 'No shipment rate found for your package' . $e);
+                activity()
+                    ->performedOn(new Shipment())
+                    ->causedBy(\request()->user())
+                    ->withProperties([
+                        'method' => __FUNCTION__,
+                        'action' => 'Aramex Recalculate Rate'
+                    ])
+                    ->log($e->getMessage());
+                $this->errors[] = 'Aramex shipment is not available at the moment.';
             }
         }
 
@@ -271,9 +301,21 @@ class ShipmentServices
                     }
                 }
             } catch (\Throwable $e) {
-                return Redirect::back()->with('error', 'No shipment rate found for your package' . $e->getMessage());
+                activity()
+                    ->performedOn(new Shipment())
+                    ->causedBy(\request()->user())
+                    ->withProperties([
+                        'method' => __FUNCTION__,
+                        'action' => 'DHL Recalculate Rate'
+                    ])
+                    ->log($e->getMessage());
+                $this->errors[] = 'DHL shipment is not available at the moment.';
             }
         }
+
+        /*if (count($this->errors) > 0) {
+            return Redirect::back()->with('error', implode("|", $this->errors));
+        }*/
 
         if (!$rate_found) {
             $shipment->status = 'failed';
@@ -396,37 +438,50 @@ class ShipmentServices
     private function trackAramex(Shipment $shipment): \Illuminate\Foundation\Application|\Illuminate\Routing\Redirector|\Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse
     {
         $aramex_shipment = AramexShipmentLog::where('shipment_id', $shipment->id)->first();
-        $response = Aramex::trackShipments([$aramex_shipment->aramex_id]);
-        if (!$response->HasErrors) {
-            $data = $response->TrackingResults->KeyValueOfstringArrayOfTrackingResultmFAkxlpY->Value->TrackingResult;
-            $check = TrackingLog::where([
-                'shipment_id' => $shipment->id,
-                'update_code' => $data->UpdateCode,
-                'provider' => 'aramex',
-            ])->first();
-
-            if (!$check) {
-                TrackingLog::create([
+        try {
+            $response = Aramex::trackShipments([$aramex_shipment->aramex_id]);
+            if (!$response->HasErrors) {
+                $data = $response->TrackingResults->KeyValueOfstringArrayOfTrackingResultmFAkxlpY->Value->TrackingResult;
+                $check = TrackingLog::where([
                     'shipment_id' => $shipment->id,
                     'update_code' => $data->UpdateCode,
-                    'waybill_number' => $data->WaybillNumber,
-                    'update_description' => $data->UpdateDescription,
-                    'update_datetime' => $data->UpdateDateTime,
-                    'update_location' => $data->UpdateLocation,
-                    'comment' => $data->Comments,
-                    'problem_code' => $data->ProblemCode,
-                    'gross_weight' => $data->GrossWeight,
-                    'chargeable_weight' => $data->ChargeableWeight,
-                    'weight_unit' => $data->WeightUnit,
                     'provider' => 'aramex',
-                ]);
+                ])->first();
+
+                if (!$check) {
+                    TrackingLog::create([
+                        'shipment_id' => $shipment->id,
+                        'update_code' => $data->UpdateCode,
+                        'waybill_number' => $data->WaybillNumber,
+                        'update_description' => $data->UpdateDescription,
+                        'update_datetime' => $data->UpdateDateTime,
+                        'update_location' => $data->UpdateLocation,
+                        'comment' => $data->Comments,
+                        'problem_code' => $data->ProblemCode,
+                        'gross_weight' => $data->GrossWeight,
+                        'chargeable_weight' => $data->ChargeableWeight,
+                        'weight_unit' => $data->WeightUnit,
+                        'provider' => 'aramex',
+                    ]);
+                    return \redirect(route('shipment.track.details', $shipment->id));
+                }
+
                 return \redirect(route('shipment.track.details', $shipment->id));
             }
 
-            return \redirect(route('shipment.track.details', $shipment->id));
+            return redirect()->back()->with('error', 'We are working on tracking info. Please check back later');
+        } catch (\Throwable  $e) {
+            activity()
+                ->performedOn(new Shipment())
+                ->causedBy(\request()->user())
+                ->withProperties([
+                    'method' => __FUNCTION__,
+                    'action' => 'Aramex Track Shipment'
+                ])
+                ->log($e->getMessage());
+            return redirect()->back()->with('error', 'We are working on tracking info. Please check back later');
         }
 
-        return redirect()->back()->with('error', 'We are working on tracking info. Please check back later');
     }
 
     private function trackDhl(TrackShipmentRequest $request, Shipment $shipment): \Illuminate\Foundation\Application|\Illuminate\Routing\Redirector|\Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse
@@ -466,12 +521,20 @@ class ShipmentServices
             }
             if ($tracking_log) return \redirect(route('shipment.track.details', $shipment->id));
             return redirect()->back()->with('message', 'We are working on tracking info. Please check back later');
-        } catch (\Throwable $exception) {
+        } catch (\Throwable $e) {
+            activity()
+                ->performedOn(new Shipment())
+                ->causedBy(\request()->user())
+                ->withProperties([
+                    'method' => __FUNCTION__,
+                    'action' => 'Aramex Track Shipment'
+                ])
+                ->log($e->getMessage());
             return redirect()->back()->with('error', 'We are working on tracking info. Please check back later');
         }
     }
 
-    public function calculatePickup(BookShipmentRequest $request, ShippingRateLog $rate_log)
+    public function calculatePickup(BookShipmentRequest $request, ShippingRateLog $rate_log): void
     {
         $shipment = Shipment::find($rate_log->shipment_id);
         $shipment_items = ShipmentItem::where('shipment_id', $rate_log->shipment_id)->first();

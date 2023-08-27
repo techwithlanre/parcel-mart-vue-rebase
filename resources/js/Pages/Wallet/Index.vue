@@ -63,7 +63,7 @@ let naira = new Intl.NumberFormat('en-US', {
 </script>
 
 <template>
-    <Head title="Dashboard" />
+    <Head title="Wallet" />
     <DashboardLayout page-title="Wallet">
         <div class="grid sm:grid-cols-2 gap-10 mt-10">
             <div class="flex rounded-xl p-5 shadow bg-white w-full gap-x-36 justify-between items-center ">

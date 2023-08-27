@@ -50,16 +50,23 @@ let naira = new Intl.NumberFormat('en-US', {
 </script>
 
 <template>
-    <DashboardLayout page-title="Shipment Checkout">
+    <DashboardLayout class="capitalize" :page-title="'Shipment Details' + ' - ' + shipment.provider">
         <Head title="Shipment Checkout"/>
         <div class="flex lg:flex-row flex-col justify-between gap-10 mt-10">
-            <div class="card p-5 rounded-xl shadow shadow-background/50 bg-white w-full">
-                <h1 class="font-bold text-xl">Shipment Status</h1>
-                <div class="flex flex-row space-x-4">
+            <div class="card rounded-xl shadow border border-gray-50 shadow-background/50 bg-white w-full">
+                <h1 class="font-bold text-xl px-5 pt-3 pb-1">Shipment Status</h1>
+                <hr>
+                <div class="flex flex-col space-y-4 mt-5 px-5">
                   <div>Tracking Number: <span class="font-bold text-primary">{{ shipment.number }}</span></div>
-                  <img :src="image" class="h-5" alt="">
+                  <div class="flex items-center">
+                    Carrier: &nbsp;
+                    <div class="flex flex-row space-x-3 items-center">
+                      <img :src="image" class="h-3" alt="">
+                    </div>
+                  </div>
+
                 </div>
-                <div>
+                <div class="px-5">
                     <h2 class="sr-only">Steps</h2>
                     <div class="mt-10">
                         <div class="overflow-hidden rounded-full bg-gray-200">
@@ -83,7 +90,7 @@ let naira = new Intl.NumberFormat('en-US', {
 
             </div>
           <div class="flex lg:flex-row flex-col justify-between gap-10 w-full">
-            <div class="shadow shadow-background/50 w-full bg-white rounded-xl">
+            <div class="shadow border border-gray-50 shadow-background/50 w-full bg-white rounded-xl">
               <div>
                 <div class="card mt-5">
                   <h1 class="font-bold text-xl px-5">Payment Summary</h1>
@@ -195,7 +202,7 @@ let naira = new Intl.NumberFormat('en-US', {
                   Weight
                 </th>
                 <td class="px-6 py-2">
-                  {{ item.weight }}cm
+                  {{ item.weight }}KG
                 </td>
               </tr>
               <tr class="">
@@ -203,7 +210,7 @@ let naira = new Intl.NumberFormat('en-US', {
                   Height
                 </th>
                 <td class="px-6 py-2">
-                  {{ item.height }}cm
+                  {{ item.height }}CM
                 </td>
               </tr>
               <tr class="">
@@ -211,7 +218,7 @@ let naira = new Intl.NumberFormat('en-US', {
                   Length
                 </th>
                 <td class="px-6 py-2">
-                  {{ item.length }}cm
+                  {{ item.length }}CM
                 </td>
               </tr>
               <tr class="">
@@ -225,6 +232,25 @@ let naira = new Intl.NumberFormat('en-US', {
               </tbody>
             </table>
           </div>
+        </div>
+      </div>
+      <div class="card bg-white border border-gray-50 shadow shadow shadow-background/50 rounded-xl mt-10">
+        <div>
+          <h1 class="font-bold text-xl px-5 pt-3 pb-1">Movement History</h1>
+          <hr>
+        </div>
+        <div class="p-5">
+          <ol v-if="tracking_log.length > 0" class="relative border-l border-gray-200">
+            <li class="mb-10 ml-4" v-for="item in tracking_log">
+              <div class="absolute w-3 h-3 bg-primary rounded-full mt-1.5 -left-1.5 border border-white sdark:border-gray-900 sdark:bg-gray-700"></div>
+              <time class="mb-1 text-sm font-normal leading-none text-primary sdark:text-gray-500">{{ item.update_datetime }} - <span class="font-semibold">{{ item.update_description }}</span></time>
+              <h3 class="text-lg font-semibold text-gray-900 sdark:text-white">{{ item.update_location }}</h3>
+              <p class="mb-4 text-base font-normal text-gray-500 sdark:text-gray-400"></p>
+              <p class="mb-4 text-base font-normal text-gray-500 sdark:text-gray-400">Gross Weight: {{ item.gross_weight }}kg</p>
+              <p class="mb-4 text-base font-normal text-gray-500 sdark:text-gray-400">Chargeable Weight: {{ item.gross_weight }}kg</p>
+            </li>
+          </ol>
+          <div v-else class="flex justify-center">No shipment history yet.</div>
         </div>
       </div>
     </DashboardLayout>

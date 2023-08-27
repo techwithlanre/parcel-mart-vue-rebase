@@ -19,7 +19,7 @@ class UserRegisterRequest extends FormRequest
         $rules = [
             'first_name' => 'required|string|max:255|alpha',
             'last_name' => 'required|string|max:255|alpha',
-            'phone' => 'required|numeric|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|max:255|unique:users',
+            'phone' => 'required|numeric|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|max:11|unique:users',
             'email' => 'required|string|email:rfc,dns|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'country' => ['required', 'exists:countries,id'],

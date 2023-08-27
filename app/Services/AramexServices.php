@@ -4,19 +4,13 @@ namespace App\Services;
 
 use App\Http\Requests\BookShipmentRequest;
 use App\Http\Requests\CreateShipmentRequest;
-use App\Mail\OrderConfirmation;
 use App\Models\AramexShipmentLog;
-use App\Models\City;
-use App\Models\Country;
 use App\Models\InsuranceOption;
 use App\Models\Shipment;
 use App\Models\ShipmentItem;
 use App\Models\ShippingRateLog;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
+use Illuminate\Http\Request;use Illuminate\Support\Str;
 use Octw\Aramex\Aramex;
-use Carbon\Carbon;
 
 class AramexServices
 {
@@ -26,7 +20,6 @@ class AramexServices
     public array $shipmentDetailsPayload = [];
     public string $originCountryCode = '';
     public string $destinationCountryCode = '';
-    public string $userCountryCode = '';
     public string $shippingCurrency = '';
 
     public function __construct(CreateShipmentRequest | BookShipmentRequest | Request $request)

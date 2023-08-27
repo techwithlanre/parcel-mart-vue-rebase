@@ -203,7 +203,7 @@ class DHLServices
             "productCode" => $product_code,
             "pickup" =>  [
                 "isRequested" => true,
-                "closeTime" => "13:00",
+                "closeTime" => "16:00",
                 "location" => "reception",
             ],
             "outputImageProperties" => [
@@ -284,7 +284,7 @@ class DHLServices
                             "number" => $shipmentItem->quantity,
                             "quantity" => [
                                 "unitOfMeasurement" => "PCS",
-                                "value" => $shipmentItem->height
+                                "value" => $shipmentItem->quantity
                             ],
                             "price" => (float) $shipmentItem->value,
                             "description" => $shipmentItem->description,
@@ -304,10 +304,10 @@ class DHLServices
                     ],
                     "exportReason" => "Permanent",
                     "invoice" => [
-                        "number" => "#INV2022001",
-                        "date" => "2022-09-21"
+                        "number" => $bookShipmentRequest->invoice_number,
+                        "date" => date('Y-m-d', strtotime($bookShipmentRequest->invoice_date))
                     ],
-                    "placeOfIncoterm" => "{{int_2_city}}",
+                    "placeOfIncoterm" => getCity('id', $destination['city'])->name,
                     "exportReasonType" => "permanent",
                     "shipmentType" => "commercial"
                 ],
@@ -319,6 +319,8 @@ class DHLServices
                 "declaredValue" => (int) $shipmentItem->value
             ]
         ];
+
+        //dd($this->bookShipmentPayload);
 
         return true;
     }

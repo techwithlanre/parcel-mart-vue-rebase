@@ -89,16 +89,16 @@ const menuType = computed(() => {
 
 <template>
   <!-- component -->
-
   <div>
     <div class="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased bg-white">
       <!-- Header -->
-      <div class="fixed w-full flex items-center justify-between text-white border-b">
+      <div class="fixed w-full flex bg-white text-white border-b">
         <div class="flex items-center justify-start pl-3 w-14 md:w-64 h-14">
           <img src="../../images/logo.png" alt="parcel-mart-logo" class="w-28 rounded-full">
         </div>
-        <div class="flex justify-between items-center header-right">
-          <ul class="flex items-center">
+        <div class="flex flex-row flex-1 justify-between items-center text-black">
+          <div class="px-10 font-bold text-xl">{{ pageTitle }}</div>
+          <ul class="flex  items-center">
             <li>
               <Link :href="route('profile.edit')" class="flex items-center mr-4 text-gray-700 hover:text-blue-100">
                 {{ page.props.auth.user.first_name + " " + page.props.auth.user.last_name }}

@@ -162,7 +162,7 @@ class ShipmentController extends Controller
 
         $insurance_options = InsuranceOption::all();
         $shipping_rate_log = ShippingRateLog::where('id', $shipment->shipping_rate_log_id)->with('courier_api_provider')->first();
-        $tracking_log = [];
+        $tracking_log = TrackingLog::where('shipment_id', $shipment->id)->get();
         return Inertia::render('Shipments/Details', compact('shipment','tracking_log','item_category','origin', 'destination','insurance_options','shipping_rate_log', 'origin_location', 'destination_location'));
     }
 

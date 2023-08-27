@@ -14,7 +14,8 @@ class AddressServices
         $data = $request->validated();
         $address = Address::create([
             'user_id'=>auth()->user()->id,
-            'address' => $request->address,
+            'address' => $request->address_1,
+            'address_2' => $request->address_2,
             'country_id' => $request->country_id,
             'state_id' => $request->state_id,
             'city_id' => $request->city_id,
@@ -38,9 +39,9 @@ class AddressServices
 
     public function updateAddress(CreateAddressRequest $request, $id)
     {
-        $data = $request->validated();
         $address = Address::find($id);
-        $address->address = $request->address;
+        $address->address = $request->address_1;
+        $address->address_2 = $request->address_2;
         $address->country_id = $request->country_id;
         $address->state_id = $request->state_id;
         $address->city_id = $request->city_id;
@@ -54,7 +55,7 @@ class AddressServices
         $address_contact->contact_email = $request->contact_email;
         $address_contact->contact_phone = $request->contact_phone;
         $address_contact->save();
-        sleep(1);
+        //sleep(1);
 
         return redirect()->route('address-book.index')->with('message', 'Address updated successfully');
     }

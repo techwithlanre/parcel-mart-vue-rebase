@@ -85,12 +85,18 @@ class WalletServices
 
     public function webhook(Request $request)
     {
-        //http://127.0.0.1:8000/wallet/callback?trxref=229ac666-36e1-4e2b-9c3f-5ed9797047df&reference=229ac666-36e1-4e2b-9c3f-5ed9797047df
+        //http://127.0.0.1:8000/wallet/callback?trxref=8756a2d1-8aa4-43ca-8974-42db7ce8f9f9&reference=8756a2d1-8aa4-43ca-8974-42db7ce8f9f9
         $url_ref_1 = trim($request->trxref);
         $url_ref_2 = trim($request->reference);
         if ($url_ref_1 !== $url_ref_2) {
-            return \redirect()->with('error', 'An error occured, Please contact support');
+            return \redirect()->with('error', 'An error occurred, Please contact support');
         } //log to db
+
+        try {
+
+        } catch (\Throwable $e) {
+
+        }
         $response = $this->verifyPayment($url_ref_1);
         $result = json_decode($response, true);
 
@@ -112,6 +118,7 @@ class WalletServices
                     if ($overdraft_balance > 0) {
                         if ($overdraft_balance >= $funding_amount) {
                             $new_overdraft_balance = $overdraft_balance - $funding_amount;
+                            $funding_amount = 0;
                         }
 
                         if ($funding_amount >= $overdraft_balance) {
@@ -126,14 +133,15 @@ class WalletServices
                     $overdraft->save();
                 }
 
-
                 if (!$transaction->confirmed) $user->confirm($transaction);
                 $paystack_transaction->status = 'success';
                 $paystack_transaction->save();
                 return \redirect(route('wallet.index'))->with('message', 'Wallet funded successfully');
             }
 
-            return \redirect(route('wallet.index'))->with('message', 'An error occurred, please try again later');
+
+
+            return \redirect(route('wallet.index'))->with('message', 'Your wallet has been previously credited for this transaction.');
         }
 
         return \redirect(route('wallet.index'))->with('message', 'An error occurred, please try again later');

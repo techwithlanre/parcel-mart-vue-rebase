@@ -17,6 +17,7 @@
         "laravel/tinker": "^2.8",
         "octw/aramex": "^1.2",
         "rawilk/laravel-ups": "^2.1",
+        "spatie/laravel-activitylog": "^4.7",
         "spatie/laravel-permission": "^5.10",
         "tightenco/ziggy": "^1.0",
         "unicodeveloper/laravel-paystack": "*"

@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateAddressRequest;
 use App\Models\Address;
+use App\Models\City;
 use App\Models\Country;
+use App\Models\State;
 use App\Services\AddressServices;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -56,7 +58,9 @@ class AddressBookController extends Controller
             ->whereId($id)
             ->with('address_contacts', 'country', 'city')->first();
         $countries = Country::all();
-        return Inertia::render('AddressBook/Edit', compact('address', 'countries'));
+        $states = State::where('country_id',$address->country_id)->get();
+        $cities = City::where('state_id',$address->state_id)->get();
+        return Inertia::render('AddressBook/Edit', compact('address', 'countries', 'states', 'cities'));
     }
 
     /**

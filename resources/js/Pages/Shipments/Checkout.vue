@@ -15,6 +15,7 @@ import '@vuepic/vue-datepicker/dist/main.css'
 import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 import {notification} from "ant-design-vue";
 import {toast} from "vue3-toastify";
+import TextInput from "@/Components/TextInput.vue";
 
 
 const activeKey = ref(['1']);
@@ -56,6 +57,8 @@ const form  = useForm({
     shipment_id: page.props.shipment.id,
     shipment_date: '',
     pickup_time: '',
+    invoice_number: '',
+    invoice_date: '',
 });
 
 const pay = () => {
@@ -104,6 +107,21 @@ const formattedCurrency = () => {
 const date = new Date();
 const tomorrow = date.setDate(date.getDate() + 1);
 const tenDays = date.setDate(date.getDate() + 10);
+
+
+const showInvoiceForm = () => {
+  let show = false;
+  if(page.props.origin_location.country === 'Nigeria' && page.props.destination_location.country !== 'Nigeria') {
+    show  = true;
+  } else if(page.props.origin_location.country !== 'Nigeria' && page.props.destination_location.country !== 'Nigeria') {
+    show = true;
+  } else if(page.props.origin_location.country !== 'Nigeria' && page.props.destination_location.country === 'Nigeria') {
+    show = true;
+  } else if(page.props.origin_location.country === 'Nigeria' && page.props.destination_location.country === 'Nigeria') {
+    show = false;
+  }
+  return show;
+}
 
 </script>
 
@@ -157,6 +175,29 @@ const tenDays = date.setDate(date.getDate() + 10);
                   <SelectInput v-model="form.insurance" :options="insurance_options" class="mt-3" />
                   <InputError :message="form.errors.insurance" />
                 </div>
+
+                <div class="mt-10 shadow-md rounded-xl" v-show="showInvoiceForm()">
+                  <h3 class="mt-5 px-5 py-3">Import/Export Details</h3>
+                  <hr>
+                  <div class="mb-3 mt-3 px-5">
+                    <InputLabel value="Invoice Number" />
+                    <TextInput type="text" v-model="form.invoice_number" class="mt-3" />
+                    <InputError :message="form.errors.invoice_number" />
+                  </div>
+
+                  <div class="mb-3 px-5 pb-5">
+                    <InputLabel value="Invoice Date" />
+                    <VueDatePicker
+                        v-model="form.invoice_date"
+                        :disabled-week-days="[6, 0]"
+                        :enable-time-picker="false"
+                        :min-time="{ hours: 9, minutes: 0 }"
+                        :max-time="{ hours: 16, minutes: 0 }"
+                        class="mt-3"></VueDatePicker>
+                    <InputError :message="form.errors.invoice_date" />
+                  </div>
+                </div>
+
               </div>
 
               <div class="mt-10 p-5 shadow-sm border border-gray-100 rounded-xl duration-300 transition-all flex flex-row justify-between items-center" v-if="form.insurance.length > 0">

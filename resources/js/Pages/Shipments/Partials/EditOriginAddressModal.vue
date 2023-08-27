@@ -7,6 +7,7 @@ import SelectInput from "@/Components/SelectInput.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import {useForm, usePage} from "@inertiajs/vue3";
 import {onMounted, ref} from "vue";
+import {toast} from "vue3-toastify";
 
 const props = defineProps({
   originAddress: Object,
@@ -64,11 +65,15 @@ const form = useForm({
 });
 
 const emit = defineEmits(['isModalOpen'])
-
+const page = usePage();
 const submit = () => {
   form.put(route('shipment.recalculate', props.shipmentId), {
-    onFinish: () => emit('isModalOpen', false),
-    //onSuccess: ()
+    onFinish: (response) => {
+      emit('isModalOpen', false);
+      if (page.props.flash.error.length > 0) {
+        toast.error(page.props.flash.error);
+      }
+    },
   })
 }
 

@@ -8,11 +8,8 @@ use App\Models\WalletOverdraft;
 use Bavix\Wallet\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
-use Unicodeveloper\Paystack\Paystack;
 
 class WalletServices
 {
@@ -33,7 +30,7 @@ class WalletServices
         $this->paystackTransaction = PaystackTransaction::create($data);
     }
 
-    public function initializePay(PayInitializeRequest $request, PaystackServices $paystackServices)
+    public function initializePay(PayInitializeRequest $request)
     {
         $this->logInitPayment($request);
         try{

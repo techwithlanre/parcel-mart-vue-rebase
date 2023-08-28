@@ -2,9 +2,10 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, Link } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 
 export default {
-    components: {PrimaryButton, AuthenticatedLayout, Link, Head},
+    components: {DashboardLayout, PrimaryButton, AuthenticatedLayout, Link, Head},
     props: {
         roles: Array
     }
@@ -13,7 +14,7 @@ export default {
 
 <template>
     <Head title="Roles Management" />
-    <AuthenticatedLayout page-title="Roles Management">
+    <DashboardLayout page-title="Roles Management">
         <div class="mb-5 flex flex-row justify-end">
             <Link class="" :href="route('roles.create')">
                 <PrimaryButton class="w-max">Create Role</PrimaryButton>
@@ -48,7 +49,7 @@ export default {
                 </table>
             </div>
         </div>
-    </AuthenticatedLayout>
+    </DashboardLayout>
 </template>
 
 <style scoped>

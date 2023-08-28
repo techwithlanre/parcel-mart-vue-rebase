@@ -31,7 +31,7 @@ const submit = () => {
 
 <template>
     <GuestLayout title="Welcome Back!" subtitle="Sign in to your dashboard">
-        <Head title="Sign In" />
+        <Head title="Login" />
         <div v-if="status" class="mb-4 font-medium text-sm text-green-600">
             {{ status }}
         </div>
@@ -87,10 +87,9 @@ const submit = () => {
                     Sign In
                 </PrimaryButton>
                 <div class="mt-5">
-                    Already have an account?
-                    <Link v-if="canResetPassword"
-                          :href="route('register.index')"
-                          class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ">
+                    Don't have an account?
+                    <Link :href="route('register.index')"
+                          class="underline text-gray-600 hover:text-gray-900 rounded-md focus:outline-none">
                         Sign Up
                     </Link>
                 </div>

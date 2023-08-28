@@ -401,6 +401,7 @@ const tabs = [
                       class="mt-2 flex"
                       v-model="form.origin.postcode"
                       placeholder=""
+                      required
                       autocomplete="postcode"/>
                   <InputError class="mt-2"/>
                 </div>
@@ -564,6 +565,7 @@ const tabs = [
                       id="postcode"
                       type="text"
                       class="mt-2 flex"
+                      required
                       v-model="form.destination.postcode"
                       autocomplete="postcode"/>
                   <InputError class="mt-2"/>

@@ -52,7 +52,7 @@ const getStates = () => {
 </script>
 
 <template>
-  <div class="mx-auto px-10 mb-10 bg-white">
+  <div class="mx-auto sm:px-10 mb-10 bg-white">
     <form class="mt-6" @submit.prevent="submit">
       <div class="">
         <InputLabel value="Contact Name *"  />

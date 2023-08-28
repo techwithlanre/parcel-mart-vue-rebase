@@ -9,7 +9,7 @@ import FAQ from "../../images/icons/_faq.svg";
 import InviteIcon from "../../images/icons/_invite.svg";
 import LogoutIcon from "../../images/icons/_logout.svg";
 import ShoppingBagIcon from "../../images/icons/shopping-bag.svg";
-import {computed} from "vue";
+import {computed, ref} from "vue";
 
 
 const page = usePage();
@@ -84,6 +84,13 @@ const setup = () => {
 const menuType = computed(() => {
   return page.props.auth.user.is_admin === 0 ? "User" : "Admin";
 });
+
+const mobileSidebarShow = ref(false)
+
+const toggleSidebar = () => {
+  mobileSidebarShow.value = !mobileSidebarShow.value;
+  console.log(mobileSidebarShow.value)
+}
 </script>
 
 
@@ -92,25 +99,34 @@ const menuType = computed(() => {
   <div>
     <div class="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased bg-white">
       <!-- Header -->
-      <div class="fixed w-full flex bg-white text-white border-b">
-        <div class="flex items-center justify-start pl-3 w-14 md:w-64 h-14">
-          <img src="../../images/logo.png" alt="parcel-mart-logo" class="w-28 rounded-full">
-        </div>
-        <div class="flex flex-row flex-1 justify-between items-center text-black">
-          <div class="px-10 font-bold text-xl">{{ pageTitle }}</div>
-          <ul class="flex  items-center">
-            <li>
-              <Link :href="route('profile.edit')" class="flex items-center mr-4 text-gray-700 hover:text-blue-100">
+      <div class="fixed w-full flex justify-between bg-white border-b">
+        <button class="ml-5 sm:hidden" @click="toggleSidebar">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9.5 4H5.5C4.67157 4 4 4.67157 4 5.5V9.5C4 10.3284 4.67157 11 5.5 11H9.5C10.3284 11 11 10.3284 11 9.5V5.5C11 4.67157 10.3284 4 9.5 4Z" fill="currentColor"/>
+            <path opacity="0.3" fill-rule="evenodd" clip-rule="evenodd" d="M5.5 13H9.5C10.3284 13 11 13.6716 11 14.5V18.5C11 19.3284 10.3284 20 9.5 20H5.5C4.67157 20 4 19.3284 4 18.5V14.5C4 13.6716 4.67157 13 5.5 13ZM14.5 4H18.5C19.3284 4 20 4.67157 20 5.5V9.5C20 10.3284 19.3284 11 18.5 11H14.5C13.6716 11 13 10.3284 13 9.5V5.5C13 4.67157 13.6716 4 14.5 4ZM14.5 13H18.5C19.3284 13 20 13.6716 20 14.5V18.5C20 19.3284 19.3284 20 18.5 20H14.5C13.6716 20 13 19.3284 13 18.5V14.5C13 13.6716 13.6716 13 14.5 13Z" fill="currentColor"/>
+          </svg>
+        </button>
+        <div class="flex flex-row justify-between items-center">
+          <div class="flex items-center justify-start pl-3 w-14 md:w-64 h-14">
+            <img src="../../images/logo.png" alt="parcel-mart-logo" class="w-28 rounded-full">
+          </div>
+          <div class="flex flex-row justify-between items-center text-black">
+            <div class="px-10 font-bold sm:text-xl text-sm hidden sm:block">{{ pageTitle }}</div>
+            <div class="flex flex-row items-center">
+              <Link :href="route('profile.edit')" class="flex justify-end items-center mr-4 hidden sm:block text-gray-700 hover:text-gray-300 sm:text-md text-sm">
                 {{ page.props.auth.user.first_name + " " + page.props.auth.user.last_name }}
               </Link>
-            </li>
-          </ul>
+              <Link :href="route('profile.edit')" class="flex justify-end sm:hidden block items-center mr-4 text-gray-700 hover:text-gray-300 sm:text-md text-sm">
+                {{ page.props.auth.user.first_name + " " + page.props.auth.user.last_name }}
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
       <!-- ./Header -->
 
       <!-- Sidebar -->
-      <div class="fixed flex flex-col top-14 left-0 w-14 hover:w-64 md:w-64 bg-primary h-full text-white transition-all duration-300 border-none z-10 sidebar">
+      <div :class="{'w-64': mobileSidebarShow === true}" class="fixed flex flex-col top-14 left-0 w-0 md:w-64 bg-primary h-full text-white transition-all duration-300 border-none z-10 sidebar">
         <div class="overflow-y-auto overflow-x-hidden flex flex-col justify-between flex-grow">
           <ul class="flex flex-col py-4 space-y-1" v-for="group  in sidebar">
             <li class="px-5 hidden md:block">
@@ -153,7 +169,7 @@ const menuType = computed(() => {
       </div>
       <!-- ./Sidebar -->
 
-      <div class="h-full ml-14 mt-14 mb-10 md:ml-64 p-10">
+      <div class="h-full ml-0 mt-14 mb-10 md:ml-64 p-5 md:p-10">
         <slot />
       </div>
     </div>

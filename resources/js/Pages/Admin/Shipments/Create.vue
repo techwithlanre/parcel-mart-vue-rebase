@@ -15,9 +15,11 @@
     import InputError from "@/Components/InputError.vue";
     import {toast} from "vue3-toastify";
     import TextAreaInput from "@/Components/TextAreaInput.vue";
+    import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 
     export default {
         components: {
+          DashboardLayout,
             TransitionRoot,
             TextAreaInput,
             PrimaryButton,
@@ -160,7 +162,7 @@
 
 <template>
 
-    <AuthenticatedLayout page-title="Create Shipment">
+    <DashboardLayout page-title="Create Shipment">
         <Head title="Create Shipment"/>
         <div class="flex lg:flex-row flex-col gap-x-10 gap-y-10">
             <TabGroup :selected-index="selectedTab" :default-index="0">
@@ -590,7 +592,7 @@
             </TabGroup>
         </div>
 <!--        <ChooseAddress :is-open="isChooseAddressOpen" @closeQuoteModal="(value) => toggleQuote(value)" :countries="countries" :addresses="addresses" />-->
-    </AuthenticatedLayout>
+    </DashboardLayout>
 </template>
 
 <style scoped>

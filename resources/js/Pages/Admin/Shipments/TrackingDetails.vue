@@ -1,6 +1,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import {Head} from "@inertiajs/vue3";
+import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 
 
 defineProps({
@@ -11,7 +12,7 @@ defineProps({
 
 <template>
     <Head title="Tracking Details" />
-    <AuthenticatedLayout page-title="Tracking Details">
+    <DashboardLayout page-title="Tracking Details">
 
         <div class="card bg-white p-10 border">
             <ol class="relative border-l border-gray-200 sdark:border-gray-700">
@@ -27,7 +28,7 @@ defineProps({
             </ol>
         </div>
 
-    </AuthenticatedLayout>
+    </DashboardLayout>
 </template>
 
 <style scoped>

@@ -3,9 +3,10 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import {Head, Link, useForm, usePage} from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Checkbox from "@/Components/Checkbox.vue";
+import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 
 export default {
-    components: {Checkbox, PrimaryButton, AuthenticatedLayout, Link, Head},
+    components: {DashboardLayout, Checkbox, PrimaryButton, AuthenticatedLayout, Link, Head},
     props: {
         permissions: Array,
         role: String
@@ -32,7 +33,7 @@ export default {
 
 <template>
     <Head title="Roles Management" />
-    <AuthenticatedLayout page-title="Roles Management">
+    <DashboardLayout page-title="Roles Management">
         <div class="mb-5 flex flex-row justify-end">
             <Link class="btn btn-primary" :href="route('roles.create')"><PrimaryButton class="w-max">Create Role</PrimaryButton></Link>
         </div>
@@ -68,7 +69,7 @@ export default {
 
 
         </div>
-    </AuthenticatedLayout>
+    </DashboardLayout>
 </template>
 
 <style scoped>

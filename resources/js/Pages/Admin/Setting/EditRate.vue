@@ -7,6 +7,7 @@ import InputError from "@/Components/InputError.vue";
 import TextInput from "@/Components/TextInput.vue";
 import SelectInput from "@/Components/SelectInput.vue";
 import {useForm, usePage} from "@inertiajs/vue3";
+import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 
 defineProps({
     provider: Object
@@ -40,7 +41,7 @@ const submit = () => {
 </script>
 
 <template>
-    <AuthenticatedLayout page-title="Edit Rate">
+    <DashboardLayout page-title="Edit Rate">
         <div >
             <div class="mx-auto lg:mt-17 mt max-w-2xl p-10 bg-white  rounded-2xl border">
                 <div>
@@ -91,7 +92,7 @@ const submit = () => {
                 </form>
             </div>
         </div>
-    </AuthenticatedLayout>
+    </DashboardLayout>
 </template>
 
 <style scoped>

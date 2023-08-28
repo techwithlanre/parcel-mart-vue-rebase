@@ -7,10 +7,11 @@ import TextInput from "@/Components/TextInput.vue";
 import SelectInput from "@/Components/SelectInput.vue";
 import {useForm} from "@inertiajs/vue3";
 import {toast} from "vue3-toastify";
+import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 
 export default {
     name: "Create",
-    components: {SelectInput, TextInput, InputError, InputLabel, PrimaryButton, AuthenticatedLayout},
+    components: {DashboardLayout, SelectInput, TextInput, InputError, InputLabel, PrimaryButton, AuthenticatedLayout},
     data() {
         return {
             form: useForm({
@@ -28,7 +29,7 @@ export default {
 </script>
 
 <template>
-    <AuthenticatedLayout page-title="Create Role">
+    <DashboardLayout page-title="Create Role">
         <div >
             <div class="mx-auto lg:mt-17 mt max-w-2xl p-10 bg-white  rounded-2xl border">
                 <div>
@@ -56,7 +57,7 @@ export default {
                 </form>
             </div>
         </div>
-    </AuthenticatedLayout>
+    </DashboardLayout>
 </template>
 
 <style scoped>

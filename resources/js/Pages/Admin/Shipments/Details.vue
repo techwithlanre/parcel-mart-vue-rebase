@@ -4,6 +4,7 @@ import {Head, useForm, usePage} from '@inertiajs/vue3';
 import {toast} from "vue3-toastify";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SelectInput from "@/Components/SelectInput.vue";
+import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 
 const page = usePage()
 defineProps({
@@ -37,7 +38,7 @@ const pay = () => {
 </script>
 
 <template>
-    <AuthenticatedLayout page-title="Shipment Checkout">
+    <DashboardLayout page-title="Shipment Checkout">
         <Head title="Shipment Checkout"/>
         <div class="flex lg:flex-row flex-col justify-between gap-10 mt-10">
             <div class="card p-5 border bg-white w-full">
@@ -292,7 +293,7 @@ const pay = () => {
                 </div>
             </form>
         </div>
-    </AuthenticatedLayout>
+    </DashboardLayout>
 </template>
 
 <style scoped>

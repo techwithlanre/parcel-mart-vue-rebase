@@ -14,6 +14,7 @@ import Pagination from "@/Components/Pagination.vue";
 import TopNav from "@/Components/TopNav.vue";
 
 import {DocumentIcon, WalletIcon} from "@heroicons/vue/20/solid/index.js";
+import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 
 const tabs = [
     { name: "Description", icon: WalletIcon, route: "description" },
@@ -56,7 +57,7 @@ const submit = () => {
 
 <template>
     <Head title="Shipping Setting::Description" />
-    <AuthenticatedLayout page-title="Margin Rate Setting">
+    <DashboardLayout page-title="Margin Rate Setting">
 <!--        <TopNav :tabs="tabs"/>-->
         <div>
             <div class="mt-10 border rounded-3xl bg-white">
@@ -83,7 +84,7 @@ const submit = () => {
                 </table>
             </div>
         </div>
-    </AuthenticatedLayout>
+    </DashboardLayout>
 
 </template>
 

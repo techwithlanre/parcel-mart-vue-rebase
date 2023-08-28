@@ -132,6 +132,7 @@ class ShipmentServices
             $dhl = new DHLServices($request);
             try {
                 $response = $dhl->calculateRate();
+                dd($response);
                 $data = json_decode($response, true);
                 if ($data && array_key_exists('products', $data)) {
                     $products = $data['products'];

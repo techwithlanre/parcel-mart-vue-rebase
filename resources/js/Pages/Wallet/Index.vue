@@ -66,18 +66,18 @@ let naira = new Intl.NumberFormat('en-US', {
     <Head title="Wallet" />
     <DashboardLayout page-title="Wallet">
         <div class="grid sm:grid-cols-2 gap-10 mt-10">
-            <div class="flex rounded-xl p-5 shadow bg-white w-full gap-x-36 justify-between items-center ">
+            <div class="flex rounded-xl p-5 shadow shadow-background/50 bg-white w-full justify-between items-center ">
                 <div>
                     <h3 class="text-sm">Wallet Balance</h3>
                     <div class="text-2xl font-bold">{{ balance }}</div>
                 </div>
-                <button @click="openModal" class="flex items-center gap-x-1 bg-background rounded p-2 text-sm">
+                <button @click="openModal" class="flex flex-row items-center gap-x-1 bg-background rounded p-2 text-sm">
                     <PlusIcon class="h-4 text-primary" />
                     <span class="text-xs text-primary">Add Fund</span>
                 </button>
             </div>
 
-            <div v-if="page.props.auth.user.user_type === 'business'" class="rounded-xl p-5 border bg-white w-full gap-x-36 justify-between items-center">
+            <div v-if="page.props.auth.user.user_type === 'business'" class="rounded-xl p-5 shadow shadow-background/50 bg-white w-full gap-x-36 justify-between items-center">
                 <div>
                     <div class="flex flex-row justify-between items-center">
                       <h3 class="text-sm">Overdraft Wallet</h3>
@@ -88,7 +88,7 @@ let naira = new Intl.NumberFormat('en-US', {
             </div>
         </div>
         <div class="rounded-xl shadow p-5 bg-white mt-10">
-            <div class="flex flex-row justify-between mb-10 items-start">
+            <div class="flex sm:flex-row flex-col justify-between mb-10 items-start">
                 <h1 class="text-lg">Wallet History</h1>
                 <div>
                     <InputLabel value="Filter" class="mb-3" />

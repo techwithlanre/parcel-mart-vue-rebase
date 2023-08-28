@@ -8,6 +8,7 @@ import {DocumentIcon, WalletIcon} from "@heroicons/vue/20/solid/index.js";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Pagination from "@/Components/Pagination.vue";
 import parcel from "../../../../images/parcel.png";
+import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 
 const activeKey = ref('1');
 const tabs = [
@@ -34,7 +35,7 @@ const trackShipment = () => {
 </script>
 
 <template>
-    <AuthenticatedLayout page-title="Shipments">
+    <DashboardLayout page-title="Shipments">
         <Head title="Start Shipment" />
         <div class="flex flex-col w-full gap-5">
             <div class="p-10 w-full bg-white border rounded-2xl" v-if="log.length > 0" >
@@ -90,7 +91,7 @@ const trackShipment = () => {
                 </div>
             </div>
         </div>
-    </AuthenticatedLayout>
+    </DashboardLayout>
 </template>
 
 <style scoped>

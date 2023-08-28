@@ -50,9 +50,9 @@ class WalletController extends Controller
         return response()->json($transactions);
     }
 
-    public function initialize(PayInitializeRequest $request, WalletServices $services, PaystackServices $paystackServices)
+    public function initialize(PayInitializeRequest $request, WalletServices $services)
     {
-        return $services->initializePay($request, $paystackServices);
+        return $services->initializePay($request);
     }
 
     public function paystackWebhook(Request $request, WalletServices $services)

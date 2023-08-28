@@ -45,7 +45,7 @@ const submit = () => {
         <div class="mt-2 px-6 mb-5">
           <div>
             <InputLabel value="Amount"/>
-            <TextInput v-model="form.amount" class="mt-3 " required type="number" min="0" placeholder="Enter the amount you want add to your wallet"/>
+            <TextInput v-model="form.amount" class="mt-3 " required type="number" min="100" placeholder="Enter the amount you want add to your wallet"/>
           </div>
         </div>
 

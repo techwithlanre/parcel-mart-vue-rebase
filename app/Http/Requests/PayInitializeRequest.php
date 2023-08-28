@@ -22,7 +22,7 @@ class PayInitializeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'amount' => ['numeric', 'required', 'min:100']
         ];
     }
 }

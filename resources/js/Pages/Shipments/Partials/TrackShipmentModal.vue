@@ -4,6 +4,8 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import {useForm} from "@inertiajs/vue3";
+import InputError from "@/Components/InputError.vue";
+import {toast} from "vue3-toastify";
 
 const trackForm = useForm({
   number: ''
@@ -11,7 +13,9 @@ const trackForm = useForm({
 
 const trackShipment = () => {
   trackForm.post(route('shipment.track'), {
-    onFinish: () => trackForm.reset(),
+    onFinish: () => {
+
+    },
   })
 }
 
@@ -41,9 +45,12 @@ const emits = defineEmits(['closeModal']);
       </div>
       <!-- Modal body -->
       <form @submit.prevent="trackShipment">
-        <div class="p-6 space-y-6">
-          <InputLabel  value="Tracking Number"/>
-          <TextInput v-model="trackForm.number" required type="text" />
+        <div class="p-6 space-y-3">
+          <div>
+            <InputLabel  value="Tracking Number"/>
+            <TextInput v-model="trackForm.number" type="text" class="mt-2" />
+          </div>
+          <InputError class="" :message="trackForm.errors.number" />
         </div>
         <!-- Modal footer -->
         <div class="flex justify-end items-center px-6 mb-6 space-x-2 border-gray-200 rounded-b sdark:border-gray-600">

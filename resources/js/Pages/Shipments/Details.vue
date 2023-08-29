@@ -236,7 +236,7 @@ let naira = new Intl.NumberFormat('en-US', {
       </div>
       <div class="card bg-white border border-gray-50 shadow shadow shadow-background/50 rounded-xl mt-10">
         <div>
-          <h1 class="font-bold text-xl px-5 pt-3 pb-1">Movement History</h1>
+          <h1 class="font-bold text-xl px-5 pt-3 pb-1">Shipment History</h1>
           <hr>
         </div>
         <div class="p-5">

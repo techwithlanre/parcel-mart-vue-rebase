@@ -72,7 +72,18 @@ class AramexServices
             $this->shippingCurrency
         );
 
-        if (isset($response->error)) return false;
+        if (isset($response->error)) {
+            activity()
+                ->performedOn(new Shipment())
+                ->causedBy(\request()->user())
+                ->withProperties([
+                    'method' => __FUNCTION__,
+                    'action' => 'Aramex Calculate Shipment Rate'
+                ])
+                ->log($response);
+            return false;
+        }
+
         return $response;
     }
 
@@ -143,6 +154,14 @@ class AramexServices
 
         $response = Aramex::createShipment($shipment_data);
         if (!empty($response->error)) {
+            activity()
+                ->performedOn(new Shipment())
+                ->causedBy(\request()->user())
+                ->withProperties([
+                    'method' => __FUNCTION__,
+                    'action' => 'Aramex Create Shipment'
+                ])
+                ->log($response);
             return false;
         }
 
@@ -164,11 +183,10 @@ class AramexServices
 
     public function createPickup(BookShipmentRequest $bookShipmentRequest, Shipment $shipment, ShipmentItem $shipment_item)
     {
-        //dd($bookShipmentRequest->all());
         try {
             $origin = json_decode($shipment->origin_address, true);
             $volume = $shipment_item->height * $shipment_item->length * $shipment_item->width;
-            $create_pickup = Aramex::createPickup([
+            return Aramex::createPickup([
                 "name" => $origin['contact_name'], // User’s Name, Sent By or in the case of the consignee, to the Attention of.
                 "cell_phone" => $origin['contact_phone'], // Phone Number
                 "phone" => $origin['contact_phone'], // Phone Number
@@ -187,9 +205,15 @@ class AramexServices
                 "weight" => $shipment_item->weight,// wieght of the pickup (in KG)
                 "volume" => $volume, // volume of the pickup  (in CM^3)
             ]);
-            return $create_pickup;
         } catch (\Throwable $e) {
-            //dd($e->getMessage());
+            activity()
+                ->performedOn(new Shipment())
+                ->causedBy(\request()->user())
+                ->withProperties([
+                    'method' => __FUNCTION__,
+                    'action' => 'Aramex Create Pickup'
+                ])
+                ->log($e->getMessage());
             return false;
         }
     }

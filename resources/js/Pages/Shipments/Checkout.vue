@@ -81,7 +81,7 @@ const pay = () => {
 
     if (!hasError) {
       form.post(route('shipment.book'), {
-        onFinish: () => toast.error(page.props.flash.error)
+        onError: () => toast.error(form.errors.message)
       });
     }
 }
@@ -238,12 +238,12 @@ const showInvoiceForm = () => {
                         <div class="flex justify-between items-center">
                           <h3 class="font-semibold text-sm">{{ origin.contact_name }}</h3>
                         </div>
-                        <p class="flex gap-x-10">
+                        <p class="flex flex-col">
                           <span class="text-sm text-primary">{{ origin.contact_phone }}</span>
                           <span class="text-sm">{{ origin.contact_email}}</span>
                         </p>
                         <p class="mt-3 text-sm"> {{ origin.address_1 }}</p>
-<!--                        <p class="text-sm"> {{ origin.landmark }}</p>-->
+                        <p class="text-sm"> {{ origin.landmark }}</p>
                         <div class="flex gap-x-10">
                           <div class="text-primary font-bold text-sm">{{ origin_location.city }}, {{ origin_location.state }}, {{ origin_location.country }}</div>
                         </div>
@@ -268,7 +268,7 @@ const showInvoiceForm = () => {
                         <div class="flex justify-between items-center">
                           <h3 class="text-sm font-semibold">{{ destination.contact_name }}</h3>
                         </div>
-                        <p class="flex gap-x-10">
+                        <p class="flex flex-col">
                           <span class="text-sm text-primary">{{ destination.contact_phone }}</span>
                           <span class="text-sm">{{ destination.contact_email}}</span>
                         </p>

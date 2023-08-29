@@ -135,7 +135,9 @@ export default {
     },
 
     initialize: function () {
-      this.form.post(route('shipment.initialize'), {})
+      this.form.post(route('shipment.initialize'), {
+        onError: () => toast.error(this.form.errors.message)
+      })
     },
 
     populateOriginAddress: function (address) {

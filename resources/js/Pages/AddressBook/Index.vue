@@ -20,18 +20,17 @@ const isOpenCreate = ref(false)
 </script>
 
 <template>
-    <Head title="Address Book" />
     <DashboardLayout page-title="Address Book">
         <div>
-            <div  v-if="addresses.data.length > 0" class="flex flex-col justify-end items-end">
+            <div v-if="addresses.data.length > 0" class="flex flex-col justify-end items-end">
                 <a @click="isOpenCreate = true"
-                      class="bg-primary px-3 py-2 mt-10 text-sm text-white hover:text-gray-50 rounded-md focus:outline-none focus:ring-2 mb-10 focus:ring-offset-2 focus:ring-background">
+                      class="cursor-pointer bg-primary px-3 py-2 mt-10 text-sm text-white hover:text-gray-50 rounded-md focus:outline-none focus:ring-2 mb-10 focus:ring-offset-2 focus:ring-background">
                     Create Address
                 </a>
             </div>
             <div v-if="addresses.data.length > 0" class="grid lg:grid-cols-3 gap-x-5 gap-y-10 justify-center items-center">
-                <div class="card shadow-md bg-white p-5"  v-for="item in addresses.data">
-                    <div class="flex justify-between items-center">
+                <div class="card shadow shadow-background/50 bg-white py-5 rounded-xl"  v-for="item in addresses.data">
+                    <div class="flex justify-between items-center px-5">
                         <h3 class="text-lg font-semibold">{{ item.address_contacts[0].contact_name }}</h3>
                         <div>
                             <button >
@@ -55,17 +54,17 @@ const isOpenCreate = ref(false)
                             </button>
                         </div>
                     </div>
-                    <p class="flex gap-x-10">
-                        <span class="text-sm text-primary">{{ item.address_contacts[0].contact_phone }}</span>
-                        <span class="text-sm">{{ item.address_contacts[0].contact_email }}</span>
+                    <p class="flex px-5">
+                        <span class="text-sm text-gray-500">{{ item.address_contacts[0].contact_phone }}</span>&nbsp;
+                        <span class="text-sm text-gray-500">{{ item.address_contacts[0].contact_email }}</span>
                     </p>
                     <hr class="mt-2">
-                    <p class="mt-5"> {{ item.address }}</p>
-                    <p class=""> {{ item.landmark }}</p>
-                    <div class="flex gap-x-10">
-                        <div class="text-blue-950 font-bold">{{ item.country.name }}</div>
-<!--                        <div class="text-blue-950 font-bold">{{ item.state?.name }}</div>-->
-                        <div class="text-blue-950 font-bold">{{ item.city.name }}</div>
+                    <div class="px-5">
+                      <p class="mt-5 text-gray-500"> {{ item.address }}</p>
+                      <p class="text-gray-500"> {{ item.landmark }}</p>
+                      <div class="flex text-gray-500">
+                        <div class="text-gray-500">{{ item.country.name }}</div>,  &nbsp;<div class="">{{ item.city.name }}</div>
+                      </div>
                     </div>
                 </div>
             </div>

@@ -56,11 +56,11 @@ const handleFilter = () => {
         <Head title="Start Shipment" />
         <div class="flex flex-col w-full gap-5 mt-10">
             <div class="flex flex-row gap-5 justify-end items-end">
-                <PrimaryButton v-if="log.length > 0 || parseInt(shipmentsCount) > 0" @click="trackShipmentOpen = true" class="w-max bg-white text-red-900 border-2 border-background" style="color: #008083; border: 1px solid #d6e9ed" type="button">
+                <PrimaryButton v-if="log.length > 0 || parseInt(shipmentsCount) > 0" @click="trackShipmentOpen = true" class="w-max text-xs bg-white text-red-900 border-2 border-background" style="color: #008083; border: 1px solid #d6e9ed" type="button">
                     Track Shipment
                 </PrimaryButton>
                 <Link :href="route('shipment.start')">
-                    <PrimaryButton class="w-max">New Shipment</PrimaryButton>
+                    <PrimaryButton class="w-max text-xs">New Shipment</PrimaryButton>
                 </Link>
             </div>
             <Modal :show="trackShipmentOpen">

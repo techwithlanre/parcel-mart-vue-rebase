@@ -18,7 +18,7 @@ use App\Models\ShippingRateLog;
 use App\Models\TrackingLog;
 use App\Models\WalletOverdraft;
 use App\Models\WalletOverdraftLog;
-use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
@@ -132,7 +132,6 @@ class ShipmentServices
             $dhl = new DHLServices($request);
             try {
                 $response = $dhl->calculateRate();
-                dd($response);
                 $data = json_decode($response, true);
                 if ($data && array_key_exists('products', $data)) {
                     $products = $data['products'];
@@ -237,6 +236,15 @@ class ShipmentServices
                     $shipment->has_rate = 1;
                     $shipment->save();
                     $rate_found = true;
+                } else {
+                    activity()
+                        ->performedOn(new Shipment())
+                        ->causedBy(\request()->user())
+                        ->withProperties([
+                            'method' => __FUNCTION__,
+                            'action' => 'Aramex Shipment Cost'
+                        ])
+                        ->log($response);
                 }
             } catch (\Throwable $e) {
                 activity()
@@ -300,6 +308,15 @@ class ShipmentServices
                         $shipment->save();
                         $rate_found = true;
                     }
+                } else {
+                    activity()
+                        ->performedOn(new Shipment())
+                        ->causedBy(\request()->user())
+                        ->withProperties([
+                            'method' => __FUNCTION__,
+                            'action' => 'DHL Shipment Cost'
+                        ])
+                        ->log($response);
                 }
             } catch (\Throwable $e) {
                 activity()
@@ -307,23 +324,20 @@ class ShipmentServices
                     ->causedBy(\request()->user())
                     ->withProperties([
                         'method' => __FUNCTION__,
-                        'action' => 'DHL Recalculate Rate'
+                        'action' => 'DHL Shipment Cost'
                     ])
                     ->log($e->getMessage());
                 $this->errors[] = 'DHL shipment is not available at the moment.';
             }
         }
 
-        /*if (count($this->errors) > 0) {
-            return Redirect::back()->with('error', implode("|", $this->errors));
-        }*/
-
         if (!$rate_found) {
             $shipment->status = 'failed';
             $shipment->save();
+            throw ValidationException::withMessages(['message' => 'No package found for locations selected']);
         }
 
-        return $rate_found ? Redirect::route('shipment.checkout', $shipment->id) : Redirect::back()->with('error', 'No shipment rate found for your package');
+        return Redirect::route('shipment.checkout', $shipment->id);
     }
 
     public function bookShipment(BookShipmentRequest $bookShipmentRequest): \Illuminate\Foundation\Application|false|\Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
@@ -338,9 +352,8 @@ class ShipmentServices
         $total_amount = str_replace(',', '', $rate->total_amount) + str_replace(',', '', $insurance_amount);
 
         if (auth()->user()->user_type === 'individual' && auth()->user()->balance < $total_amount) {
-            return redirect(route('shipment.checkout', $request['shipment_id']))->with('error', 'Insufficient balance');
+            throw ValidationException::withMessages(['message' => 'Insufficient balance']);
         }
-
 
         if (auth()->user()->user_type === 'business') {
             $current_balance = auth()->user()->balance;
@@ -349,7 +362,7 @@ class ShipmentServices
             $previous_overdraft = $overdraft_wallet->balance;
             $total_overdraft = $current_overdraft_amount + $previous_overdraft;
             if ($total_overdraft > auth()->user()->credit_limit) {
-                return redirect()->back()->with('error', 'Insufficient balance: Order amount is above your credit limit');
+                throw ValidationException::withMessages(['message' => 'Insufficient balance: Order amount is above your credit limit']);
             }
         }
 
@@ -359,7 +372,15 @@ class ShipmentServices
             $aramex = new AramexServices($bookShipmentRequest);
             $pickup = $aramex->createPickup($bookShipmentRequest, $shipment, $shipment_item);
             if (!$pickup) {
-                return redirect()->back()->with('error', 'We were not able to process your pickup. Please try again later');
+                activity()
+                    ->performedOn(new Shipment())
+                    ->causedBy(\request()->user())
+                    ->withProperties([
+                        'method' => __FUNCTION__,
+                        'action' => 'Aramex create pickup'
+                    ])
+                    ->log($pickup);
+                throw ValidationException::withMessages(['message' => 'We were not able to process your pickup. Please try again later']);
             }
 
             if ($pickup->error == 0) {
@@ -422,6 +443,9 @@ class ShipmentServices
 
     }
 
+    /**
+     * @throws ValidationException
+     */
     public function trackShipment(TrackShipmentRequest $request): \Illuminate\Foundation\Application|\Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
         $shipment_number = trim($request->number);
@@ -430,7 +454,9 @@ class ShipmentServices
             'user_id' => auth()->user()->id,
         ])->first();
 
-        if (!$shipment) return \redirect(route('shipment.index'))->with('error', 'Tracking number not found');
+        if (!$shipment) {
+            throw ValidationException::withMessages(['number' => 'Tracking number not found']);
+        }
         if ($shipment->provider == 'aramex') return $this->trackAramex($shipment);
         if ($shipment->provider == 'dhl') return $this->trackDhl($request, $shipment);
         return redirect()->back()->with('error', 'An error occurred. Please try again later');

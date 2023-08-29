@@ -35,7 +35,7 @@ class CreateAddressRequest extends FormRequest
             'country_id' => 'required|numeric',
             'state_id' => 'required|numeric',
             'city_id' => 'required|numeric',
-            'postcode' => 'string'
+            'postcode' => 'required|min:4'
         ];
 
         if ($this->formRequest->filled('business_name')) $rules['business_name'] = [new BusinessNameRule];

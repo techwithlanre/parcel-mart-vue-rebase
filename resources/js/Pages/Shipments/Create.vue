@@ -1,6 +1,6 @@
 <script>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import {Head, Link, useForm, usePage} from "@inertiajs/vue3";
+import {Head, Link, useRemember, usePage, useForm} from "@inertiajs/vue3";
 import {
   Tab,
   TabGroup,

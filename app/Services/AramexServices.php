@@ -78,9 +78,9 @@ class AramexServices
                 ->causedBy(\request()->user())
                 ->withProperties([
                     'method' => __FUNCTION__,
-                    'action' => 'Aramex Calculate Shipment Rate'
+                    'action' => 'Aramex Recalculate Shipment Rate'
                 ])
-                ->log($response);
+                ->log($response->errors->Notification->Message);
             return false;
         }
 

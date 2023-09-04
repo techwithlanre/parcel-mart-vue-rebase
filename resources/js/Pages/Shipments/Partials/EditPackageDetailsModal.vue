@@ -106,7 +106,7 @@ const getDestinationCountries = function () {
   <div>
     <div class="flex flex-row justify-between items-start p-5">
       <div class="">
-        <h3>Edit Origin Address</h3>
+        <h3>Edit Package Details</h3>
         <p class="text-sm">Use this form to edit origin address for this booking</p>
       </div>
       <div>

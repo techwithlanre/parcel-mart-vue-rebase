@@ -23,7 +23,7 @@ use Illuminate\Validation\ValidationException;
 
 class DHLServices
 {
-    protected $request;
+    protected Request|TrackShipmentRequest|BookShipmentRequest|CreateShipmentRequest $request;
     protected String $env;
     protected String $base_url;
     protected String $account_number;

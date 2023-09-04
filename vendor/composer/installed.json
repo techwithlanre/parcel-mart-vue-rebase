@@ -1284,6 +1284,92 @@
             "install-path": "../fruitcake/php-cors"
         },
         {
+            "name": "gabrielbull/ups-api",
+            "version": "2.1.0",
+            "version_normalized": "2.1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/gabrielbull/php-ups-api.git",
+                "reference": "7feb044716171e1b19b198dc837769c4a3db0901"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/gabrielbull/php-ups-api/zipball/7feb044716171e1b19b198dc837769c4a3db0901",
+                "reference": "7feb044716171e1b19b198dc837769c4a3db0901",
+                "shasum": ""
+            },
+            "require": {
+                "ext-dom": "*",
+                "ext-simplexml": "*",
+                "guzzlehttp/guzzle": "^6.0 || ^7.0",
+                "php": "^7.3 || ^8.0",
+                "psr/log": "^1.0 || ^2.0 || ^3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.5.4"
+            },
+            "suggest": {
+                "ext-soap": "Required if you need the Tradeability API of UPS"
+            },
+            "time": "2022-06-22T12:42:11+00:00",
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0-dev"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Ups\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Gabriel Bull",
+                    "email": "me@gabrielbull.com"
+                },
+                {
+                    "name": "Sebastien Vergnes",
+                    "email": "sebastien@vergnes.eu"
+                },
+                {
+                    "name": "Michael Williams",
+                    "email": "michael.williams@limelyte.com"
+                },
+                {
+                    "name": "Stefan Doorn",
+                    "email": "stefan@efectos.nl"
+                },
+                {
+                    "name": "Eduard Sukharev",
+                    "email": "sukharev.eh@gmail.com"
+                }
+            ],
+            "description": "PHP UPS API",
+            "keywords": [
+                "Rate",
+                "Rating",
+                "api",
+                "quantum view",
+                "shipping",
+                "time in transit",
+                "tracking",
+                "tradeability",
+                "ups",
+                "wrapper"
+            ],
+            "support": {
+                "issues": "https://github.com/gabrielbull/php-ups-api/issues",
+                "source": "https://github.com/gabrielbull/php-ups-api/tree/2.1.0"
+            },
+            "install-path": "../gabrielbull/ups-api"
+        },
+        {
             "name": "graham-campbell/result-type",
             "version": "v1.1.1",
             "version_normalized": "1.1.1.0",
@@ -5855,6 +5941,83 @@
             "install-path": "../psy/psysh"
         },
         {
+            "name": "ptondereau/laravel-ups-api",
+            "version": "v3.0.0",
+            "version_normalized": "3.0.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ptondereau/Laravel-UPS-Api.git",
+                "reference": "81757e0b87842b9a0284205436acab561ae4d755"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ptondereau/Laravel-UPS-Api/zipball/81757e0b87842b9a0284205436acab561ae4d755",
+                "reference": "81757e0b87842b9a0284205436acab561ae4d755",
+                "shasum": ""
+            },
+            "require": {
+                "gabrielbull/ups-api": "^1.2.2 || ^2.0",
+                "illuminate/contracts": "^8.0 || ^9.0 || ^10.0",
+                "illuminate/support": "^8.0 || ^9.0 || ^10.0",
+                "php": "^7.4.15 || ^8.0"
+            },
+            "require-dev": {
+                "graham-campbell/analyzer": "^4.0",
+                "graham-campbell/testbench": "^6.0",
+                "phpunit/phpunit": "^9.3.7"
+            },
+            "time": "2023-06-13T14:31:12+00:00",
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Ptondereau\\LaravelUpsApi\\UpsApiServiceProvider"
+                    ]
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Ptondereau\\LaravelUpsApi\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Pierre Tondereau",
+                    "email": "pierre.tondereau@gmail.com"
+                }
+            ],
+            "description": "A small Laravel's wrapper for the PHP UPS API library",
+            "keywords": [
+                "Laravel UPS Api",
+                "Laravel-Ups-Api",
+                "Pierre Tondereau",
+                "Ptondereau",
+                "framework",
+                "laravel",
+                "ups"
+            ],
+            "support": {
+                "issues": "https://github.com/ptondereau/Laravel-UPS-Api/issues",
+                "source": "https://github.com/ptondereau/Laravel-UPS-Api/tree/v3.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://www.paypal.me/ptondereau",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/ptondereau",
+                    "type": "github"
+                }
+            ],
+            "install-path": "../ptondereau/laravel-ups-api"
+        },
+        {
             "name": "ralouphie/getallheaders",
             "version": "3.0.3",
             "version_normalized": "3.0.3.0",
@@ -6087,87 +6250,6 @@
                 }
             ],
             "install-path": "../ramsey/uuid"
-        },
-        {
-            "name": "rawilk/laravel-ups",
-            "version": "v2.1.6",
-            "version_normalized": "2.1.6.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/rawilk/laravel-ups.git",
-                "reference": "88f16869a1d12f007f40070aade568254d1cb228"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/rawilk/laravel-ups/zipball/88f16869a1d12f007f40070aade568254d1cb228",
-                "reference": "88f16869a1d12f007f40070aade568254d1cb228",
-                "shasum": ""
-            },
-            "require": {
-                "ext-simplexml": "*",
-                "illuminate/contracts": "^8.0|^9.0|^10.0",
-                "illuminate/http": "^8.0|^9.0|^10.0",
-                "illuminate/support": "^8.0|^9.0|^10.0",
-                "php": "^8.0|^8.1|^8.2",
-                "spatie/laravel-package-tools": "^1.0|^1.13"
-            },
-            "require-dev": {
-                "guzzlehttp/guzzle": "^7.2",
-                "laravel/pint": "^1.2",
-                "orchestra/testbench": "^6.23|^7.0|^8.0",
-                "pestphp/pest": "^1.22",
-                "pestphp/pest-plugin-laravel": "^1.3",
-                "pestphp/pest-plugin-parallel": "^1.2"
-            },
-            "suggest": {
-                "ext-gd": "Required for rotating labels",
-                "guzzlehttp/guzzle": "^7.2"
-            },
-            "time": "2023-03-20T15:34:41+00:00",
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Rawilk\\Ups\\UpsServiceProvider"
-                    ]
-                }
-            },
-            "installation-source": "dist",
-            "autoload": {
-                "psr-4": {
-                    "Rawilk\\Ups\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Randall Wilk",
-                    "email": "randall@randallwilk.dev",
-                    "homepage": "https://randallwilk.dev",
-                    "role": "Developer"
-                }
-            ],
-            "description": "UPS api wrapper for Laravel.",
-            "homepage": "https://github.com/rawilk/laravel-ups",
-            "keywords": [
-                "UPS Api",
-                "laravel-ups",
-                "rawilk"
-            ],
-            "support": {
-                "issues": "https://github.com/rawilk/laravel-ups/issues",
-                "source": "https://github.com/rawilk/laravel-ups/tree/v2.1.6"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/rawilk",
-                    "type": "github"
-                }
-            ],
-            "install-path": "../rawilk/laravel-ups"
         },
         {
             "name": "sebastian/cli-parser",

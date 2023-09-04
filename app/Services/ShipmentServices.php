@@ -16,6 +16,7 @@ use App\Models\Shipment;
 use App\Models\ShipmentItem;
 use App\Models\ShippingRateLog;
 use App\Models\TrackingLog;
+use App\Models\UpsRateLog;
 use App\Models\WalletOverdraft;
 use App\Models\WalletOverdraftLog;
 use Illuminate\Validation\ValidationException;
@@ -90,6 +91,7 @@ class ShipmentServices
                         'courier_api_provider_id' => $check_aramex->value('id'),
                         'provider_code' => 'aramex',
                     ])->delete();
+
                     ShippingRateLog::create([
                         'user_id' => auth()->user()->id,
                         'shipment_id'=>$shipment_id,
@@ -210,12 +212,15 @@ class ShipmentServices
         return Redirect::back()->with('error', 'No shipment rate found for your package');
     }
 
+    /**
+     * @throws ValidationException
+     */
     public function calculateShipmentCost(CreateShipmentRequest $request): bool|\Illuminate\Http\RedirectResponse
     {
         $shipment = $this->logShipment($request);
         $check_aramex = CourierApiProvider::where('alias', 'aramex');
         $rate_found = false;
-        if ($check_aramex->value('status') == 'active') {
+        if ($check_aramex->value('status') == 'sactive') {
             $aramex = new AramexServices($request);
             try {
                 $response = $aramex->calculateShippingRate();
@@ -260,7 +265,7 @@ class ShipmentServices
         }
 
         $check_dhl = CourierApiProvider::where('alias', 'dhl');
-        if ($check_dhl->value('status') == 'active') {
+        if ($check_dhl->value('status') == 'sactive') {
             $dhl = new DHLServices($request);
             try {
                 $response = $dhl->calculateRate();
@@ -328,6 +333,72 @@ class ShipmentServices
                     ])
                     ->log($e->getMessage());
                 $this->errors[] = 'DHL shipment is not available at the moment.';
+            }
+        }
+
+        $check_ups = CourierApiProvider::where('alias', 'ups');
+        if ($check_ups->value('status') == 'active') {
+            $ups = new UpsServices($request);
+            try {
+                $response = $ups->calculateRate();
+                $data = json_decode($response, true);
+                if (array_key_exists('ResponseStatus', $data['RateResponse']['Response'])) {
+                    if ($data['RateResponse']['Response']['ResponseStatus']['Code'] == 1) {
+                        $ratedShipment = $data['RateResponse']['RatedShipment'];
+                        if ($ratedShipment['TotalCharges']['MonetaryValue'] > 0) {
+                            $multiplier = ($check_ups->value('profit_margin') / 100) + 1;
+                            $shipmentAmount = $ratedShipment['TotalCharges']['MonetaryValue'] * $multiplier;
+                            $tax = $shipmentAmount * 0.075;
+                            $rate_log = ShippingRateLog::create([
+                                'user_id' => auth()->user()->id,
+                                'shipment_id' => $shipment->id,
+                                'courier_api_provider_id' => $check_dhl->value('id'),
+                                'product_name' => 'UPS Shipment',
+                                'product_code' => '08',
+                                'provider_code' => 'ups',
+                                'currency' => 'NGN',
+                                'total_amount' => $shipmentAmount,
+                                'amount_before_tax' => number_format($shipmentAmount - $tax),
+                                'tax' => number_format($tax),
+                                'created_at' => now()
+                            ]);
+
+                            UpsRateLog::create([
+                                'shipment_id' => $shipment->id,
+                                'shipping_rate_log_id' => $rate_log->id,
+                                'service_code' => $ratedShipment['Service']['Code'],
+                                'packaging_type_code' => '02',
+                                'billing_weight' => json_encode($ratedShipment['BillingWeight']),
+                                'total_price' => json_encode($ratedShipment['TotalCharges']),
+                                'total_price_breakdown' => json_encode($ratedShipment),
+                                'pricing_date' => now(),
+                            ]);
+
+                            $shipment->has_rate = 1;
+                            $shipment->save();
+                            $rate_found = true;
+                        } else {
+                            activity()
+                                ->performedOn(new Shipment())
+                                ->causedBy(\request()->user())
+                                ->withProperties([
+                                    'method' => __FUNCTION__,
+                                    'action' => 'UPS Shipment Cost'
+                                ])
+                                ->log($response);
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                activity()
+                    ->performedOn(new Shipment())
+                    ->causedBy(\request()->user())
+                    ->withProperties([
+                        'method' => __FUNCTION__,
+                        'action' => 'UPS Shipment Cost'
+                    ])
+                    ->log($e->getMessage());
+                $this->errors[] = 'UPS shipment is not available at the moment.';
             }
         }
 

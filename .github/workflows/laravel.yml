@@ -24,8 +24,8 @@ jobs:
     - name: 📂 Sync files
       uses: SamKirkland/FTP-Deploy-Action@4.0.0
       with:
-        server: ${{ secrets.SERVER}}
-        username: ${{ secrets.USERNAME}}
-        password: ${{ secrets.PASSWORD}}
-        server-dir: /ship.parcelsmartsolution.com/
+        server: ${{secrets.SERVER}}
+        username: ${{secrets.USERNAME}}
+        password: ${{secrets.PASSWORD}}
+        server-dir: ${{secrets.SERVER_DIR}}
         protocol: ftps

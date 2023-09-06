@@ -90,69 +90,64 @@ class WalletServices
         } //log to db
 
         try {
+            $response = $this->verifyPayment($url_ref_1);
+            $result = json_decode($response, true);
 
-        } catch (\Throwable $e) {
-
-        }
-        $response = $this->verifyPayment($url_ref_1);
-        $result = json_decode($response, true);
-
-        if ($result['status']) {
-            if ($result['data']['reference'] != $url_ref_1 && $result['data']['status'] != 'success') {
-               return \redirect()->with('error', 'An error occurred, Please contact support');
-            }
-
-            $paystack_transaction = PaystackTransaction::where('reference', $url_ref_1)->first();
-            $transaction = Transaction::whereId($paystack_transaction->transaction_id)->first();
-            if ($paystack_transaction && $paystack_transaction['status'] == 'processing') {
-                $user = auth()->user();
-                $funding_amount = $transaction->amount;
-                $new_funding_amount = 0;
-                $overdraft = WalletOverdraft::where('user_id', $user->id)->first();
-                if ($overdraft) {
-                    $overdraft_balance = $overdraft->balance;
-                    $new_overdraft_balance = $overdraft_balance;
-                    if ($overdraft_balance > 0) {
-                        if ($overdraft_balance >= $funding_amount) {
-                            $new_overdraft_balance = $overdraft_balance - $funding_amount;
-                            $funding_amount = 0;
-                        }
-
-                        if ($funding_amount >= $overdraft_balance) {
-                            $funding_amount = $funding_amount - $overdraft_balance;
-                            $new_overdraft_balance = 0;
-                        }
-                    }
-
-                    $transaction->amount = $funding_amount;
-                    $transaction->save();
-                    $overdraft->balance = $new_overdraft_balance;
-                    $overdraft->save();
+            if ($result['status']) {
+                if ($result['data']['reference'] != $url_ref_1 && $result['data']['status'] != 'success') {
+                    return \redirect()->with('error', 'An error occurred, Please contact support');
                 }
 
-                if (!$transaction->confirmed) $user->confirm($transaction);
-                $paystack_transaction->status = 'success';
-                $paystack_transaction->save();
-                return \redirect(route('wallet.index'))->with('message', 'Wallet funded successfully');
+                $paystack_transaction = PaystackTransaction::where('reference', $url_ref_1)->first();
+                $transaction = Transaction::whereId($paystack_transaction->transaction_id)->first();
+                if ($paystack_transaction && $paystack_transaction['status'] == 'processing') {
+                    $user = auth()->user();
+                    $funding_amount = $transaction->amount;
+                    $new_funding_amount = 0;
+                    $overdraft = WalletOverdraft::where('user_id', $user->id)->first();
+                    if ($overdraft) {
+                        $overdraft_balance = $overdraft->balance;
+                        $new_overdraft_balance = $overdraft_balance;
+                        if ($overdraft_balance > 0) {
+                            if ($overdraft_balance >= $funding_amount) {
+                                $new_overdraft_balance = $overdraft_balance - $funding_amount;
+                                $funding_amount = 0;
+                            }
+
+                            if ($funding_amount >= $overdraft_balance) {
+                                $funding_amount = $funding_amount - $overdraft_balance;
+                                $new_overdraft_balance = 0;
+                            }
+                        }
+
+                        $transaction->amount = $funding_amount;
+                        $transaction->save();
+                        $overdraft->balance = $new_overdraft_balance;
+                        $overdraft->save();
+                    }
+
+                    if (!$transaction->confirmed) $user->confirm($transaction);
+                    $paystack_transaction->status = 'success';
+                    $paystack_transaction->save();
+                    return \redirect(route('wallet.index'))->with('message', 'Wallet funded successfully');
+                }
+
+                return \redirect(route('wallet.index'))->with('message', 'Your wallet has been previously credited for this transaction.');
             }
+        } catch (\Throwable $e) {
 
-
-
-            return \redirect(route('wallet.index'))->with('message', 'Your wallet has been previously credited for this transaction.');
+            return \redirect(route('wallet.index'))->with('message', 'An error occurred, please try again later');
         }
+
 
         return \redirect(route('wallet.index'))->with('message', 'An error occurred, please try again later');
     }
 
-    private function callPaystack($data)
+    private function callPaystack($data): bool|string
     {
         $url = "https://api.paystack.co/transaction/initialize";
         $fields_string = http_build_query($data);
-
-        //open connection
         $ch = curl_init();
-
-        //set the url, number of POST vars, POST data
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $fields_string);
@@ -166,8 +161,7 @@ class WalletServices
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
         //execute post
-        $result = curl_exec($ch);
-        return $result;
+        return curl_exec($ch);
 
     }
 }

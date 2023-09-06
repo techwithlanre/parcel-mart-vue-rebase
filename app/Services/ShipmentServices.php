@@ -78,8 +78,9 @@ class ShipmentServices
     {
         $shipment_id = request()->id;
         $shipment = Shipment::find($shipment_id);
+
         $check_aramex = CourierApiProvider::where('alias', 'aramex');
-        $aramex_rate_found = $dhl_rate_found = false;
+        $aramex_rate_found = $dhl_rate_found = $ups_rate_found = false;
         if ($check_aramex->value('status') == 'active') {
             $aramex = new AramexServices($request);
             try {
@@ -196,15 +197,97 @@ class ShipmentServices
             }
         }
 
+        $check_ups = CourierApiProvider::where('alias', 'ups');
+        if ($check_ups->value('status') == 'active') {
+            $ups = new UpsServices($request);
+            try {
+                $response = $ups->calculateRate();
+                $data = json_decode($response, true);
+                if (array_key_exists('ResponseStatus', $data['RateResponse']['Response'])) {
+                    if ($data['RateResponse']['Response']['ResponseStatus']['Code'] == 1) {
+                        $ratedShipment = $data['RateResponse']['RatedShipment'];
+                        if ($ratedShipment['TotalCharges']['MonetaryValue'] > 0) {
+                            $multiplier = ($check_ups->value('profit_margin') / 100) + 1;
+                            $shipmentAmount = $ratedShipment['TotalCharges']['MonetaryValue'] * $multiplier;
+                            $tax = $shipmentAmount * 0.075;
+                            ShippingRateLog::where([
+                                'user_id' => auth()->user()->id,
+                                'shipment_id'=>$shipment_id,
+                                'courier_api_provider_id' => $check_ups->value('id'),
+                                'provider_code' => 'ups',
+                            ])->delete();
+
+                            $rate_log = ShippingRateLog::create([
+                                'user_id' => auth()->user()->id,
+                                'shipment_id' => $shipment->id,
+                                'courier_api_provider_id' => $check_ups->value('id'),
+                                'product_name' => 'UPS Shipment',
+                                'product_code' => '08',
+                                'provider_code' => 'ups',
+                                'currency' => 'NGN',
+                                'total_amount' => $shipmentAmount,
+                                'amount_before_tax' => number_format($shipmentAmount - $tax),
+                                'tax' => number_format($tax),
+                                'created_at' => now()
+                            ]);
+
+                            UpsRateLog::create([
+                                'shipment_id' => $shipment->id,
+                                'shipping_rate_log_id' => $rate_log->id,
+                                'service_code' => $ratedShipment['Service']['Code'],
+                                'packaging_type_code' => '02',
+                                'billing_weight' => json_encode($ratedShipment['BillingWeight']),
+                                'total_price' => json_encode($ratedShipment['TotalCharges']),
+                                'total_price_breakdown' => json_encode($ratedShipment),
+                                'pricing_date' => now(),
+                            ]);
+
+                            $shipment->has_rate = 1;
+                            $shipment->save();
+                            $ups_rate_found = true;
+                        } else {
+                            activity()
+                                ->performedOn(new Shipment())
+                                ->causedBy(\request()->user())
+                                ->withProperties([
+                                    'method' => __FUNCTION__,
+                                    'action' => 'UPS Shipment Cost'
+                                ])
+                                ->log($response);
+                        }
+
+                        if (!$ups_rate_found) {
+                            ShippingRateLog::where([
+                                'user_id' => auth()->user()->id,
+                                'shipment_id'=>$shipment_id,
+                                'courier_api_provider_id' => $check_ups->value('id'),
+                                'provider_code' => 'ups',
+                            ])->delete();
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                activity()
+                    ->performedOn(new Shipment())
+                    ->causedBy(\request()->user())
+                    ->withProperties([
+                        'method' => __FUNCTION__,
+                        'action' => 'UPS Shipment Cost'
+                    ])
+                    ->log($e->getMessage());
+                $this->errors[] = 'UPS shipment is not available at the moment.';
+            }
+        }
+
         if (count($this->errors) > 0) {
             return Redirect::back()->with('error', implode("|", $this->errors));
         }
 
-        if (!$aramex_rate_found && !$dhl_rate_found) {
+        if (!$aramex_rate_found && !$dhl_rate_found && !$ups_rate_found) {
             return Redirect::back()->with('error', 'No shipment rate found for your package');
         }
 
-        if ($aramex_rate_found || $dhl_rate_found) {
+        if ($aramex_rate_found || $dhl_rate_found || $ups_rate_found) {
             $this->logRecalculateShipment($request);
             return Redirect::route('shipment.checkout', $shipment->id);
         }
@@ -352,7 +435,7 @@ class ShipmentServices
                             $rate_log = ShippingRateLog::create([
                                 'user_id' => auth()->user()->id,
                                 'shipment_id' => $shipment->id,
-                                'courier_api_provider_id' => $check_dhl->value('id'),
+                                'courier_api_provider_id' => $check_ups->value('id'),
                                 'product_name' => 'UPS Shipment',
                                 'product_code' => '08',
                                 'provider_code' => 'ups',

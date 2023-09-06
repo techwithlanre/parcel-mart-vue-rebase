@@ -93,9 +93,7 @@ class PaystackServices
     public function makePaymentRequest($data = null)
     {
         if ($data == null) {
-
             $quantity = intval(request()->quantity ?? 1);
-
             $data = array_filter([
                 "amount" => intval(request()->amount) * $quantity,
                 "reference" => request()->reference,

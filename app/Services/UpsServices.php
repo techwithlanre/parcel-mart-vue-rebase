@@ -5,8 +5,12 @@ namespace App\Services;
 use App\Http\Requests\BookShipmentRequest;
 use App\Http\Requests\CreateShipmentRequest;
 use App\Http\Requests\TrackShipmentRequest;
+use App\Models\InsuranceOption;
 use App\Models\ItemCategory;
 use App\Models\Shipment;
+use App\Models\ShipmentItem;
+use App\Models\ShippingRateLog;
+use Carbon\Carbon;
 use Exception;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
@@ -58,6 +62,7 @@ class UpsServices
     private function setAccessToken($accessToken): void
     {
         $this->accessToken = $accessToken;
+        dd($accessToken);
     }
 
     public function getAccessToken(): bool
@@ -161,23 +166,24 @@ class UpsServices
                             ],
                             "Dimensions" => [
                                 "UnitOfMeasurement" => [
-                                    "Code" => $this->metric($weightUnit)
+                                    "Code" =>  $this->metric($weightUnit)
                                 ],
-                                "Length" => $this->convertMetric($weightUnit, $this->request->shipment['length']),
-                                "Width" => $this->convertMetric($weightUnit, $this->request->shipment['width']),
-                                "Height" => $this->convertMetric($weightUnit, $this->request->shipment['height'])
+                                "Length" => (string) $this->convertMetric($weightUnit, $this->request->shipment['length']),
+                                "Width" => (string) $this->convertMetric($weightUnit, $this->request->shipment['width']),
+                                "Height" => (string) $this->convertMetric($weightUnit, $this->request->shipment['height'])
                             ],
                             "PackageWeight" => [
                                 "UnitOfMeasurement" => [
                                     "Code" => $weightUnit
                                 ],
-                                "Weight" => $this->convertWeight($weightUnit, $this->request->shipment['weight'])
+                                "Weight" => (string) $this->convertWeight($weightUnit, $this->request->shipment['weight'])
                             ]
                         ]
                     ]
                 ]
             ];
 
+            //dd($this->accessToken);
             $response = Http::withToken($this->accessToken)->post("$this->baseUrl/api/rating/v2205/Rate", $payload);
             return ($response->status() == 200) ? $response->body() : false;
         } catch (\Throwable $throwable) {
@@ -191,6 +197,122 @@ class UpsServices
                 ->log($throwable->getMessage());
             return false;
         }
+    }
+
+    public function bookShipment(Shipment $shipment, ShipmentItem $shipmentItem, InsuranceOption $insuranceOption, ShippingRateLog $shippingRateLog, BookShipmentRequest $bookShipmentRequest)
+    {
+        $origin = json_decode($shipment->origin_address, true);
+        $destination = json_decode($shipment->destination_address, true);
+        $product_code = $this->productCode($origin, $destination, $shipment);
+        if (!$product_code) return false;
+        $type = $this->shipmentType($origin, $destination);
+        if (!$type) return false;
+        $shipment_date = Carbon::create($bookShipmentRequest->shipment_date)->timezone('GMT+1');
+        $shipment_date = str_replace(' ', 'T', $shipment_date->toDateTimeString()) . " GMT+01:00";
+
+        $payload = [
+            "ShipmentRequest" => [
+                "Request" => [
+                    "SubVersion" => "2205",
+                    "RequestOption" => "nonvalidate",
+                    "TransactionReference" => [
+                        "CustomerContext" => ""
+                    ]
+                ],
+                "Shipment" => [
+                    "Description" => "Parcel/Document Shipment",
+                    "Shipper" => [
+                        "Name" => "Parcels Mart Solution",
+                        "AttentionName" => "Parcels Mart Solutions",
+                        "TaxIdentificationNumber" => "123456",
+                        "Phone" => [
+                            "Number" => "1115554758",
+                            "Extension" => ""
+                        ],
+                        "ShipperNumber" => "A1226Y",
+                        "Address" => [
+                            "AddressLine" => "27, Sani Abacha Road, GRA",
+                            "City" => "Port Harcourt",
+                            "PostalCode" => "500001",
+                            "CountryCode" => "NG"
+                        ]
+                    ],
+                    "ShipTo" => [
+                        "AttentionName" => "1160b_74",
+                        "Phone" => [
+                            "Number" => "9225377171"
+                        ],
+                        "Address" => [
+                            "AddressLine" => $this->request->origin['address_1'],
+                            "City" => "New York",
+                            "StateProvinceCode" => "",
+                            "PostalCode" => "95113",
+                            "CountryCode" => "US"
+                        ]
+                    ],
+                    "ShipFrom" => [
+                        "Name" => $origin['contact_name'],
+                        "AttentionName" => "1160b_74",
+                        "Phone" => [
+                            "Number" => $origin['contact_phone']
+                        ],
+                        "FaxNumber" => "",
+                        "Address" => [
+                            "AddressLine" => [
+                                "2311 York Rd"
+                            ],
+                            "City" => "Alpharetta",
+                            "StateProvinceCode" => "GA",
+                            "PostalCode" => "30005",
+                            "CountryCode" => "NG"
+                        ]
+                    ],
+                    "PaymentInformation" => [
+                        "ShipmentCharge" => [
+                            "Type" => "01",
+                            "BillShipper" => [
+                                "AccountNumber" => "A1226Y"
+                            ]
+                        ]
+                    ],
+                    "Service" => [
+                        "Code" => "08",
+                        "Description" => "Express"
+                    ],
+                    "Package" => [
+                        "Description" => " ",
+                        "Packaging" => [
+                            "Code" => "02",
+                            "Description" => "Nails"
+                        ],
+                        "Dimensions" => [
+                            "UnitOfMeasurement" => [
+                                "Code" => "CM",
+                                "Description" => "Inches"
+                            ],
+                            "Length" => "10",
+                            "Width" => "30",
+                            "Height" => "45"
+                        ],
+                        "PackageWeight" => [
+                            "UnitOfMeasurement" => [
+                                "Code" => "KGS",
+                                "Description" => "Pounds"
+                            ],
+                            "Weight" => "5"
+                        ]
+                    ]
+                ],
+                "LabelSpecification" => [
+                    "LabelImageFormat" => [
+                        "Code" => "GIF",
+                        "Description" => "GIF"
+                    ],
+                    "HTTPUserAgent" => "Mozilla/4.5"
+                ]
+            ]
+        ];
+
     }
 
     private function productCode($origin, $destination, $shipmentItem): bool|string

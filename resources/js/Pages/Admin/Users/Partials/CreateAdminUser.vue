@@ -7,11 +7,15 @@ import SelectInput from "@/Components/SelectInput.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import {Link, useForm} from "@inertiajs/vue3";
+import {toast} from "vue3-toastify";
 
 
 defineProps({
-    countries: Array
-})
+  countries: Array,
+  roles: Array
+});
+
+const emit = defineEmits(['isModalOpen'])
 
 const form = useForm({
     first_name: '',
@@ -23,16 +27,36 @@ const form = useForm({
     country: '0',
     role: ''
 });
+
+const submit = () => {
+  form.post(route('users.store'), {
+    onFinish: () => {
+      emit('isModalOpen', false);
+      toast.success('User created')
+    }
+  })
+}
 </script>
 
 <template>
-  <div class="mx-auto max-w-2xl p-10 bg-white shadow rounded-xl">
-    <div>
-      <h3 class="font-bold text-2xl ">Create an admin user</h3>
+  <div class="mx-auto max-w-2xl bg-white shadow rounded-xl">
+    <div class="flex flex-row justify-between items-start p-5">
+      <div class="">
+        <h3>Create Admin User</h3>
+        <p class="text-sm">Use this form to create admin users</p>
+      </div>
+      <div>
+        <svg @click="emit('isModalOpen', false)" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-red-900 cursor-pointer" fill="none" viewBox="0 0 24 24"
+             stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
     </div>
-    <form @submit.prevent="submit">
+    <hr>
+    <form @submit.prevent="submit" class="p-5">
       <div class="grid lg:grid-cols-2 grid-cols-1 justify-between gap-x-4 gap-y-3">
         <div>
+          <InputLabel value="First Name" class="" />
           <TextInput
               id="first_name"
               type="text"
@@ -46,6 +70,7 @@ const form = useForm({
           <InputError class="mt-2" :message="form.errors.first_name" />
         </div>
         <div>
+          <InputLabel value="Last Name" class="" />
           <TextInput
               id="last_name"
               type="text"
@@ -60,6 +85,7 @@ const form = useForm({
       </div>
 
       <div class="mt-4">
+        <InputLabel value="Email" class="mt-3" />
         <TextInput
             id="email"
             type="email"
@@ -73,6 +99,7 @@ const form = useForm({
       </div>
 
       <div class="mt-4">
+        <InputLabel value="Phone" class="mt-3" />
         <TextInput
             id="phone"
             type="tel"
@@ -87,6 +114,7 @@ const form = useForm({
 
       <div class="grid lg:grid-cols-2 grid-cols-1 justify-between gap-x-4 gap-y-3 mt-3">
         <div class="">
+          <InputLabel value="Password" class="mt-3" />
           <TextInput
               id="password"
               type="password"
@@ -100,6 +128,7 @@ const form = useForm({
         </div>
 
         <div class="">
+          <InputLabel value="Confirm Password" class="mt-3" />
           <TextInput
               id="password_confirmation"
               type="password"
@@ -115,28 +144,23 @@ const form = useForm({
 
       <div class="">
         <div class="mt-4">
+          <InputLabel value="Role" class="mt-3" />
           <SelectInput
-              place-holder="Select Country"
+              place-holder="Select Role"
+              required
               class="block w-full"
-              :model-value="form.country"
-              :options="countries"
+              v-model="form.role"
+              :options="roles"
           />
 
-          <InputError class="mt-2" :message="form.errors.country" />
+          <InputError class="mt-2" :message="form.errors.role" />
         </div>
       </div>
 
       <div class="flex flex-col items-center justify-end mt-6">
         <PrimaryButton class="w-full" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-          Sign Up
+          Create User
         </PrimaryButton>
-        <div class="mt-5">
-          Already registered?
-          <Link :href="route('login')"
-                class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-            Sign In
-          </Link>
-        </div>
       </div>
     </form>
   </div>

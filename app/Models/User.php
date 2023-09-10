@@ -10,6 +10,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Bavix\Wallet\Traits\HasWallet;
 use Bavix\Wallet\Interfaces\Wallet;
+use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 use Laravel\Passport\HasApiTokens;
 

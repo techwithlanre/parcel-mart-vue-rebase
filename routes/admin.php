@@ -8,7 +8,9 @@ Route::prefix('admin')->middleware('check.admin.user')->group(function () {
     Route::prefix('users')->group(function () {
         Route::get('', [UserController::class, 'index'])->name('users.index');
         Route::get('create', [UserController::class, 'create'])->name('users.create');
+        Route::post('create', [UserController::class, 'store'])->name('users.store');
         Route::put('set-credit-limit/{user_id}', [UserController::class, 'setCreditLimit'])->name('users.set-credit-limit');
+        Route::put('change-user-role/{user_id}', [UserController::class, 'changeUserRole'])->name('users.change-user-role');
     });
 
     //Route::resource('users', UserController::class);

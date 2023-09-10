@@ -4,6 +4,7 @@ import {Head, Link, useForm, usePage} from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import DashboardLayout from "@/Layouts/DashboardLayout.vue";
+import {onMounted, ref} from "vue";
 
 export default {
     components: {DashboardLayout, Checkbox, PrimaryButton, AuthenticatedLayout, Link, Head},
@@ -14,19 +15,45 @@ export default {
     data() {
         return {
             form: useForm({
-                'create-user': this.permissions['create-user'],
-                'read-user': this.permissions['read-user'],
-                'edit-user': this.permissions['edit-user'],
-                'delete-user': this.permissions['delete-user'],
+              'create-user': this.permissions['create-user'],
+              'read-user': this.permissions['read-user'],
+              'edit-user': this.permissions['edit-user'],
+              'delete-user': this.permissions['delete-user'],
+              'create-shipment': this.permissions['create-shipment'],
+              'read-shipment': this.permissions['read-shipment'],
+              'edit-shipment': this.permissions['edit-shipment'],
+              'delete-shipment': this.permissions['delete-shipment'],
+              'create-provider': this.permissions['create-provider'],
+              'read-provider': this.permissions['read-provider'],
+              'edit-provider': this.permissions['edit-provider'],
+              'delete-provider': this.permissions['delete-provider'],
+              'create-role': this.permissions['create-role'],
+              'read-role': this.permissions['read-role'],
+              'edit-role': this.permissions['edit-role'],
+              'delete-role': this.permissions['delete-role'],
+              'create-permission': this.permissions['create-permission'],
+              'read-permission': this.permissions['read-permission'],
+              'edit-permission': this.permissions['edit-permission'],
+              'delete-permission': this.permissions['delete-permission'],
+
             }),
-            page: usePage()
+            page: usePage(),
+            userPermissions: []
         }
     },
 
     methods: {
         submit: function () {
             this.form.post(route('roles.update-permissions', this.role.id))
-        }
+        },
+
+      checkPermission: function (permission) {
+        return this.userPermissions.includes(permission);
+      }
+    },
+
+    mounted() {
+      this.userPermissions = this.page.props.auth.permissions;
     }
 }
 </script>
@@ -37,30 +64,66 @@ export default {
         <div class="mb-5 flex flex-row justify-end">
             <Link class="btn btn-primary" :href="route('roles.create')"><PrimaryButton class="w-max">Create Role</PrimaryButton></Link>
         </div>
-        <div class="card p-5 border bg-white">
+        <div class="card p-5 border bg-white rounded-xl" v-show="checkPermission('read-permission')">
             <h1>Update permissions for <span class="font-bold">{{ role.name }}</span></h1>
             <form @submit.prevent="submit">
                 <div class="overflow-x-auto border-x border-t rounded-xl mt-5">
                     <table class="table-auto w-full ">
                         <thead class="border-b">
                         <tr class="bg-gray-100">
-                            <th class="text-left p-4 font-medium">Permission</th>
-                            <th class="text-left p-4 font-medium">Create</th>
-                            <th class="text-left p-4 font-medium">Read</th>
-                            <th class="text-left p-4 font-medium">Update</th>
-                            <th class="text-left p-4 font-medium">Delete</th>
+                            <th class="text-left p-4 font-bold">Permission</th>
+                            <th class="text-left p-4 font-bold">Create</th>
+                            <th class="text-left p-4 font-bold">Read</th>
+                            <th class="text-left p-4 font-bold">Update</th>
+                            <th class="text-left p-4 font-bold">Delete</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr class="border-b hover:bg-gray-50">
+                          <tr class="border-b hover:bg-gray-50">
                             <td class="p-4">
-                                <h1 class="tex-tmd font-bold">Users</h1>
+                              <h1 class="font-normal">Roles</h1>
                             </td>
-                            <td class="p-4"><Checkbox v-model="form['create-user']" :checked="form['create-user']" /></td>
-                            <td class="p-4"><Checkbox v-model="form['read-user']" :checked="form['read-user']" /></td>
-                            <td class="p-4"><Checkbox v-model="form['edit-user']" :checked="form['edit-user']" /></td>
-                            <td class="p-4"><Checkbox v-model="form['delete-user']" :checked="form['delete-user']" /></td>
-                        </tr>
+                            <td class="p-4"><Checkbox v-model="form['create-role']" :checked="form['create-role']" /></td>
+                            <td class="p-4"><Checkbox v-model="form['read-role']" :checked="form['read-role']" /></td>
+                            <td class="p-4"><Checkbox v-model="form['edit-role']" :checked="form['edit-role']" /></td>
+                            <td class="p-4"><Checkbox v-model="form['delete-role']" :checked="form['delete-role']" /></td>
+                          </tr>
+                          <tr class="border-b hover:bg-gray-50">
+                            <td class="p-4">
+                              <h1 class="font-normal">Permissions</h1>
+                            </td>
+                            <td class="p-4"><Checkbox v-model="form['create-permission']" :checked="form['create-permission']" /></td>
+                            <td class="p-4"><Checkbox v-model="form['read-permission']" :checked="form['read-permission']" /></td>
+                            <td class="p-4"><Checkbox v-model="form['edit-permission']" :checked="form['edit-permission']" /></td>
+                            <td class="p-4"><Checkbox v-model="form['delete-permission']" :checked="form['delete-permission']" /></td>
+                          </tr>
+                          <tr class="border-b hover:bg-gray-50">
+                              <td class="p-4">
+                                  <h1 class="font-normal">Users</h1>
+                              </td>
+                              <td class="p-4"><Checkbox v-model="form['create-user']" :checked="form['create-user']" /></td>
+                              <td class="p-4"><Checkbox v-model="form['read-user']" :checked="form['read-user']" /></td>
+                              <td class="p-4"><Checkbox v-model="form['edit-user']" :checked="form['edit-user']" /></td>
+                              <td class="p-4"><Checkbox v-model="form['delete-user']" :checked="form['delete-user']" /></td>
+                          </tr>
+                          <tr class="border-b hover:bg-gray-50">
+                            <td class="p-4">
+                              <h1 class="font-normal">Shipment</h1>
+                            </td>
+                            <td class="p-4"><Checkbox v-model="form['create-shipment']" :checked="form['create-shipment']" /></td>
+                            <td class="p-4"><Checkbox v-model="form['read-shipment']" :checked="form['read-shipment']" /></td>
+                            <td class="p-4"><Checkbox v-model="form['edit-shipment']" :checked="form['edit-shipment']" /></td>
+                            <td class="p-4"><Checkbox v-model="form['delete-shipment']" :checked="form['delete-shipment']" /></td>
+                          </tr>
+                          <tr class="border-b hover:bg-gray-50">
+                            <td class="p-4">
+                              <h1 class="font-normal">API Providers</h1>
+                            </td>
+                            <td class="p-4"><Checkbox v-model="form['create-provider']" :checked="form['create-provider']" /></td>
+                            <td class="p-4"><Checkbox v-model="form['read-provider']" :checked="form['read-provider']" /></td>
+                            <td class="p-4"><Checkbox v-model="form['edit-provider']" :checked="form['edit-provider']" /></td>
+                            <td class="p-4"><Checkbox v-model="form['delete-provider']" :checked="form['delete-provider']" /></td>
+                          </tr>
                         </tbody>
                     </table>
                 </div>

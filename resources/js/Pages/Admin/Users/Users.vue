@@ -1,19 +1,24 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import {Link} from "@inertiajs/vue3";
+import {Link, usePage} from "@inertiajs/vue3";
 import Pagination from "@/Components/Pagination.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Modal from "@/Components/Modal.vue";
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import CreateAdminUser from "@/Pages/Admin/Users/Partials/CreateAdminUser.vue";
 import SetCreditLimit from "@/Pages/Admin/Users/Partials/SetCreditLimit.vue";
 import DashboardLayout from "@/Layouts/DashboardLayout.vue";
+import ChangeUserRole from "@/Pages/Admin/Users/Partials/ChangeUserRole.vue";
 
-defineProps({
-    users: Array
+const props = defineProps({
+  users: Array,
+  roles: Array
 })
+const page = usePage();
+const userPermissions = ref([]);
 
 const isOpenCreateUser = ref(false);
+const isOpenUserChangeRole = ref(false);
 const isOpenSetCreditLimit = ref(false);
 const currentUser = ref({});
 
@@ -26,6 +31,18 @@ const openSetCreditLimitModal = (user) => {
   currentUser.value = user;
   isOpenSetCreditLimit.value = true;
 }
+const openUserChangeRoleModal = (user) => {
+  currentUser.value = user;
+  isOpenUserChangeRole.value = true;
+}
+
+onMounted(() => {
+  userPermissions.value = page.props.auth.permissions;
+})
+
+const checkPermission = (permission) => {
+  return userPermissions.value.includes(permission);
+}
 
 </script>
 
@@ -34,24 +51,23 @@ const openSetCreditLimitModal = (user) => {
         <div class="card p-5 bg-white">
             <div class="overflow-x-auto shadow-background shadow mt-10 rounded-xl">
               <!-- Header -->
-              <div class="px-6 py-4 grid gap-3 md:flex md:justify-between md:items-center border-b border-gray-200 sdark:border-gray-700">
+              <div class="px-6 py-4 grid gap-3 md:flex md:justify-between md:items-center border-b border-gray-200">
                 <div>
-                  <h2 class="text-xl font-semibold text-gray-800 sdark:text-gray-200">
+                  <h2 class="text-xl font-semibold text-gray-800">
                     Users
                   </h2>
-                  <p class="text-sm text-gray-600 sdark:text-gray-400">
+                  <p class="text-sm text-gray-600">
                     Add users, edit and more.
                   </p>
                 </div>
-
-                <div>
+                <div v-show="checkPermission('create-user')">
                   <div class="inline-flex gap-x-2">
-                    <Link :href="route('users.create')" class="py-2 px-3 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-background text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm sdark:focus:ring-offset-gray-800">
+                    <PrimaryButton @click="isOpenCreateUser = true" class="py-2 px-3 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-background text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm sdark:focus:ring-offset-gray-800">
                       <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
                         <path d="M2.63452 7.50001L13.6345 7.5M8.13452 13V2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                       </svg>
                       <span>Add user</span>
-                    </Link>
+                    </PrimaryButton>
                   </div>
                 </div>
               </div>
@@ -63,6 +79,7 @@ const openSetCreditLimitModal = (user) => {
                         <th class="text-left p-4 font-medium">Email</th>
                         <th class="text-left p-4 font-medium">Phone</th>
                         <th class="text-left p-4 font-medium">User Type</th>
+                        <th class="text-left p-4 font-medium">Role</th>
                         <th class="text-left p-4 font-medium">Credit Limit</th>
                         <th class="text-left p-4 font-medium">Wallet</th>
                         <th class="text-left p-4 font-medium">Actions</th>
@@ -78,6 +95,7 @@ const openSetCreditLimitModal = (user) => {
                         <td class="p-4 uppercase">
                           <div>{{ item.user_type }}<span v-if="item.user_type === 'business'" class="font-bold text-primary">: {{ item.business_name }}</span></div>
                         </td>
+                        <td class="p-4">{{ item.roles[0]?.name }}</td>
                         <td class="p-4">{{ naira.format(item.credit_limit) }}</td>
                         <td class="p-4 text-primary font-semibold">{{ naira.format(item.wallet.balance) }}</td>
                         <td class="p-4">
@@ -92,12 +110,9 @@ const openSetCreditLimitModal = (user) => {
                               <a href="javascript:void(0)" v-if="item.user_type === 'business'" v-on:click="openSetCreditLimitModal(item)" class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-background sdark:text-gray-400 sdark:hover:bg-gray-700 sdark:hover:text-gray-300">
                                 Set Credit Limit
                               </a>
-<!--                              <a class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-background sdark:text-gray-400 sdark:hover:bg-gray-700 sdark:hover:text-gray-300" href="#">
-                                Downloads
+                              <a v-show="checkPermission('edit-user') && item.is_admin === 1" href="javascript:void(0)"  v-on:click="openUserChangeRoleModal(item)" class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-background sdark:text-gray-400 sdark:hover:bg-gray-700 sdark:hover:text-gray-300">
+                                Change User Role
                               </a>
-                              <a class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-background sdark:text-gray-400 sdark:hover:bg-gray-700 sdark:hover:text-gray-300" href="#">
-                                Team Account
-                              </a>-->
                             </div>
                           </div>
                         </td>
@@ -109,10 +124,13 @@ const openSetCreditLimitModal = (user) => {
       <Pagination :links="users.links"/>
       <!--Create User Modal-->
       <Modal :show="isOpenCreateUser">
-        <CreateAdminUser />
+        <CreateAdminUser  @is-modal-open="(value) => isOpenCreateUser = value" :roles="roles" />
       </Modal>
-      <Modal :show="isOpenSetCreditLimit">
+      <Modal :show="isOpenSetCreditLimit" :closeable="true">
         <SetCreditLimit @is-modal-open="(value) => isOpenSetCreditLimit = value" :user="currentUser" />
+      </Modal>
+      <Modal :show="isOpenUserChangeRole" :closeable="true">
+        <ChangeUserRole @is-modal-open="(value) => isOpenUserChangeRole = value" :user="currentUser" :roles="roles" />
       </Modal>
     </DashboardLayout>
 </template>

@@ -222,7 +222,7 @@ class ShipmentServices
                                 'shipment_id' => $shipment->id,
                                 'courier_api_provider_id' => $check_ups->value('id'),
                                 'product_name' => 'UPS Shipment',
-                                'product_code' => '08',
+                                'product_code' => '',
                                 'provider_code' => 'ups',
                                 'currency' => 'NGN',
                                 'total_amount' => $shipmentAmount,
@@ -348,7 +348,7 @@ class ShipmentServices
         }
 
         $check_dhl = CourierApiProvider::where('alias', 'dhl');
-        if ($check_dhl->value('status') == 'sactive') {
+        if ($check_dhl->value('status') == 'active') {
             $dhl = new DHLServices($request);
             try {
                 $response = $dhl->calculateRate();

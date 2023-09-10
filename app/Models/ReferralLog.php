@@ -18,4 +18,9 @@ class ReferralLog extends Model
         'date_paid',
         'referral_payment_log_id',
     ];
+
+    public function referredBy(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(User::class, 'id', 'referred_by_id');
+    }
 }

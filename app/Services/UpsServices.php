@@ -62,7 +62,6 @@ class UpsServices
     private function setAccessToken($accessToken): void
     {
         $this->accessToken = $accessToken;
-        dd($accessToken);
     }
 
     public function getAccessToken(): bool
@@ -90,10 +89,8 @@ class UpsServices
 
     public function calculateRate(): false|string
     {
-        $product_code = $this->productCode($this->request->origin, $this->request->destination, $this->request->shipment);
-        if (!$product_code) return false;
-        $type = $this->shipmentType($this->request->origin, $this->request->destination);
-        if (!$type) return false;
+        $service_code = $this->serviceCode($this->request->origin, $this->request->destination);
+        if (!$service_code) return false;
         $weightUnit = $this->weightUnit(getCountry('id', $this->request->destination['country'])->iso2);
         try {
             $payload = [
@@ -119,6 +116,16 @@ class UpsServices
                             ]
                         ],
                         "ShipFrom" => [
+                            "Name" => $this->request->origin['contact_name'],
+                            "Address" => [
+                                "AddressLine" => $this->request->origin['address_1'],
+                                "City" => getCity('id', $this->request->origin['city'])->name,
+                                "StateProvinceCode" => "",
+                                "PostalCode" => $this->request->origin['postcode'],
+                                "CountryCode" => getCountry('id', $this->request->origin['country'])->iso2
+                            ]
+                        ],
+                        "ShipTo" => [
                             "Name" => $this->request->destination['contact_name'],
                             "Address" => [
                                 "AddressLine" => $this->request->destination['address_1'],
@@ -128,36 +135,16 @@ class UpsServices
                                 "CountryCode" => getCountry('id', $this->request->destination['country'])->iso2
                             ]
                         ],
-                        /*"ShipFrom" => [
-                            "Name" => $this->request->origin['contact_name'],
-                            "Address" => [
-                                "AddressLine" => $this->request->origin['address_1'],
-                                "City" => getCity('id', $this->request->origin['city'])->name,
-                                "StateProvinceCode" => "",
-                                "PostalCode" => $this->request->origin['postcode'],
-                                "CountryCode" => getCountry('id', $this->request->origin['country'])->iso2
-                            ]
-                        ],*/
-                        "ShipTo" => [
-                            "Name" => $this->request->origin['contact_name'],
-                            "Address" => [
-                                "AddressLine" => $this->request->origin['address_1'],
-                                "City" => "New York",
-                                "StateProvinceCode" => "",
-                                "PostalCode" => "95113",
-                                "CountryCode" => "US"
-                            ]
-                        ],
                         "Service" => [
-                            "Code" => "08",
-                            "Description" => ""
+                            "Code" => $service_code,
+                            "Description" => "Express"
                         ],
                         "ShipmentTotalWeight" => [
                             "UnitOfMeasurement" => [
                                 "Code" => $weightUnit,
-                                "Description" => ""
+                                "Description" => $weightUnit == "KGS" ? "Kilogram" : "Ponds"
                             ],
-                            "Weight" => "10"
+                            "Weight" => (string) $this->convertWeight($weightUnit, $this->request->shipment['weight'])
                         ],
                         "Package" => [
                             "PackagingType" => [
@@ -315,6 +302,13 @@ class UpsServices
 
     }
 
+    private function serviceCode($origin, $destination): bool|string
+    {
+        $type = $this->shipmentType($origin, $destination);
+        if (!$type) return false;
+        return ($type == "DOMESTIC") ? '11' : '65';
+    }
+
     private function productCode($origin, $destination, $shipmentItem): bool|string
     {
         $product_code = '';
@@ -325,7 +319,6 @@ class UpsServices
             $category = ItemCategory::find($shipmentItem['category'])->name ?? "Parcel";
             $product_code = $category == substr($category, 0 ,1);
         }
-
         return $product_code;
     }
 

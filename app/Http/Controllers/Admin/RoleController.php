@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Validator;
@@ -30,7 +31,9 @@ class RoleController extends Controller
             'name' => 'required|unique:roles,name'
         ])->validate();
 
-        Role::create($request->all());
+        $role = new Role;
+        $role->name = Str::slug($request->input('name'), "-");
+        $role->save();
         return redirect(route('roles.index'))->with('message', 'Role created successfully');
     }
 
@@ -39,7 +42,10 @@ class RoleController extends Controller
         $all_permissions = Permission::all();
         $permissions = [];
         $role = Role::find($id);
-        foreach ($all_permissions as $ap) $permissions[$ap->name] = $role->hasPermissionTo($ap->name);
+        foreach ($all_permissions as $ap) {
+            $permissions[$ap->name] = $role->hasPermissionTo($ap->name);
+        }
+
         return Inertia::render('Admin/Roles/Permissions', compact('permissions', 'id', 'role'));
     }
 

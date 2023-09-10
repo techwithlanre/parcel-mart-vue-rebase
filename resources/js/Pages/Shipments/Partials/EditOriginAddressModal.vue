@@ -69,8 +69,9 @@ const page = usePage();
 const submit = () => {
   form.put(route('shipment.recalculate', props.shipmentId), {
     onFinish: (response) => {
+      location.reload();
       emit('isModalOpen', false);
-      if (page.props.flash.error.length > 0) {
+      if (page.props.flash?.error?.length > 0) {
         toast.error(page.props.flash.error);
       }
     },

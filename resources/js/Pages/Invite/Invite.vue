@@ -6,7 +6,8 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {useForm} from "@inertiajs/vue3";
 
 const props = defineProps({
-  code: String
+  code: String,
+  referred: Array
 })
 
 const ref_code = ref(null)
@@ -37,8 +38,8 @@ const generateCode = () => {
 <template>
   <DashboardLayout page-title="Invite">
     <div class="flex flex-col p-6 lg:px-[250px]">
-      <h1 class="text-3xl lg:text-5xl font-bold text-center">Your <br>Referral Code</h1>
-<!--      <p class="text-center text-sm mb-10">Don't just take our words, hear from our customers</p>-->
+      <h1 class="text-3xl lg:text-3xl font-bold text-center">Your <br>Referral Code</h1>
+      <p class="text-center text-sm mb-10">Invite friends and family to earn rewards</p>
       <div class="flex gap-x-20">
         <div class="flex flex-col bg-white w-full ">
           <div v-if="code != null" class="text-center flex flex-col items-center">
@@ -54,6 +55,26 @@ const generateCode = () => {
           </div>
           <PrimaryButton v-else :class="{ 'opacity-25': form.processing }" :disabled="form.processing" class="w-max flex justify-center items-center mx-auto mt-10" @click="generateCode">Generate Referral Code</PrimaryButton>
         </div>
+      </div>
+      <div class="rounded-xl border mt-20">
+        <table class="w-full text-sm text-left text-gray-500 rounded-xl">
+          <thead class="text-xs text-gray-700 uppercase bg-gray-50 rounded-xl">
+            <tr class="bg-gray-100 rounded-t-xl">
+              <th class="text-left p-4 font-medium">Name</th>
+              <th class="text-left p-4 font-medium">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+          <tr class="hover:bg-gray-50" v-for="item in referred">
+            <td class="p-4">
+              <h1 class="text-md font-bold">{{ item.first_name }} {{ item.last_name }}</h1>
+            </td>
+            <td class="p-4">
+              <date-format>{{ item.created_at }}</date-format>
+            </td>
+          </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </DashboardLayout>

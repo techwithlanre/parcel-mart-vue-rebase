@@ -99,26 +99,24 @@ const toggleSidebar = () => {
   <div>
     <div class="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased bg-white">
       <!-- Header -->
-      <div class="fixed w-full flex justify-between bg-white border-b">
+      <div class=" w-full bg-white border-b">
         <button class="ml-5 sm:hidden" @click="toggleSidebar">
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M9.5 4H5.5C4.67157 4 4 4.67157 4 5.5V9.5C4 10.3284 4.67157 11 5.5 11H9.5C10.3284 11 11 10.3284 11 9.5V5.5C11 4.67157 10.3284 4 9.5 4Z" fill="currentColor"/>
             <path opacity="0.3" fill-rule="evenodd" clip-rule="evenodd" d="M5.5 13H9.5C10.3284 13 11 13.6716 11 14.5V18.5C11 19.3284 10.3284 20 9.5 20H5.5C4.67157 20 4 19.3284 4 18.5V14.5C4 13.6716 4.67157 13 5.5 13ZM14.5 4H18.5C19.3284 4 20 4.67157 20 5.5V9.5C20 10.3284 19.3284 11 18.5 11H14.5C13.6716 11 13 10.3284 13 9.5V5.5C13 4.67157 13.6716 4 14.5 4ZM14.5 13H18.5C19.3284 13 20 13.6716 20 14.5V18.5C20 19.3284 19.3284 20 18.5 20H14.5C13.6716 20 13 19.3284 13 18.5V14.5C13 13.6716 13.6716 13 14.5 13Z" fill="currentColor"/>
           </svg>
         </button>
-        <div class="flex flex-row justify-between items-center">
-          <div class="flex items-center justify-start pl-3 w-14 md:w-64 h-14">
+        <div class="flex flex-row justify-start items-center">
+          <div class="flex items-center justify-start pl-3 w-14 md:w-64 h-14 border-r-2">
             <img src="../../images/logo.png" alt="parcel-mart-logo" class="w-28 rounded-full">
           </div>
           <div class="flex flex-row justify-between items-center text-black">
             <div class="px-10 font-bold sm:text-xl text-sm hidden sm:block">{{ pageTitle }}</div>
-            <div class="flex flex-row items-center">
-              <Link :href="route('profile.edit')" class="flex justify-end items-center mr-4 hidden sm:block text-gray-700 hover:text-gray-300 sm:text-md text-sm">
+            <div class="">
+              hy
+<!--              <Link :href="route('profile.edit')" class="mr-4 float-end sm:block text-gray-700 hover:text-gray-700 sm:text-md text-sm font-semibold">
                 {{ page.props.auth.user.first_name + " " + page.props.auth.user.last_name }}
-              </Link>
-              <Link :href="route('profile.edit')" class="flex justify-end sm:hidden block items-center mr-4 text-gray-700 hover:text-gray-300 sm:text-md text-sm">
-                {{ page.props.auth.user.first_name + " " + page.props.auth.user.last_name }}
-              </Link>
+              </Link>-->
             </div>
           </div>
         </div>

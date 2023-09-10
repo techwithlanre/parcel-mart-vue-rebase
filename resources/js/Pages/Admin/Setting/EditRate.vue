@@ -1,5 +1,5 @@
 <script setup>
-import {defineComponent} from 'vue'
+import {defineComponent, onMounted, ref} from 'vue'
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import InputLabel from "@/Components/InputLabel.vue";
@@ -38,12 +38,22 @@ const submit = () => {
     })
 }
 
+const userPermissions = ref([]);
+
+onMounted(() => {
+  userPermissions.value = page.props.auth.permissions;
+})
+
+const checkPermission = (permission) => {
+  return userPermissions.value.includes(permission);
+}
+
 </script>
 
 <template>
     <DashboardLayout page-title="Edit Rate">
         <div >
-            <div class="mx-auto lg:mt-17 mt max-w-2xl p-10 bg-white  rounded-2xl border">
+            <div v-show="checkPermission('edit-provider')" class="mx-auto lg:mt-17 mt max-w-2xl p-10 bg-white  rounded-2xl border" >
                 <div>
                     <h3 class="font-bold text-2xl ">Edit rate</h3>
                 </div>

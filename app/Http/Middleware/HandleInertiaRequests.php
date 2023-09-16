@@ -36,8 +36,6 @@ class HandleInertiaRequests extends Middleware
         $check = 0;
         if ($request->user()) $check = DB::table('model_has_roles')->where('model_id', $request->user()->id)->count();
         return array_merge(parent::share($request), [
-            //'user.roles' => $request->user() ? $request->user()->roles->pluck('name') : [],
-            //'user.permissions' => $request->user() ? $request->user()->getPermissionsViaRoles()->pluck('name') : []
             'auth' => [
                 'user' => $request->user(),
                 'role' => ($check > 0) ? auth()->user()->roles()->first()->name : null,

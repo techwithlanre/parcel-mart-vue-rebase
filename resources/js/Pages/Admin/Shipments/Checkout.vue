@@ -1,5 +1,4 @@
 <script setup>
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import {Head, useForm, usePage} from '@inertiajs/vue3';
 import SelectInput from "@/Components/SelectInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
@@ -37,7 +36,7 @@ const pay = () => {
 
 const setOption = () => {
     form.option_id = form.option.id;
-    console.log(form.option_id);
+    //console.log(form.option_id);
 }
 
 </script>
@@ -266,7 +265,7 @@ const setOption = () => {
                     <div class="mt-10">
                         <h3>Choose an Insurance Option</h3>
                         <SelectInput v-model="form.insurance" :options="insurance_options" />
-                        <div class="mt-5 p-5 card border duration-300 transition-all flex flex-row justify-between items-center" v-if="form.insurance.length > 0">
+                        <div class="mt-5 p-5 card border duration-500 transition-all flex flex-row justify-between items-center" v-if="form.insurance.length > 0">
                             <div>
                                 <div class="text-lg font-bold">{{ insurance_options[form.insurance - 1].name }}</div>
                                 <div>Covers damages upto {{ insurance_options[form.insurance - 1].cover }}</div>

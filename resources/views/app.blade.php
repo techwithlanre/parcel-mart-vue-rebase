@@ -3,8 +3,8 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
-        <title inertia>Parcel Smart</title>
+        {!! \App\Meta\Meta::render() !!}
+        <title inertia>Parcels Mart</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">

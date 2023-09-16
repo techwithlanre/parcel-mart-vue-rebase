@@ -1,6 +1,5 @@
 <script setup>
 import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
-import {CloseOutlined} from "@ant-design/icons";
 import QuoteTabs from "@/Pages/Home/Partials/QuoteTabs.vue";
 
 defineProps({
@@ -14,7 +13,7 @@ defineProps({
         <Dialog as="div" @close="closeModal" class="relative z-10">
             <TransitionChild
                 as="template"
-                enter="duration-300 ease-out"
+                enter="duration-500 ease-out"
                 enter-from="opacity-0"
                 enter-to="opacity-100"
                 leave="duration-200 ease-in"

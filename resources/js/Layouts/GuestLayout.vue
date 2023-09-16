@@ -1,6 +1,4 @@
 <script >
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
-import { Link } from '@inertiajs/vue3';
 
 export default {
     name: "GuestLayout",

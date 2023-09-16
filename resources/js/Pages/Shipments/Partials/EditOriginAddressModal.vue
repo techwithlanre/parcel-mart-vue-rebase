@@ -6,7 +6,7 @@ import TextInput from "@/Components/TextInput.vue";
 import SelectInput from "@/Components/SelectInput.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import {useForm, usePage} from "@inertiajs/vue3";
-import {onMounted, ref} from "vue";
+import {ref} from "vue";
 import {toast} from "vue3-toastify";
 
 const props = defineProps({
@@ -23,7 +23,7 @@ const originCountries = ref(props.countries);
 const originStates = ref(props.states);
 const originCities = ref(props.cities);
 
-console.log(props.shipment);
+//console.log(props.shipment);
 
 const form = useForm({
   origin: {
@@ -93,7 +93,7 @@ const getOriginCities = function () {
 
 const getDestinationCountries = function () {
   axios.get('/api/allowed-countries/' + form.origin.country).then(function (response) {
-    console.log(response.data)
+    //console.log(response.data)
     props.countries = response.data;
   });
 }
@@ -116,7 +116,7 @@ const getDestinationCountries = function () {
     </div>
     <hr>
     <div class="p-5">
-      <form @submit.prevent="submit" class="duration-300">
+      <form @submit.prevent="submit" class="duration-500">
         <div class="p-6 flex flex-col gap-y-2">
           <div class="">
             <InputLabel value="Contact Name *"/>

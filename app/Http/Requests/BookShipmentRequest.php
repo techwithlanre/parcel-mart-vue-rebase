@@ -12,11 +12,9 @@ class BookShipmentRequest extends FormRequest
      * @param Request $bookShipmentRequest
      * @return bool
      */
-    protected Request $bookShipmentRequest;
 
-    public function authorize(Request $bookShipmentRequest): bool
+    public function authorize(): bool
     {
-        $this->bookShipmentRequest = $bookShipmentRequest;
         return true;
     }
 
@@ -27,24 +25,18 @@ class BookShipmentRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = [
+        return [
             'option_id' => 'required|exists:shipping_rate_logs,id',
             'shipment_id' => 'required|exists:shipments,id',
+            'invoice_date' => 'nullable|date',
+            'invoice_number' => 'nullable|min:4',
             'insurance' => 'required|exists:insurance_options,id',
-            'shipment_date' => [
-                'required',
-                'date',
-                'after:'.date('Y-m-d'),
-                'before:'.date('Y-m-d', strtotime("+10 days"))
-            ],
-        ];
-        if ($this->bookShipmentRequest->filled('invoice_date')) $rules['invoice_date'] = ['date'];
-        if ($this->bookShipmentRequest->filled('invoice_number')) $rules['invoice_date'] = ['string'];
+            'shipment_date' => ['required','date','after:'.date('Y-m-d'),'before:'.date('Y-m-d', strtotime("+10 days"))],
 
-        return $rules;
+        ];
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
             'shipment_date.after' => "Planned shipment date must start from tomorrow",

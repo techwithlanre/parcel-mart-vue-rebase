@@ -2,7 +2,7 @@
 import InputError from '@/Components/InputError.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
-import {Head, Link, useForm} from '@inertiajs/vue3';
+import {Head, Link} from '@inertiajs/vue3';
 import SelectInput from "@/Components/SelectInput.vue";
 import GuestLayout from "@/Layouts/GuestLayout.vue";
 import IndividualRegisterForm from "@/Pages/Auth/Components/IndividualRegisterForm.vue";
@@ -39,7 +39,7 @@ export default {
 
         toggleTabs(index) {
             this.currentTab = index;
-            console.log(this.currentTab);
+            //console.log(this.currentTab);
         }
     }
 }

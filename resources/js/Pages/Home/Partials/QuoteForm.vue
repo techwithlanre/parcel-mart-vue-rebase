@@ -1,12 +1,5 @@
 <script setup>
-import { ref } from 'vue'
-import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue'
-import TextInput from "@/Components/TextInput.vue";
-import SelectInput from "@/Components/SelectInput.vue";
-import {Link} from "@inertiajs/vue3";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import QuoteTabs from "@/Pages/Home/Partials/QuoteTabs.vue";
-import greenTruck from "/resources/images/green-truck.jpg";
 
 defineProps({
     countries: Array

@@ -1,15 +1,14 @@
 <script setup>
-import Quote from '/resources/images/icons/quote.svg';
 import {Swiper, SwiperSlide, useSwiper} from 'swiper/vue';
 import 'swiper/css';
 
 const swiperController = useSwiper();
 
 const onSwiper = (swiper) => {
-    console.log(swiper);
+    //console.log(swiper);
 };
 const onSlideChange = () => {
-    console.log('slide change');
+    //console.log('slide change');
 };
 
 const testimonials = [
@@ -81,7 +80,7 @@ const testimonials = [
                             </button>
 
                             <button
-                                class="next-button rounded-full border border-primary hover:border-background duration-300 p-3 text-primary/80 hover:bg-background hover:text-primary transition-all"
+                                class="next-button rounded-full border border-primary hover:border-background duration-500 p-3 text-primary/80 hover:bg-background hover:text-primary transition-all"
                                 @click="swiperController.slideNext()">
                                 <span class="sr-only">Next Slide</span>
                                 <svg

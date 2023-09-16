@@ -1,9 +1,6 @@
 <script setup>
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import {Head, useForm, usePage} from '@inertiajs/vue3';
 import {toast} from "vue3-toastify";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import SelectInput from "@/Components/SelectInput.vue";
 import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 
 const page = usePage()

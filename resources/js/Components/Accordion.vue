@@ -23,14 +23,14 @@ defineProps({
                 class="flex w-full justify-between rounded-lg
                                 bg-background bg-opacity-40 px-5 py-5 text-left text-sm font-medium
                                 text-primary hover:bg-primary hover:text-white focus:outline-none focus-visible:ring
-                                focus-visible:ring-background focus-visible:ring-opacity-75 duration-300 border border-background" >
+                                focus-visible:ring-background focus-visible:ring-opacity-75 duration-500 border border-background" >
                 <span class="lg:text-2xl text-sm lg:text-lg">{{ title }}</span>
                 <ChevronUpIcon
                     :class="open ? 'rotate-180 transform' : ''"
-                    class="h-5 w-5 text-gray-200 duration-300"
+                    class="h-5 w-5 text-gray-200 duration-500"
                 />
             </DisclosureButton>
-            <DisclosurePanel class="px-4 pb-2 lg:text-2xl text-sm pt-4 text-gray-500 duration-300">{{ body }}</DisclosurePanel>
+            <DisclosurePanel class="px-4 pb-2 lg:text-2xl text-sm pt-4 text-gray-500 duration-500">{{ body }}</DisclosurePanel>
         </div>
     </Disclosure>
 </template>

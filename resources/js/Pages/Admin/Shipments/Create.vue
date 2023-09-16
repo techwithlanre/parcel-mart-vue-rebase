@@ -1,6 +1,6 @@
 <script>
     import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-    import {Head, Link, useForm, usePage} from "@inertiajs/vue3";
+    import {useForm, usePage} from "@inertiajs/vue3";
     import {
         Tab,
         TabGroup,
@@ -13,7 +13,6 @@
     import SelectInput from "@/Components/SelectInput.vue";
     import InputLabel from "@/Components/InputLabel.vue";
     import InputError from "@/Components/InputError.vue";
-    import {toast} from "vue3-toastify";
     import TextAreaInput from "@/Components/TextAreaInput.vue";
     import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 
@@ -31,7 +30,7 @@
             categories: Array,
         },
         mounted() {
-            console.log('component mounted')
+            //console.log('component mounted')
         },
 
         data() {
@@ -166,8 +165,8 @@
         <Head title="Create Shipment"/>
         <div class="flex lg:flex-row flex-col gap-x-10 gap-y-10">
             <TabGroup :selected-index="selectedTab" :default-index="0">
-                <TabList class="space-x-1 rounded-2xl bg-white border duration-300 lg:w-1/6 flex flex-col gap-y-3 p-5">
-                    <Tab as="template" :disabled="originDisabled" v-slot="{ selected }" class="duration-300" v-on:click="changeTab(0)">
+                <TabList class="space-x-1 rounded-2xl bg-white border duration-500 lg:w-1/6 flex flex-col gap-y-3 p-5">
+                    <Tab as="template" :disabled="originDisabled" v-slot="{ selected }" class="duration-500" v-on:click="changeTab(0)">
                         <button
                             :class="['w-full text-left px-5 rounded-lg lg:py-2 py-2 font-medium leading-5 text-primary',
                                 'ring-white ring-opacity-60 ring-offset-2 ring-offset-background focus:outline-none focus:ring-2', selected
@@ -175,7 +174,7 @@
                             Origin Address
                         </button>
                     </Tab>
-                    <Tab as="template" v-slot="{ selected }" class="duration-300" v-on:click="changeTab(1)">
+                    <Tab as="template" v-slot="{ selected }" class="duration-500" v-on:click="changeTab(1)">
                         <button
                             :class="['w-full text-left px-5 rounded-lg lg:py-2 py-2 font-medium leading-5 text-primary',
                                 'ring-white ring-opacity-60 ring-offset-2 ring-offset-background focus:outline-none focus:ring-2', selected
@@ -183,7 +182,7 @@
                             Destination Address
                         </button>
                     </Tab>
-                    <Tab as="template" v-slot="{ selected }" class="duration-300" v-on:click="changeTab(2)">
+                    <Tab as="template" v-slot="{ selected }" class="duration-500" v-on:click="changeTab(2)">
                         <button
                             :class="['w-full text-left px-5 rounded-lg lg:py-2 py-2 font-medium leading-5 text-primary',
                                 'ring-white ring-opacity-60 ring-offset-2 ring-offset-background focus:outline-none focus:ring-2', selected
@@ -193,7 +192,7 @@
                     </Tab>
                 </TabList>
                 <TabPanels class="w-full lg:w-3/6">
-                    <TabPanel class="fade-in duration-300 w-full">
+                    <TabPanel class="fade-in duration-500 w-full">
                         <div class="card border bg-white">
                             <h3 class="p-5 text-lg">Enter origin address details</h3>
                             <div class="p-0">
@@ -215,7 +214,7 @@
                             <div class="flex justify-center">
                                 OR
                             </div>
-                            <form @submit.prevent="validateForm(1)" class="duration-300">
+                            <form @submit.prevent="validateForm(1)" class="duration-500">
                                 <div class="p-6 flex flex-col gap-y-2">
                                     <div class="">
                                         <InputLabel value="Contact Name *"  />
@@ -363,7 +362,7 @@
                             </form>
                         </div>
                     </TabPanel>
-                    <TabPanel class="fade-in duration-300 w-full">
+                    <TabPanel class="fade-in duration-500 w-full">
                         <div class="card border bg-white">
                             <h3 class="p-5 text-lg">Enter destination address details</h3>
                             <div class="p-0">
@@ -535,7 +534,7 @@
                         </div>
                     </TabPanel>
 
-                    <TabPanel class="fade-in duration-300 w-full">
+                    <TabPanel class="fade-in duration-500 w-full">
                         <div class="card border bg-white">
                             <h3 class="p-5 text-lg">Enter shipping details</h3>
                             <div class="p-0">

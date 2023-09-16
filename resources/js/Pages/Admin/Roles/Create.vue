@@ -6,12 +6,12 @@ import InputError from "@/Components/InputError.vue";
 import TextInput from "@/Components/TextInput.vue";
 import SelectInput from "@/Components/SelectInput.vue";
 import {useForm} from "@inertiajs/vue3";
-import {toast} from "vue3-toastify";
 import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 
 export default {
     name: "Create",
-    components: {DashboardLayout, SelectInput, TextInput, InputError, InputLabel, PrimaryButton, AuthenticatedLayout},
+    components: {
+      DashboardLayout, SelectInput, TextInput, InputError, InputLabel, PrimaryButton, AuthenticatedLayout},
     data() {
         return {
             form: useForm({
@@ -44,10 +44,8 @@ export default {
                             placeholder="Enter role name"
                             class="mt-2 flex"
                             required/>
-
                         <InputError :message="form.errors.name" class="mt-2" />
                     </div>
-
 
                     <div class="flex flex-col items-center justify-end mt-6">
                         <PrimaryButton class="w-full" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">

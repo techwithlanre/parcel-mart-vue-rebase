@@ -1,17 +1,7 @@
 <script setup>
-import {Head, Link, useForm, usePage} from "@inertiajs/vue3";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import {TrashIcon, StarIcon} from "@heroicons/vue/24/solid/index.js";
-import InputError from "@/Components/InputError.vue";
-import TextInput from "@/Components/TextInput.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import InputLabel from "@/Components/InputLabel.vue";
+import {Link, useForm, usePage} from "@inertiajs/vue3";
 import {onMounted, ref} from "vue";
-import {twMerge} from "tailwind-merge";
-import TextAreaInput from "@/Components/TextAreaInput.vue";
 import {toast} from "vue3-toastify";
-import Pagination from "@/Components/Pagination.vue";
-import TopNav from "@/Components/TopNav.vue";
 
 import {DocumentIcon, WalletIcon} from "@heroicons/vue/20/solid/index.js";
 import DashboardLayout from "@/Layouts/DashboardLayout.vue";
@@ -67,29 +57,38 @@ const checkPermission = (permission) => {
 </script>
 
 <template>
-    <Head title="Shipping Setting::Description" />
-    <DashboardLayout page-title="Margin Rate Setting">
-<!--        <TopNav :tabs="tabs"/>-->
-        <div>
-            <div class="mt-10 border rounded-3xl bg-white" v-show="checkPermission('read-provider')">
-                <table class="w-full">
+    <DashboardLayout page-title="API Providers">
+        <div class="shadow rounded-xl">
+          <div class="px-6 py-4 grid gap-3 md:flex md:justify-between md:items-center border-gray-200">
+            <div>
+              <h2 class="text-xl font-semibold text-gray-800">
+                API Providers
+              </h2>
+              <p class="text-sm text-gray-600">
+                List of API Providers and their profit margin
+              </p>
+            </div>
+
+          </div>
+            <div class="overflow-x-auto shadow-background" v-show="checkPermission('read-provider')">
+                <table class="w-full text-sm text-left text-gray-500">
                     <thead class="rounded-t-3xl">
-                    <tr class="text-sm font-medium text-gray-700 border-b border-gray-200 px-5">
-                        <td class="font-bold p-7">Name</td>
-                        <td class="font-bold p-7">Status</td>
-                        <td class="font-bold p-7">Profit Margin</td>
-                        <td class="font-bold p-7">Action</td>
-                    </tr>
+                      <tr class="bg-gray-100">
+                          <td class="font-bold p-4">Name</td>
+                          <td class="font-bold p-4">Status</td>
+                          <td class="font-bold p-4">Profit Margin</td>
+                          <td class="font-bold p-4">Action</td>
+                      </tr>
                     </thead>
                     <tbody>
-                    <tr v-if="providers.length > 0" v-for="item in providers" class="hover:bg-gray-100 transition-colors group px-5">
-                        <td class="text-sm p-7">{{ item.name }}</td>
-                        <td class="text-sm p-7">{{ item.status }}</td>
-                        <td class="text-sm p-7">{{ item.profit_margin }}%</td>
-                        <td class="text-sm p-7"><Link v-show="checkPermission('edit-provider')" :href="route('setting.rate.edit', item.id)" class="text-primary">Edit</Link></td>
+                    <tr v-if="providers.length > 0" v-for="item in providers" class="hover:bg-gray-100 border-b transition-colors group px-5">
+                        <td class="p-4">{{ item.name }}</td>
+                        <td class="p-4">{{ item.status }}</td>
+                        <td class="p-4">{{ item.profit_margin }}%</td>
+                        <td class="p-4"><Link v-show="checkPermission('edit-provider')" :href="route('setting.rate.edit', item.id)" class="text-primary">Edit</Link></td>
                     </tr>
                     <tr v-else class="hover:bg-gray-100 transition-colors group border-b px-5">
-                        <td class="text-sm p-7 text-center text-gray-400" colspan="5">No data in table</td>
+                        <td class="text-sm p-4 text-center text-gray-400" colspan="5">No data in table</td>
                     </tr>
                     </tbody>
                 </table>

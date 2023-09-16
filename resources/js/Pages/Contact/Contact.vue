@@ -1,17 +1,8 @@
 <script setup>
 
 import HomeLayout from "@/Layouts/HomeLayout.vue";
-import plane from "../../../images/icons/plane.svg";
-import arrowRightUp from "../../../images/icons/arrow-right-up.svg";
-import ship from "../../../images/icons/ship.svg";
-import truck from "../../../images/icons/truck.svg";
-import warehouse from "../../../images/icons/warehouse.svg";
-import smartSend from "../../../images/icons/smart-send.svg";
-import QuoteTabs from "@/Pages/Home/Partials/QuoteTabs.vue";
 import TextInput from "@/Components/TextInput.vue";
-import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import SelectInput from "@/Components/SelectInput.vue";
 import TextAreaInput from "@/Components/TextAreaInput.vue";
 import {useForm} from "@inertiajs/vue3";
 

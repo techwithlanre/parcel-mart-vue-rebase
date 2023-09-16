@@ -1,11 +1,9 @@
 <script setup>
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import {Head, useForm, usePage} from '@inertiajs/vue3';
 import {toast} from "vue3-toastify";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import SelectInput from "@/Components/SelectInput.vue";
 import {computed} from "vue";
 import DashboardLayout from "@/Layouts/DashboardLayout.vue";
+import Helper from "../../Helpers/Helper.js";
 
 const page = usePage()
 defineProps({
@@ -50,8 +48,7 @@ let naira = new Intl.NumberFormat('en-US', {
 </script>
 
 <template>
-    <DashboardLayout class="capitalize" :page-title="'Shipment Details' + ' - ' + shipment.provider">
-        <Head title="Shipment Checkout"/>
+    <DashboardLayout class="capitalize" :page-title="'Shipment Details' + ' - ' + shipment.provider.toUpperCase()">
         <div class="flex lg:flex-row flex-col justify-between gap-10 mt-10">
             <div class="card rounded-xl shadow border border-gray-50 shadow-background/50 bg-white w-full">
                 <h1 class="font-bold text-xl px-5 pt-3 pb-1">Shipment Status</h1>
@@ -96,13 +93,12 @@ let naira = new Intl.NumberFormat('en-US', {
                   <h1 class="font-bold text-xl px-5">Payment Summary</h1>
                   <hr>
                   <div class="px-5 text-gray-600 text-sm mt-5">
-                    <p>Amount: {{ naira.format(shipping_rate_log.amount_before_tax) }}</p>
-                    <p>Tax: {{ naira.format(shipping_rate_log.tax) }}</p>
-                    <p>Insurance: {{ naira.format(insurance_options[0].amount) }}</p>
+                    <p>Amount: {{ Helper.nairaFormat(shipping_rate_log?.charge_before_tax) }}</p>
+                    <p>Tax: {{ Helper.nairaFormat(shipping_rate_log?.charge_tax) }}</p>
+                    <p>Insurance: {{ Helper.nairaFormat(shipping_rate_log?.insurance_amount) }}</p>
                   </div>
-
                   <div class="p-4">
-                    <div class="font-bold">Total Shipment Amount:  {{ shipping_rate_log.total_amount }}</div>
+                    <div class="font-bold">Total Shipment Amount:  {{ Helper.nairaFormat(parseFloat(shipping_rate_log.total_charge) + parseFloat(shipping_rate_log.insurance_amount)) }}</div>
                   </div>
                 </div>
               </div>
@@ -119,16 +115,16 @@ let naira = new Intl.NumberFormat('en-US', {
                   <h3 class="text-sm">Pickup From</h3>
                 </div>
                 <div class="flex flex-row justify-between gap-x-10 rounded-xl ml-5 mt-5">
-                  <div class="card bg-white duration-300 w-full">
+                  <div class="card bg-white duration-500 w-full">
                     <div class="flex justify-between items-center">
                       <h3 class="font-semibold text-sm">{{ origin.contact_name }}</h3>
                     </div>
-                    <p class="flex gap-x-10">
+                    <p class="flex flex-col gap-x-10">
                       <span class="text-sm text-primary">{{ origin.contact_phone }}</span>
-                      <span class="text-sm">{{ origin.contact_email}}</span>
+                      <span class="text-sm lowercase">{{ origin.contact_email}}</span>
                     </p>
                     <p class="mt-3 text-sm"> {{ origin.address_1 }}</p>
-                    <!--                        <p class="text-sm"> {{ origin.landmark }}</p>-->
+                    <p class="text-sm"> {{ origin.landmark }}</p>
                     <div class="flex gap-x-10">
                       <div class="text-primary font-bold text-sm">{{ origin_location.city }}, {{ origin_location.state }}, {{ origin_location.country }}</div>
                     </div>
@@ -141,16 +137,16 @@ let naira = new Intl.NumberFormat('en-US', {
                   <h3 class="text-sm">Deliver To</h3>
                 </div>
                 <div class="flex flex-row justify-between gap-x-10 rounded-xl ml-5 mt-5">
-                  <div class="card bg-white duration-300 w-full">
+                  <div class="card bg-white duration-500 w-full">
                     <div class="flex justify-between items-center">
                       <h3 class="text-sm font-semibold">{{ destination.contact_name }}</h3>
                     </div>
                     <p class="flex gap-x-10">
                       <span class="text-sm text-primary">{{ destination.contact_phone }}</span>
-                      <span class="text-sm">{{ destination.contact_email}}</span>
+                      <span class="text-sm lowercase">{{ destination.contact_email}}</span>
                     </p>
                     <p class="mt-3 text-sm"> {{ destination.address_1 }}</p>
-                    <!--                        <p class="text-sm"> {{ destination.landmark }}</p>-->
+                    <p class="text-sm"> {{ destination.landmark }}</p>
                     <div class="flex gap-x-10">
                       <div class="text-primary text-sm font-bold">{{ destination_location.city }}, {{ destination_location.state }}, {{ destination_location.country }}</div>
                     </div>
@@ -161,12 +157,12 @@ let naira = new Intl.NumberFormat('en-US', {
           </div>
         </div>
         <div class="card rounded-xl shadow shadow-background/50 w-full bg-white">
-          <h1 class="font-bold text-xl p-5">Shipment Information</h1>
+          <h1 class="font-bold text-xl p-5">Package Information</h1>
           <div class="relative overflow-x-auto rounded-2xl">
             <table class="w-full text-sm text-left text-gray-500">
               <tbody v-for="item in shipment.shipment_items" :key="item.id" >
               <tr class="bg-white">
-                <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
+                <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap">
                   Item Category
                 </th>
                 <td class="px-6 py-2">
@@ -174,11 +170,11 @@ let naira = new Intl.NumberFormat('en-US', {
                 </td>
               </tr>
               <tr class="bg-white">
-                <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap sdark:text-white">
+                <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap">
                   Value
                 </th>
                 <td class="px-6 py-2">
-                  {{ naira.format(item.value) }}
+                  {{ Helper.nairaFormat(item.value) }}
                 </td>
               </tr>
               <tr class="bg-white">

@@ -21,7 +21,7 @@
 <script setup>
 import FrontNavigation from "@/Components/FrontNavigation/FrontNavigation.vue";
 import Hero from "@/Components/Front/Hero/Hero.vue";
-import {Head, Link} from "@inertiajs/vue3";
+import {Head} from "@inertiajs/vue3";
 import Partners from "@/Pages/Home/Partials/Partners.vue";
 import Why from "@/Pages/Home/Partials/Why.vue";
 import Testimonials from "@/Pages/Home/Partials/Testimonials.vue";

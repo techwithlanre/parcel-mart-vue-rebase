@@ -1,23 +1,20 @@
 <script setup>
 import { ref } from 'vue'
-import ParcelForm from "@/Components/Front/ParcelForm/ParcelForm.vue";
-import DocumentForm from "@/Components/Front/DocumentForm/DocumentForm.vue";
-import {Head, Link} from "@inertiajs/vue3";
+import {Link} from "@inertiajs/vue3";
 import apple from "/resources/images/icons/apple.svg";
 import googlePlay from "/resources/images/icons/google-play.svg";
 import TextInput from "@/Components/TextInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import phoneMockup from '/resources/images/phone-mockup-2.png';
-import map from '/resources/images/map-2.png';
 
 const activeKey = ref('1');
 
 
 const handleButtonClick = e => {
-    console.log('click left button', e);
+    //console.log('click left button', e);
 };
 const handleMenuClick = e => {
-    console.log('click', e);
+    //console.log('click', e);
 };
 
 </script>

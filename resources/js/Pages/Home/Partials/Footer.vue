@@ -1,8 +1,4 @@
 <script setup>
-import logo from '/resources/images/logo.png';
-import {Head, Link} from "@inertiajs/vue3";
-import mastercard  from '/resources/images/icons/mastercard.svg';
-import visa  from '/resources/images/visa.jpg';
 
 defineProps({
     show: {

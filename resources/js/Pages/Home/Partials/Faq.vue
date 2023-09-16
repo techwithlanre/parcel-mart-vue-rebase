@@ -1,9 +1,5 @@
 <script setup>
 
-import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
-import { ChevronUpIcon } from '@heroicons/vue/20/solid'
-
-import Quote from "../../../../images/icons/quote.svg";
 import Accordion from "@/Components/Accordion.vue";
 
 const faqs = [

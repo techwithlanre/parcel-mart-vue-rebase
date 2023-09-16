@@ -14,7 +14,7 @@ class AddressServices
         $data = $request->validated();
         $address = Address::create([
             'user_id'=>auth()->user()->id,
-            'address' => $request->address_1,
+            'address_1' => $request->address_1,
             'address_2' => $request->address_2,
             'country_id' => $request->country_id,
             'state_id' => $request->state_id,

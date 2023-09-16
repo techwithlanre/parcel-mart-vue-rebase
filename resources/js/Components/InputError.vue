@@ -8,7 +8,7 @@ defineProps({
 
 <template>
     <div v-show="message">
-        <p class="text-orange-400 text-sm mt-1.5 transition delay-150 duration-300 ease-in-out">
+        <p class="text-orange-400 text-sm mt-1.5 transition delay-150 duration-500 ease-in-out">
             {{ message }}
         </p>
     </div>

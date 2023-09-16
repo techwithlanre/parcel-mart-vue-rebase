@@ -1,7 +1,5 @@
 <script setup>
 
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import TextInput from "@/Components/TextInput.vue";
 import {ref} from "vue";
 import {Link, Head, useForm, usePage} from "@inertiajs/vue3"
 import {DocumentIcon, WalletIcon} from "@heroicons/vue/20/solid/index.js";
@@ -55,11 +53,11 @@ const handleFilter = () => {
     <DashboardLayout page-title="Shipments">
         <Head title="Start Shipment" />
         <div class="flex flex-col w-full gap-5 mt-10">
-            <div class="flex flex-row gap-5 justify-end items-end">
-                <PrimaryButton v-if="log.length > 0 || parseInt(shipmentsCount) > 0" @click="trackShipmentOpen = true" class="w-max text-xs bg-white text-red-900 border-2 border-background" style="color: #008083; border: 1px solid #d6e9ed" type="button">
+            <div v-if="log.length > 0 || parseInt(shipmentsCount) > 0" class="flex flex-row gap-5 justify-end items-end">
+                <PrimaryButton @click="trackShipmentOpen = true" class="w-max text-xs bg-white text-red-900 border-2 border-background" style="color: #008083; border: 1px solid #d6e9ed" type="button">
                     Track Shipment
                 </PrimaryButton>
-                <Link :href="route('shipment.start')">
+                <Link :href="route('shipment.origin')">
                     <PrimaryButton class="w-max text-xs">New Shipment</PrimaryButton>
                 </Link>
             </div>
@@ -94,31 +92,32 @@ const handleFilter = () => {
                         </tr>
                         </thead>
                         <tbody>
-                        <tr v-if="log.length > 0" v-for="item in log" class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700 hover:bg-gray-50 sdark:hover:bg-gray-600">
+                        <tr v-if="log.length > 0" v-for="item in log" class="bg-white border-b hover:bg-gray-50">
                             <td class="px-6 py-4">
                                 <div class="font-bold">{{ item.origin['name']}}</div>
                                 <span class="text-gray-600">{{ item.origin['phone'] }}</span>
-<!--                                <div>{{ item.origin['address_1']}}</div>-->
+                                <div>{{ item.origin['address_1']}}</div>
                                 <div>{{item.origin['city']}}, {{ item.origin['country']}}</div>
                             </td>
                             <td class="px-6 py-4">
                                 <div class="font-bold">{{ item.destination['name']}}</div>
                                 <span class="text-gray-600">{{ item.destination['phone'] }}</span>
-  <!--                                <div>{{ item.destination['address_1']}}</div>-->
+                                  <div>{{ item.destination['address_1']}}</div>
                                 <div>{{item.destination['city']}}, {{ item.destination['country']}}</div>
                             </td>
-                            <td class="px-6 py-4 font-medium text-gray-900 sdark:text-white">
+                            <td class="px-6 py-4 font-medium text-gray-900">
                                 {{ item.number }}
                             </td>
                             <td class="px-6 py-4">
                               <span
-                                  :class="{'bg-orange-400' : item.status ==='processing', 'bg-yellow-400' : item.status ==='pending', 'bg-green-400' : item.status ==='delivered'}"
-                                  class="px-3 py-1 rounded-full text-white font-medium">{{ item.status}}</span>
+                                  :class="{'bg-blue-100 text-blue-800' : item.status ==='processing',
+                                  'bg-orange-100 text-orange-800' : item.status ==='pending', 'bg-green-100 text-green-800' : item.status ==='delivered'}"
+                                  class="px-3 rounded-xl py-1">{{ item.status}}</span>
 
                             </td>
                             <td class="px-6 py-4">
-                                <Link :href="route('shipment.checkout', item.id)" v-if="item.status === 'pending'" class="text-primary font-medium hover:text-green-600">Checkout</Link>
-                                <Link :href="route('shipment.details', item.id)" v-else class="btn btn-sm bg-green-400 text-white px-3 py-2 rounded text-sm font-medium hover:text-green-600">View</Link>
+                                <Link :href="route('shipment.origin', item.id)" v-if="item.status === 'pending'" class="text-primary font-medium hover:text-green-600">Checkout</Link>
+                                <Link :href="route('shipment.details', item.id)" v-else class="btn btn-sm rounded-xl bg-green-400 text-white px-5 py-1 text-sm font-medium hover:text-green-600">View</Link>
                             </td>
                         </tr>
                         </tbody>
@@ -130,7 +129,7 @@ const handleFilter = () => {
                 <div class="flex flex-col items-center">
                     <img :src="parcel" alt="" class="h-52">
                     <h1 class="mt-5 text-center">You have not shipped any package with us! Click the button below to start your shipment</h1>
-                    <Link :href="route('shipment.start')" class="mt-5"><PrimaryButton>Start Shipment</PrimaryButton></Link>
+                    <Link :href="route('shipment.origin')" class="mt-5"><PrimaryButton>Start Shipment</PrimaryButton></Link>
                 </div>
             </div>
         </div>

@@ -9,21 +9,24 @@ use App\Models\DhlShipmentLog;
 use App\Models\InsuranceOption;
 use App\Models\ItemCategory;
 use App\Models\Shipment;
+use App\Models\ShipmentAddress;
 use App\Models\ShipmentItem;
 use App\Models\ShippingRateLog;
 use Carbon\Carbon;
+use Cubes\MyDhl\RateRequest\RequestedShipment\Ship;
 use DateTime;
 use DateTimeZone;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class DHLServices
 {
-    protected Request|TrackShipmentRequest|BookShipmentRequest|CreateShipmentRequest $request;
+    protected Shipment $shipment;
     protected String $env;
     protected String $base_url;
     protected String $account_number;
@@ -32,9 +35,10 @@ class DHLServices
     protected String $password;
     protected array $calculateRatePayload;
     protected array $bookShipmentPayload;
-    public function __construct(CreateShipmentRequest | BookShipmentRequest | TrackShipmentRequest | Request $request)
+
+    public function __construct(Shipment $shipment)
     {
-        $this->request = $request;
+        $this->shipment = $shipment;
         $this->initialize();
     }
 
@@ -62,24 +66,28 @@ class DHLServices
                 ->log('Could not set rate payload');
             return false;
         }
-        return $this->call();
+
+        $response = Http::withBasicAuth($this->username, $this->password)
+            ->withHeaders(['Content-Type: application/json',])->post('https://express.api.dhl.com/mydhlapi/test/rates', $this->calculateRatePayload);
+        return $response->body();
     }
 
     private function calculateRatePayload()
     {
-        $product_code = $this->productCode($this->request->origin, $this->request->destination, $this->request->shipment);
+        $origin = ShipmentAddress::where(['shipment_id' => $this->shipment->id,'type' => 'origin'])->first();
+        $destination = ShipmentAddress::where(['shipment_id' => $this->shipment->id,'type' => 'destination'])->first();
+        $product_code = $this->productCode($origin, $destination, $this->shipment);
         if (!$product_code) return false;
-        $type = $this->isInternational($this->request->origin, $this->request->destination);
+        $type = $this->isInternational($origin, $destination);
         if (!$type) return false;
         $account_number = $type == "I" ? $this->import_account_number : $this->account_number;
         $date = new DateTime();
         $shipment_date = $date->modify('+1 weekday')->format('Y-m-d 10:00:00');
         $shipment_date = str_replace(' ', 'T', $shipment_date) . " GMT+0100";
-
+        $item = ShipmentItem::where('shipment_id', $this->shipment->id)->first();
         $this->calculateRatePayload = [
             "plannedShippingDateAndTime" => $shipment_date,
             "productCode" => $product_code,
-            //"productCode" => "P",
             "payerCountryCode" => "NG",
             "unitOfMeasurement" => "metric",
             "isCustomsDeclarable" => $type == "I",
@@ -92,32 +100,32 @@ class DHLServices
             ],
             "customerDetails" => [
                 "shipperDetails" => [
-                    "addressLine1" => substr($this->request->origin['address_1'], 0, 45),
-                    "postalCode" => $this->request->origin['postcode'],
-                    "cityName" => getCity('id', $this->request->origin['city'])->name,
-                    "countryCode" => getCountry('id', $this->request->origin['country'])->iso2
+                    "addressLine1" => substr($origin->address_1, 0, 45),
+                    "postalCode" => $origin->postcode,
+                    "cityName" => getCity('id', $origin->city_id)->name,
+                    "countryCode" => getCountry('id', $origin->country_id)->iso2
                 ],
                 "receiverDetails" => [
-                    "addressLine1" => substr($this->request->destination['address_1'], 0, 45),
-                    "postalCode" => $this->request->destination['postcode'],
-                    "cityName" => getCity('id', $this->request->destination['city'])->name,
-                    "countryCode" => getCountry('id', $this->request->destination['country'])->iso2
+                    "addressLine1" => substr($destination->address_1, 0, 45),
+                    "postalCode" => $destination->postcode,
+                    "cityName" => getCity('id', $destination->city_id)->name,
+                    "countryCode" => getCountry('id', $destination->country_id)->iso2
                 ]
             ],
             "monetaryAmount" => [
                 [
                     "typeCode" => "declaredValue",
-                    "value" => (int) $this->request->shipment['value'],
+                    "value" => (int) $item->value,
                     "currency" => "NGN"
                 ]
             ],
             "packages" => [
                 [
-                    "weight" => (int) $this->request->shipment['weight'],
+                    "weight" => (int) $item->weight,
                     "dimensions" => [
-                        "length" => (int) $this->request->shipment['length'],
-                        "width" => (int) $this->request->shipment['width'],
-                        "height" => (int) $this->request->shipment['height']
+                        "length" => (int) $item->length,
+                        "width" => (int) $item->width,
+                        "height" => (int) $item->height
                     ]
                 ]
             ]
@@ -129,8 +137,9 @@ class DHLServices
     /**
      * @throws ValidationException
      */
-    public function bookShipment(Shipment $shipment, ShipmentItem $shipmentItem, InsuranceOption $insuranceOption, ShippingRateLog $shippingRateLog, BookShipmentRequest $bookShipmentRequest)
+    public function bookShipment(ShipmentItem $shipmentItem, InsuranceOption $insuranceOption, ShippingRateLog $shippingRateLog, BookShipmentRequest $bookShipmentRequest)
     {
+        $shipment = $this->shipment;
         $payload = $this->bookShipmentPayload($shipment, $shipmentItem, $insuranceOption, $shippingRateLog, $bookShipmentRequest);
         if (!$payload)  throw ValidationException::withMessages(['message' => 'Unable to book shipment. Please try again later']);
 
@@ -151,6 +160,7 @@ class DHLServices
         $shippingRateLog->pickup_number = $result['dispatchConfirmationNumber'];
         $shippingRateLog->save();
         $shipment->number = $result['shipmentTrackingNumber'];
+        $shipment->pickup_number = $result['dispatchConfirmationNumber'];
         $shipment->save();
         return true;
     }
@@ -178,10 +188,11 @@ class DHLServices
         return true;
     }
 
-    private function isInternational($origin, $destination)
+    private function isInternational($origin, $destination): string
     {
-        $origin_country = getCountry('id', $origin['country'])->iso2;
-        $destination_country = getCountry('id', $destination['country'])->iso2;
+
+        $origin_country = getCountry('id', $origin->country_id)->iso2;
+        $destination_country = getCountry('id', $destination->country_id)->iso2;
 
         $type = '';
         //if ($origin_country !== 'NG' || $destination_country !== 'NG') return false;
@@ -208,8 +219,8 @@ class DHLServices
 
     private function bookShipmentPayload(Shipment $shipment, ShipmentItem $shipmentItem, InsuranceOption $insuranceOption, ShippingRateLog $shippingRateLog, BookShipmentRequest $bookShipmentRequest)
     {
-        $origin = json_decode($shipment->origin_address, true);
-        $destination = json_decode($shipment->destination_address, true);
+        $origin = ShipmentAddress::where(['shipment_id' => $this->shipment->id,'type' => 'origin'])->first();
+        $destination = ShipmentAddress::where(['shipment_id' => $this->shipment->id,'type' => 'destination'])->first();
         $product_code = $this->productCode($origin, $destination, $shipment);
         if (!$product_code) return false;
         $type = $this->isInternational($origin, $destination);
@@ -251,36 +262,36 @@ class DHLServices
                 "shipperDetails" => [
                     'postalAddress' => [
                         "postalCode" => $origin['postcode'] ?? '',
-                        "cityName" => getCity('id', $origin['city'])->name,
-                        "countryCode" => getCountry('id', $origin['country'])->iso2,
-                        "addressLine1" => substr($origin['address_1'], 0, 45),
-                        "addressLine2" => !empty($origin['address_2']) ? $origin['address_2'] : $origin['landmark'],
-                        "addressLine3" => $origin['landmark'],
-                        "countyName" => getState('id', $origin['state'])->name,
+                        "cityName" => getCity('id', $origin->city_id)->name,
+                        "countryCode" => getCountry('id', $origin->country_id)->iso2,
+                        "addressLine1" => substr($origin->address_1, 0, 45),
+                        "addressLine2" => !empty($origin->address_2) ? $origin->address_2 : $origin->landmark,
+                        "addressLine3" => $origin->landmark,
+                        "countyName" => getState('id', $origin->state_id)->name,
                     ],
                     'contactInformation' => [
-                        "email" => $origin['contact_email'] ?? 'muhjamie@gmail.com',
-                        "phone" => $origin['contact_phone'],
-                        "companyName" => $origin['company_name'] ?? $origin['contact_name'],
-                        "fullName" => $origin['contact_name']
+                        "email" => $origin->contact_email,
+                        "phone" => $origin->contact_phone,
+                        "companyName" => $origin->company_name ?? $origin->contact_name,
+                        "fullName" => $origin->contact_name
                     ],
                     "typeCode" => "business"
                 ],
                 "receiverDetails" => [
                     'postalAddress' => [
-                        "postalCode" => $destination['postcode'] ?? '',
-                        "cityName" => getCity('id', $destination['city'])->name,
-                        "countryCode" => getCountry('id', $destination['country'])->iso2,
-                        "addressLine1" => substr($destination['address_1'], 0, 45),
-                        "addressLine2" => !empty($destination['address_2']) ? $destination['address_2'] : $destination['landmark'],
-                        "addressLine3" => $destination['landmark'],
-                        "countyName" => getState('id', $destination['state'])->name,
+                        "postalCode" => $destination->postcode ?? '',
+                        "cityName" => getCity('id', $destination->city_id)->name,
+                        "countryCode" => getCountry('id', $destination->country_id)->iso2,
+                        "addressLine1" => substr($destination->address_1, 0, 45),
+                        "addressLine2" => !empty($destination->address_2) ? $destination->address_2 : $destination->landmark,
+                        "addressLine3" => $destination->landmark,
+                        "countyName" => getState('id', $destination->state_id)->name,
                     ],
                     'contactInformation' => [
-                        "email" => $destination['contact_email'] ?? 'muhjamie@gmail.com',
-                        "phone" => $destination['contact_phone'],
-                        "companyName" => $destination['company_name'] ?? $destination['contact_name'],
-                        "fullName" => $destination['contact_name']
+                        "email" => $destination->contact_email,
+                        "phone" => $destination->contact_phone,
+                        "companyName" => $destination->company_name ?? $destination->contact_name,
+                        "fullName" => $destination->contact_name
                     ],
                     "typeCode" => "business"
                 ]
@@ -307,7 +318,7 @@ class DHLServices
         ];
 
         if ($type == 'I') {
-            $this->bookShipmentPayload['exportDeclaration'] = [
+            $this->bookShipmentPayload['content']['exportDeclaration'] = [
                 "lineItems" => [
                     [
                         "number" => $shipmentItem->quantity,
@@ -333,10 +344,10 @@ class DHLServices
                 ],
                 "exportReason" => "Permanent",
                 "invoice" => [
-                    "number" => $bookShipmentRequest->invoice_number ?? '#INV001',
-                    "date" => date('Y-m-d', strtotime($bookShipmentRequest->invoice_date)) ?? "#INV001"
+                    "number" => $bookShipmentRequest->invoice_number,
+                    "date" => date('Y-m-d', strtotime($bookShipmentRequest->invoice_date))
                 ],
-                "placeOfIncoterm" => getCity('id', $destination['city'])->name,
+                "placeOfIncoterm" => getCity('id', $destination->city_id)->name,
                 "exportReasonType" => "permanent",
                 "shipmentType" => "commercial"
             ];
@@ -347,29 +358,16 @@ class DHLServices
 
     private function sendBookShipmentRequest()
     {
+
         try {
-            $curl = curl_init();
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://express.api.dhl.com/mydhlapi/test/shipments',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_USERPWD => $this->username . ':' . $this->password,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => json_encode($this->bookShipmentPayload),
-                CURLOPT_HTTPHEADER => array(
+            $response = Http::withBasicAuth($this->username, $this->password)
+                ->withHeaders([
                     'Message-Reference: ' . Str::uuid(),
                     'Content-Type: application/json',
                     'Accept: application/json',
-                ),
-            ));
+                ])->post('https://express.api.dhl.com/mydhlapi/test/shipments', $this->bookShipmentPayload);
 
-            $response = curl_exec($curl);
-            curl_close($curl);
-            $result = json_decode($response, true);
+            $result = json_decode($response->body(), true);
             if (!isset($result['shipmentTrackingNumber'])) {
                 activity()
                     ->performedOn(new Shipment())
@@ -379,12 +377,19 @@ class DHLServices
                         'action' => 'DHL book shipment'
                     ])
                     ->log($response);
-                return false;
+                throw ValidationException::withMessages(['message' => 'Unable to book shipment. Please try again later']);
             }
             return $result;
         } catch (\Throwable $e) {
-            $response = $e->getMessage();
-            return false;
+            activity()
+                ->performedOn(new Shipment())
+                ->causedBy(\request()->user())
+                ->withProperties([
+                    'method' => __FUNCTION__,
+                    'action' => 'DHL book shipment'
+                ])
+                ->log($e->getMessage());
+            throw ValidationException::withMessages(['message' => 'Unable to book shipment. Please try again later']);
         }
     }
 
@@ -418,17 +423,16 @@ class DHLServices
     public function trackShipment(DhlShipmentLog $dhlShipmentLog)
     {
         try {
-            $client = new Client([
-                'auth' => [$this->username, $this->password]
-            ]);
-
-            //$response = $client->get('https://express.api.dhl.com/mydhlapi/test/shipments/7957673080/tracking?trackingView=all-checkpoints&levelOfDetail=all' . $dhlShipmentLog->tracking_url. '?trackingView=all-checkpoints&levelOfDetail=all');
-            $response = $client->get($dhlShipmentLog->tracking_url . '?trackingView=all-checkpoints&levelOfDetail=all');
-            if ($response->getStatusCode() == 200)  return $response->getBody()->getContents();
+            $response = Http::withBasicAuth($this->username, $this->password)
+                ->withHeaders([
+                    'Message-Reference: ' . Str::uuid(),
+                    'Content-Type: application/json',
+                    'Accept: application/json',
+                ])->get($dhlShipmentLog->tracking_url);
+            if ($response->status() == 200)  return $response->body();
             return false;
         } catch (\Throwable $e) {
             $response = $e->getMessage();
-            //$responseBodyAsString = $response->getBody()->getContents();
             return redirect()->back()->with('error', 'We are working on tracking info. Please check back later');
 
         }
@@ -474,9 +478,8 @@ class DHLServices
 
     public function calculatePickup(Shipment $shipment, ShipmentItem $shipmentItem, Request $request)
     {
-        $origin = json_decode($shipment->origin_address, true);
-        $destination = json_decode($shipment->destination_address, true);
-
+        $origin = ShipmentAddress::where(['shipment_id' => $this->shipment->id,'type' => 'origin'])->first();
+        $destination = ShipmentAddress::where(['shipment_id' => $this->shipment->id,'type' => 'destination'])->first();
         $product_code = $this->productCode($origin, $destination, $shipment);
         $type = $this->isInternational($origin, $destination);
         $shipment_date = Carbon::create($request->shipment_date)->timezone('GMT+1');

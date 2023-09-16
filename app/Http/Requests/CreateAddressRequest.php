@@ -32,6 +32,7 @@ class CreateAddressRequest extends FormRequest
             'contact_phone' => 'required|numeric|regex:/^([0-9\s\-\+\(\)]*)$/|min:10',
             'landmark' => 'required|max:45|min:3',
             'address_1' => ['required','string','max:45','min:3', new AddressRule],
+            'address_2' => ['required','string','max:45','min:3', new AddressRule],
             'country_id' => 'required|numeric',
             'state_id' => 'required|numeric',
             'city_id' => 'required|numeric',
@@ -39,7 +40,6 @@ class CreateAddressRequest extends FormRequest
         ];
 
         if ($this->formRequest->filled('business_name')) $rules['business_name'] = [new BusinessNameRule];
-        if ($this->formRequest->filled('address_2')) $rules['address_2'] = [new AddressRule];
 
         return $rules;
     }

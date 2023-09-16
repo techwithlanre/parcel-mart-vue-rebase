@@ -1,14 +1,12 @@
 <script setup>
-import {defineComponent, ref} from 'vue'
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import {Head, Link} from "@inertiajs/vue3";
+import {ref} from 'vue'
+import {Link} from "@inertiajs/vue3";
 import Pagination from "@/Components/Pagination.vue";
 import {twMerge} from "tailwind-merge";
 import addressBook from "../../../images/address-book.png";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Modal from "@/Components/Modal.vue";
 import CreateAddress from "@/Pages/AddressBook/CreateAddress.vue";
-import EditOriginAddressModal from "@/Pages/Shipments/Partials/EditOriginAddressModal.vue";
 import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 
 defineProps({
@@ -45,9 +43,9 @@ const isOpenCreate = ref(false)
                                             <a-menu-item>
                                                 <Link :href="route('address-book.edit', item.id)">Edit</Link>
                                             </a-menu-item>
-                                            <a-menu-item>
+<!--                                            <a-menu-item>
                                                 <Link :href="route('address-book.destroy', item.id)" :class="twMerge('text-red-600 font-bold')">Delete</Link>
-                                            </a-menu-item>
+                                            </a-menu-item>-->
                                         </a-menu>
                                     </template>
                                 </a-dropdown>
@@ -60,7 +58,7 @@ const isOpenCreate = ref(false)
                     </p>
                     <hr class="mt-2">
                     <div class="px-5">
-                      <p class="mt-5 text-gray-500"> {{ item.address }}</p>
+                      <p class="mt-5 text-gray-500"> {{ item.address_1 }}</p>
                       <p class="text-gray-500"> {{ item.landmark }}</p>
                       <div class="flex text-gray-500">
                         <div class="text-gray-500">{{ item.country.name }}</div>,  &nbsp;<div class="">{{ item.city.name }}</div>

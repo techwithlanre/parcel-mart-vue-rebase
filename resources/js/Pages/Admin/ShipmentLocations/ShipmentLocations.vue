@@ -1,10 +1,9 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import {Head, Link, useForm, usePage} from "@inertiajs/vue3";
+import {Head, usePage} from "@inertiajs/vue3";
 import {ref, computed} from "vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
-import SelectInput from "@/Components/SelectInput.vue";
 
 defineProps({
     data: Array,
@@ -17,7 +16,7 @@ const visible = ref(false);
 const confirmLoading = ref(false);
 //const filteredOptions = computed(() => page.props.countries.filter(selected => !editForm.destinations.includes(selected)));
 const filteredOptions = computed(() => page.props.countries.filter(selected => !editForm.destinations.includes(selected)));
-//console.log(page.props.countries.filter(selected => !editForm.destinations.includes(selected)));
+////console.log(page.props.countries.filter(selected => !editForm.destinations.includes(selected)));
 const showModal = (item) => {
     editForm.origin = item.origin;
     editForm.destinations = item.destination_countries.map(item => ({ value: item.id }));

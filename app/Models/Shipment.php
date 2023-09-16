@@ -11,15 +11,14 @@ class Shipment extends Model
 
     protected $fillable = [
         'user_id',
-        'origin_address',
-        'destination_address',
-        'status',
-        'shipment_price',
-        'shipment_paid_amount',
-        'insurance_amount',
-        'transaction_id',
-        'insurance_id',
+        'number',
+        'pickup_number',
         'provider',
+        'provider_id',
+        'shipping_rate_log_id',
+        'has_rate',
+        'status',
+        'is_paid',
         'created_at',
         'updated_at',
         'reference'
@@ -30,9 +29,9 @@ class Shipment extends Model
         return $this->hasMany(ShipmentItem::class);
     }
 
-    public function shipping_rate_log(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function shipping_rate_log(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
-        return $this->hasMany(ShippingRateLog::class);
+        return $this->hasOne(ShippingRateLog::class);
     }
 
     public function country()

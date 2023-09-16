@@ -1,5 +1,4 @@
 <script setup>
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import {ref} from "vue";
 import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
@@ -51,7 +50,7 @@ const generateCode = () => {
                 </svg>
               </button>
             </button>
-            <div v-if="copyMessage.length > 0" class="duration-300 transition-all ease-in-out text-center mt-5 text-sm px-3 py-1 border rounded-full w-max">{{ copyMessage }}</div>
+            <div v-if="copyMessage.length > 0" class="duration-500 transition-all ease-in-out text-center mt-5 text-sm px-3 py-1 border rounded-full w-max">{{ copyMessage }}</div>
           </div>
           <PrimaryButton v-else :class="{ 'opacity-25': form.processing }" :disabled="form.processing" class="w-max flex justify-center items-center mx-auto mt-10" @click="generateCode">Generate Referral Code</PrimaryButton>
         </div>

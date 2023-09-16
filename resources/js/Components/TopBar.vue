@@ -1,6 +1,6 @@
 <script setup>
 import {computed, ref} from 'vue';
-import { usePage, Head, Link } from '@inertiajs/vue3'
+import { usePage, Link } from '@inertiajs/vue3'
 
 const props = defineProps({
     title: String
@@ -31,7 +31,7 @@ const adminMenu = [
             </div>
             <div class="flex items-center gap-2 z-50" >
                 <div class="flex flex-col">
-                    <div v-show="show" class="absolute py-2 mt-10 bg-white flex flex-col gap-2 text-gray-600 rounded-md shadow-xl duration-300 ease-in-out transition-all w-44" >
+                    <div v-show="show" class="absolute py-2 mt-10 bg-white flex flex-col gap-2 text-gray-600 rounded-md shadow-xl duration-500 ease-in-out transition-all w-44" >
                         <Link :href="route('profile.edit')" class="px-5 py-1 text-primary hover:text-primary-dark">Profile</Link>
                     </div>
                 </div>

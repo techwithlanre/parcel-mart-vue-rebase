@@ -8,9 +8,7 @@ import FAQ from "/resources/images/icons/_faq.svg";
 import InviteIcon from "/resources/images/icons/_invite.svg";
 import LogoutIcon from "/resources/images/icons/_logout.svg";
 import {Link, usePage} from '@inertiajs/vue3';
-import {toast} from "vue3-toastify";
 import 'flowbite';
-import {onMounted, watch} from "vue";
 import { notification } from 'ant-design-vue';
 
 const page = usePage();
@@ -75,21 +73,21 @@ const adminMenu = [
           </button>
         </div>
       </div>
-      <div id="navbar-collapse-with-animation" class="hs-collapse hidden overflow-hidden transition-all duration-300 basis-full grow sm:block">
+      <div id="navbar-collapse-with-animation" class="hs-collapse hidden overflow-hidden transition-all duration-500 basis-full grow sm:block">
         <div class="flex flex-col gap-y-4 gap-x-0 mt-5 sm:flex-row sm:items-center sm:justify-end sm:gap-y-0 sm:gap-x-7 sm:mt-0 sm:pl-7">
           <Link
               v-if="!page.props.auth.user.is_admin"
               v-for="item in sidebar"
               class="font-medium text-gray-500 sm:py-6 hover:text-primary"
               :href="item.route" aria-current="page"
-              :class="{'text-primary group font-bold py-1 hover:text-primary border-b-2 border-primary transition-all duration-300': $page.url.startsWith(item.route)}">{{ item.name }}</Link>
+              :class="{'text-primary group font-bold py-1 hover:text-primary border-b-2 border-primary transition-all duration-500': $page.url.startsWith(item.route)}">{{ item.name }}</Link>
 
           <Link
               v-else
               v-for="item in adminMenu"
               class="font-medium text-gray-500 sm:py-6 hover:text-primary"
               :href="item.route" aria-current="page"
-              :class="{'text-primary group font-bold py-1 hover:text-primary border-b-2 border-primary transition-all duration-300': $page.url.startsWith(item.route)}">{{ item.name }}</Link>
+              :class="{'text-primary group font-bold py-1 hover:text-primary border-b-2 border-primary transition-all duration-500': $page.url.startsWith(item.route)}">{{ item.name }}</Link>
 
           <Link :href="route('profile.edit')" class="flex items-center gap-x-2 font-medium text-gray-500 hover:text-primary sm:border-l sm:border-gray-300 sm:my-6 sm:pl-6 sdark:border-gray-700 sdark:text-gray-400 sdark:hover:text-primary" href="#">
             <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">

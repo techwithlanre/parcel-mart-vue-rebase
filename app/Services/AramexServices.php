@@ -7,14 +7,17 @@ use App\Http\Requests\CreateShipmentRequest;
 use App\Models\AramexShipmentLog;
 use App\Models\InsuranceOption;
 use App\Models\Shipment;
+use App\Models\ShipmentAddress;
 use App\Models\ShipmentItem;
 use App\Models\ShippingRateLog;
 use Illuminate\Http\Request;use Illuminate\Support\Str;
+use Nette\Schema\ValidationException;
 use Octw\Aramex\Aramex;
 
 class AramexServices
 {
-    public $request;
+    public Request|BookShipmentRequest|CreateShipmentRequest | Shipment $request;
+    public Shipment $shipment;
     public array $originAddressPayload = [];
     public array $destinationAddressPayload = [];
     public array $shipmentDetailsPayload = [];
@@ -22,38 +25,69 @@ class AramexServices
     public string $destinationCountryCode = '';
     public string $shippingCurrency = '';
 
-    public function __construct(CreateShipmentRequest | BookShipmentRequest | Request $request)
+    public function __construct(Shipment $shipment)
     {
-        $this->request = $request;
+        $this->shipment = $shipment;
     }
 
     private function initializeCalculateRate(): void
     {
-        $this->originCountryCode = getCountry('id', $this->request->origin['country'])->iso2;
+        $origin = ShipmentAddress::where([
+            'shipment_id' => $this->shipment->id,
+            'type' => 'origin',
+        ])->first();
+
+        $this->originCountryCode = getCountry('id', $origin->country_id)->iso2;
         $this->originAddressPayload = [
-            'line1' => $this->request->origin['address_1'],
-            'line2' => $this->request->origin['address_2'],
-            'city' => getCity('id', $this->request->origin['city'])->name,
+            'line1' => $origin->address_1,
+            'line2' => $origin->landmark,
+            'city' => getCity('id', $origin->city_id)->name,
             'country_code' => $this->originCountryCode
         ];
 
-        $this->destinationCountryCode = getCountry('id', $this->request->destination['country'])->iso2;
+        $destination = ShipmentAddress::where([
+            'shipment_id' => $this->shipment->id,
+            'type' => 'destination',
+        ])->first();
+
+        $this->destinationCountryCode = getCountry('id', $destination->country_id)->iso2;
         $this->destinationAddressPayload = [
-            'line1' => $this->request->destination['address_1'],
-            'line2' => $this->request->destination['address_2'],
-            'city' => getCity('id', $this->request->destination['city'])->name,
-            'country_code' => $this->destinationCountryCode
+            'line1' => $destination->address_1,
+            'line2' => $destination->landmark,
+            'city' => getCity('id', $destination->city_id)->name,
+            'country_code' => $this->destinationCountryCode,
         ];
 
+        $product_type = $product_group = '';
+        if ($this->originCountryCode == "NG") {
+            if ($this->destinationCountryCode == "NG") {
+                $product_group = 'DOM';
+                $product_type = 'OND';
+            }
+            if ($this->destinationCountryCode != "NG") {
+                $product_group = 'EXP';
+                $product_type = 'PPX';
+            }
+        }
 
-        $product_group = ($this->originCountryCode == $this->destinationCountryCode) ? 'DOM' : 'EXP';
-        $product_type = ($this->originCountryCode == $this->destinationCountryCode) ? 'OND' : 'PPX';
+        if ($this->originCountryCode != "NG")  {
+            if ($this->destinationCountryCode == "NG") {
+                $product_group = 'EXP';
+                $product_type = 'PPX';
+            }
+            if ($this->destinationCountryCode != "NG") {
+                $product_group = 'EXP';
+                $product_type = 'PPX';
+            }
+        }
+
+        $item = ShipmentItem::where('shipment_id', $this->shipment->id)->first();
         $this->shipmentDetailsPayload = [
-            'weight' => $this->request->shipment['weight'], // KG
-            'number_of_pieces' => $this->request->shipment['quantity'],
-            'length'=>$this->request->shipment['length'],
-            'width'=>$this->request->shipment['width'],
-            'height'=>$this->request->shipment['height'],
+            'weight' => $item->weight, // KG
+            'number_of_pieces' => $item->quantity,
+            'length' => $item->length,
+            'width'=> $item->width,
+            'height'=>$item->height,
             'payment_type' => 'P',
             'product_group' => $product_group,
             'product_type' => $product_type
@@ -62,8 +96,7 @@ class AramexServices
         $this->setShippingCurrency();
     }
 
-    public function calculateShippingRate()
-    {
+    public function calculateShippingRate() {
         $this->initializeCalculateRate();
         $response = Aramex::calculateRate(
             $this->originAddressPayload,
@@ -71,6 +104,8 @@ class AramexServices
             $this->shipmentDetailsPayload,
             $this->shippingCurrency
         );
+
+        //dd($response);
 
         if (isset($response->error)) {
             activity()
@@ -89,16 +124,25 @@ class AramexServices
 
     private function setShippingCurrency(): void
     {
-        //$this->shippingCurrency = (getCountry('id', auth()->user()->country_id)->iso2 == 'NG') ? 'NGN' : 'USD';
         $this->shippingCurrency = 'NGN';
     }
 
-    public function  bookShipment(Shipment $shipment, ShipmentItem $shipmentItem, InsuranceOption $insuranceOption, ShippingRateLog $shippingRateLog, $pickup_guid = null): bool
+    /**
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function  bookShipment(BookShipmentRequest $request, ShipmentItem $shipmentItem, InsuranceOption $insuranceOption, ShippingRateLog $shippingRateLog, $pickup_guid = null): bool
     {
-        $origin = json_decode($shipment->origin_address, true);
-        $destination = json_decode($shipment->destination_address, true);
-        $product_group = (getCountry('id', $origin['country'])->iso2 == getCountry('id', $destination['country'])->iso2) ? 'DOM' : 'EXP';
-        $product_type = (getCountry('id', $origin['country'])->iso2 == getCountry('id', $destination['country'])->iso2) ? 'OND' : 'PPX';
+        $shipment = $this->shipment;
+        $origin = ShipmentAddress::where([
+            'shipment_id' => $this->shipment->id,
+            'type' => 'origin',
+        ])->first();;
+        $destination = ShipmentAddress::where([
+            'shipment_id' => $this->shipment->id,
+            'type' => 'destination',
+        ])->first();
+        $product_group = (getCountry('id', $origin['country_id'])->iso2 == getCountry('id', $destination['country_id'])->iso2) ? 'DOM' : 'EXP';
+        $product_type = (getCountry('id', $origin['country_id'])->iso2 == getCountry('id', $destination['country_id'])->iso2) ? 'OND' : 'PPX';
 
         $shipment_data = [
             'shipper' => [
@@ -106,8 +150,8 @@ class AramexServices
                 'email' => $origin['contact_email'],
                 'phone'      => $origin['contact_phone'],
                 'cell_phone' => $origin['contact_phone'],
-                'country_code' => getCountry('id', $origin['country'])->iso2,
-                'city' => getCity('id', $origin['city'])->name,
+                'country_code' => getCountry('id', $origin['country_id'])->iso2,
+                'city' => getCity('id', $origin['city_id'])->name,
                 'zip_code' => $origin['postcode'],
                 'line1' => $origin['address_1'],
                 'line2' => !empty($origin['address_2']) ? $origin['address_2'] : $origin['landmark'],
@@ -118,15 +162,15 @@ class AramexServices
                 'email' => $destination['contact_email'],
                 'phone'      => $destination['contact_phone'],
                 'cell_phone' => $destination['contact_phone'],
-                'country_code' => getCountry('id', $destination['country'])->iso2,
-                'city' => getCity('id', $destination['city'])->name,
+                'country_code' => getCountry('id', $destination['country_id'])->iso2,
+                'city' => getCity('id', $destination['city_id'])->name,
                 'zip_code' => $destination['postcode'],
                 'line1' => $destination['address_1'],
                 'line2' => $destination['address_2'] ?? $destination['landmark'],
                 'line3' => $destination['landmark']
             ],
-            'shipping_date_time' => strtotime($this->request->shipment_date) + 50000, // shipping date
-            'due_date' => strtotime($this->request->shipment_date) + 60000,  // due date of the shipment
+            'shipping_date_time' => strtotime($request->shipment_date) + 50000, // shipping date
+            'due_date' => strtotime($request->shipment_date) + 60000,  // due date of the shipment
             'comments' => '', // ,comments
             'pickup_location' => 'at reception', // location as pickup
             'pickup_guid' => $pickup_guid, // GUID taken from createPickup method (optional)
@@ -145,14 +189,12 @@ class AramexServices
             //'cash_additional_amount' => 0, // optional
             //'cash_additional_amount_description' => 'Something here',
             'product_group' => $product_group, // or EXP (defined in config file, if you don't pass it will take the config value)
-            'product_type' => $product_type, // refer to the official documentation (defined in config file, if you dont pass it will take the config value)
-            'payment_type' => 'P', // P,C, 3 refer to the official documentation (defined in config file, if you dont pass it will take the config value)
-            //'payment_option' => null, // refer to the official documentation (defined in config file, if you dont pass it will take the    value)
+            'product_type' => $product_type, // refer to the official documentation (defined in config file, if you don't pass it will take the config value)
+            'payment_type' => 'P', // P,C, 3 refer to the official documentation (defined in config file, if you don't pass it will take the config value)
+            //'payment_option' => null, // refer to the official documentation (defined in config file, if you don't pass it will take the    value)
         ];
 
-        //dd($shipment_data);
-
-        $response = Aramex::createShipment($shipment_data);
+        $response = Aramex::createShipment($shipment_data); //TODO pickup date 4 days
         if (!empty($response->error)) {
             activity()
                 ->performedOn(new Shipment())
@@ -161,8 +203,10 @@ class AramexServices
                     'method' => __FUNCTION__,
                     'action' => 'Aramex Create Shipment'
                 ])
-                ->log($response);
-            return false;
+                ->log($response->errors[0]?->Message);
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'message' => ['Can not process shipment with provider.'],
+            ]);
         }
 
         AramexShipmentLog::create([
@@ -181,21 +225,26 @@ class AramexServices
         return true;
     }
 
-    public function createPickup(BookShipmentRequest $bookShipmentRequest, Shipment $shipment, ShipmentItem $shipment_item)
+    public function createPickup(BookShipmentRequest $bookShipmentRequest, ShipmentItem $shipment_item)
     {
+        $shipment = $this->shipment;
         try {
-            $origin = json_decode($shipment->origin_address, true);
+            $origin = ShipmentAddress::where([
+                'shipment_id' => $this->shipment->id,
+                'type' => 'origin',
+            ])->first();
+
             $volume = $shipment_item->height * $shipment_item->length * $shipment_item->width;
             return Aramex::createPickup([
                 "name" => $origin['contact_name'], // User’s Name, Sent By or in the case of the consignee, to the Attention of.
                 "cell_phone" => $origin['contact_phone'], // Phone Number
                 "phone" => $origin['contact_phone'], // Phone Number
                 "email" => $origin['contact_email'],
-                "country_code" => getCountry('id', $origin['country'])->iso2, // ISO 3166-1 Alpha-2 Code
-                "city" => getCity('id', $origin['city'])->name, // City Name
+                "country_code" => getCountry('id', $origin['country_id'])->iso2, // ISO 3166-1 Alpha-2 Code
+                "city" => getCity('id', $origin['city_id'])->name, // City Name
                 "zip_code" => $origin['postcode'] ,// Postal Code
                 "line1" => $origin['address_1'],
-                "line2" => $origin['address_2'] ?? $origin['address_1'],
+                "line2" => $origin['address_2'] ?? $origin['landmark'],
                 "pickup_date" => strtotime($bookShipmentRequest->shipment_date), // time parameter describe the date of the pickup
                 "ready_time" => strtotime($bookShipmentRequest->shipment_date),// time parameter describe the ready pickup date
                 "last_pickup_time" => strtotime($bookShipmentRequest->shipment_date),// time parameter
@@ -206,6 +255,7 @@ class AramexServices
                 "volume" => $volume, // volume of the pickup  (in CM^3)
             ]);
         } catch (\Throwable $e) {
+            dd($e->getMessage());
             activity()
                 ->performedOn(new Shipment())
                 ->causedBy(\request()->user())

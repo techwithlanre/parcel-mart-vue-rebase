@@ -1,12 +1,8 @@
 <script setup>
-import DangerButton from '@/Components/DangerButton.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
-import Modal from '@/Components/Modal.vue';
-import SecondaryButton from '@/Components/SecondaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import {useForm, usePage} from '@inertiajs/vue3';
-import { nextTick, ref } from 'vue';
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 
 
@@ -59,7 +55,7 @@ const form = useForm({
       </div>
 
       <PrimaryButton class="mt-5" :class="{'opacity-25 ' : form.processing, 'cursor-not-allowed': user.user_type === 'business'}" :disabled="form.processing || user.user_type === 'business'">Upgrade</PrimaryButton>
-      <div v-show="form.recentlySuccessful" class="mt-3 duration-300 transition-all slide-down-appear">Request sent</div>
+      <div v-show="form.recentlySuccessful" class="mt-3 duration-500 transition-all slide-down-appear">Request sent</div>
     </form>
   </section>
 </template>

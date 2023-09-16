@@ -101,6 +101,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('track', [\App\Http\Controllers\ShipmentController::class, 'trackShipment'])->name('shipment.track');
         Route::get('tracking-details/{shipment_id}', [\App\Http\Controllers\ShipmentController::class, 'trackingDetails'])->name('shipment.track.details');
         Route::get('pickup', [\App\Http\Controllers\ShipmentController::class, 'calculatePickup'])->name('shipment.calculate.pickup');
+
+
+        //new routes
+        Route::get('origin/{id?}', [\App\Http\Controllers\ShipmentController::class, 'origin'])->name('shipment.origin');
+        Route::get('destination/{id}', [\App\Http\Controllers\ShipmentController::class, 'destination'])->name('shipment.destination');
+        Route::get('package-information/{id}', [\App\Http\Controllers\ShipmentController::class, 'packageInformation'])->name('shipment.package-information');
+        Route::post('store-origin/{id?}', [\App\Http\Controllers\ShipmentController::class, 'storeOrigin'])->name('shipment.origin.store');
+        Route::post('store-destination/{id}', [\App\Http\Controllers\ShipmentController::class, 'storeDestination'])->name('shipment.destination.store');
+        Route::post('store-package-information/{id}', [\App\Http\Controllers\ShipmentController::class, 'storePackageInformation'])->name('shipment.package-information.store');
     });
 
     /*Wallet*/
@@ -153,7 +162,7 @@ Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name(
 
 
 //TODO
-Route::get('workbench/{id}', function (\Illuminate\Http\Request $request) {
+/*Route::get('workbench/{id}', function (\Illuminate\Http\Request $request) {
    $cc = \App\Models\AllowedShipmentCountry::where('country_id', $request->id)->first();
    $origin = $cc->country_id;
    $destinations = explode(',', $cc->allowed_destinations);
@@ -167,6 +176,7 @@ Route::get('workbench/{id}', function (\Illuminate\Http\Request $request) {
    echo '<pre>';
    print_r($data);
    exit;
-});
+});*/
 
 Route::get('workbench', [\App\Http\Controllers\WorkbenchController::class, 'index']);
+Route::get('workbench/aramex-countries', [\App\Http\Controllers\WorkbenchController::class, 'aramexCountries']);

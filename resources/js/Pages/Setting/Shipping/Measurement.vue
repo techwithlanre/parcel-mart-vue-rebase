@@ -1,12 +1,8 @@
 <script setup>
-import {Head, Link, useForm} from "@inertiajs/vue3";
+import {Head, useForm} from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import InputLabel from "@/Components/InputLabel.vue";
 import {ref} from "vue";
-import {twMerge} from "tailwind-merge";
-import TextAreaInput from "@/Components/TextAreaInput.vue";
 import {toast} from "vue3-toastify";
-import Pagination from "@/Components/Pagination.vue";
 import TopNav from "@/Components/TopNav.vue";
 
 import {DocumentIcon, WalletIcon} from "@heroicons/vue/20/solid/index.js";

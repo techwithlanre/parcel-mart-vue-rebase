@@ -4,7 +4,6 @@ import {Head, Link, useForm, usePage} from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import DashboardLayout from "@/Layouts/DashboardLayout.vue";
-import {onMounted, ref} from "vue";
 
 export default {
     components: {DashboardLayout, Checkbox, PrimaryButton, AuthenticatedLayout, Link, Head},
@@ -35,7 +34,11 @@ export default {
               'read-permission': this.permissions['read-permission'],
               'edit-permission': this.permissions['edit-permission'],
               'delete-permission': this.permissions['delete-permission'],
-
+              'read-dashboard': this.permissions['read-dashboard'],
+              'read-shipment-report': this.permissions['read-shipment-report'],
+              'read-tax-report': this.permissions['read-tax-report'],
+              'read-payment-report': this.permissions['read-payment-report'],
+              'read-user-report': this.permissions['read-user-report'],
             }),
             page: usePage(),
             userPermissions: []
@@ -59,8 +62,7 @@ export default {
 </script>
 
 <template>
-    <Head title="Roles Management" />
-    <DashboardLayout page-title="Roles Management">
+    <DashboardLayout page-title="User Parmissions">
         <div class="mb-5 flex flex-row justify-end">
             <Link class="btn btn-primary" :href="route('roles.create')"><PrimaryButton class="w-max">Create Role</PrimaryButton></Link>
         </div>
@@ -98,6 +100,15 @@ export default {
                             <td class="p-4"><Checkbox v-model="form['delete-permission']" :checked="form['delete-permission']" /></td>
                           </tr>
                           <tr class="border-b hover:bg-gray-50">
+                            <td class="p-4">
+                              <h1 class="font-normal">Dashboard</h1>
+                            </td>
+                            <td class="p-4">N/A</td>
+                            <td class="p-4"><Checkbox v-model="form['read-dashboard']" :checked="form['read-dashboard']" /></td>
+                            <td class="p-4">N/A</td>
+                            <td class="p-4">N/A</td>
+                          </tr>
+                          <tr class="border-b hover:bg-gray-50">
                               <td class="p-4">
                                   <h1 class="font-normal">Users</h1>
                               </td>
@@ -123,6 +134,42 @@ export default {
                             <td class="p-4"><Checkbox v-model="form['read-provider']" :checked="form['read-provider']" /></td>
                             <td class="p-4"><Checkbox v-model="form['edit-provider']" :checked="form['edit-provider']" /></td>
                             <td class="p-4"><Checkbox v-model="form['delete-provider']" :checked="form['delete-provider']" /></td>
+                          </tr>
+                          <tr class="border-b hover:bg-gray-50">
+                            <td class="p-4">
+                              <h1 class="font-normal">Shipment Report</h1>
+                            </td>
+                            <td class="p-4">N/A</td>
+                            <td class="p-4"><Checkbox v-model="form['read-shipment-report']" :checked="form['read-shipment-report']" /></td>
+                            <td class="p-4">N/A</td>
+                            <td class="p-4">N/A</td>
+                          </tr>
+                          <tr class="border-b hover:bg-gray-50">
+                            <td class="p-4">
+                              <h1 class="font-normal">User Report</h1>
+                            </td>
+                            <td class="p-4">N/A</td>
+                            <td class="p-4"><Checkbox v-model="form['read-user-report']" :checked="form['read-user-report']" /></td>
+                            <td class="p-4">N/A</td>
+                            <td class="p-4">N/A</td>
+                          </tr>
+                          <tr class="border-b hover:bg-gray-50">
+                            <td class="p-4">
+                              <h1 class="font-normal">Payment Report</h1>
+                            </td>
+                            <td class="p-4">N/A</td>
+                            <td class="p-4"><Checkbox v-model="form['read-payment-report']" :checked="form['read-payment-report']" /></td>
+                            <td class="p-4">N/A</td>
+                            <td class="p-4">N/A</td>
+                          </tr>
+                          <tr class="border-b hover:bg-gray-50">
+                            <td class="p-4">
+                              <h1 class="font-normal">Tax Report</h1>
+                            </td>
+                            <td class="p-4">N/A</td>
+                            <td class="p-4"><Checkbox v-model="form['read-tax-report']" :checked="form['read-tax-report']" /></td>
+                            <td class="p-4">N/A</td>
+                            <td class="p-4">N/A</td>
                           </tr>
                         </tbody>
                     </table>

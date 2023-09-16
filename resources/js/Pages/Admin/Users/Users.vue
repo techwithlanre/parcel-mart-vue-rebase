@@ -1,22 +1,22 @@
 <script setup>
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import {Link, usePage} from "@inertiajs/vue3";
+import {usePage} from "@inertiajs/vue3";
 import Pagination from "@/Components/Pagination.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Modal from "@/Components/Modal.vue";
 import {onMounted, ref} from "vue";
 import CreateAdminUser from "@/Pages/Admin/Users/Partials/CreateAdminUser.vue";
 import SetCreditLimit from "@/Pages/Admin/Users/Partials/SetCreditLimit.vue";
-import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 import ChangeUserRole from "@/Pages/Admin/Users/Partials/ChangeUserRole.vue";
+import DashboardLayout from "@/Layouts/DashboardLayout.vue";
+import Helper from "../../../Helpers/Helper.js";
 
+const page = usePage();
 const props = defineProps({
   users: Array,
   roles: Array
 })
-const page = usePage();
-const userPermissions = ref([]);
 
+const userPermissions = ref([]);
 const isOpenCreateUser = ref(false);
 const isOpenUserChangeRole = ref(false);
 const isOpenSetCreditLimit = ref(false);
@@ -62,30 +62,33 @@ const checkPermission = (permission) => {
                 </div>
                 <div v-show="checkPermission('create-user')">
                   <div class="inline-flex gap-x-2">
-                    <PrimaryButton @click="isOpenCreateUser = true" class="py-2 px-3 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-background text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm sdark:focus:ring-offset-gray-800">
-                      <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M2.63452 7.50001L13.6345 7.5M8.13452 13V2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <PrimaryButton @click="isOpenCreateUser = true"
+                                   class="py-2 px-3 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-background text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm sdark:focus:ring-offset-gray-800">
+                      <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"
+                           fill="none">
+                        <path d="M2.63452 7.50001L13.6345 7.5M8.13452 13V2" stroke="currentColor" stroke-width="2"
+                              stroke-linecap="round"/>
                       </svg>
-                      <span>Add user</span>
+                      <span>Add User</span>
                     </PrimaryButton>
                   </div>
                 </div>
               </div>
               <!-- End Header -->
-                <table class="w-full text-sm text-left text-gray-500">
-                  <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                    <tr class="bg-gray-100">
-                        <th class="text-left p-4 font-medium">Name</th>
-                        <th class="text-left p-4 font-medium">Email</th>
-                        <th class="text-left p-4 font-medium">Phone</th>
-                        <th class="text-left p-4 font-medium">User Type</th>
-                        <th class="text-left p-4 font-medium">Role</th>
-                        <th class="text-left p-4 font-medium">Credit Limit</th>
-                        <th class="text-left p-4 font-medium">Wallet</th>
-                        <th class="text-left p-4 font-medium">Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
+              <table class="w-full text-sm text-left text-gray-500">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                  <tr class="bg-gray-100">
+                      <th class="text-left p-4 font-medium">Name</th>
+                      <th class="text-left p-4 font-medium">Email</th>
+                      <th class="text-left p-4 font-medium">Phone</th>
+                      <th class="text-left p-4 font-medium">User Type</th>
+                      <th class="text-left p-4 font-medium">Role</th>
+                      <th class="text-left p-4 font-medium">Credit Limit</th>
+                      <th class="text-left p-4 font-medium">Wallet</th>
+                      <th class="text-left p-4 font-medium">Actions</th>
+                  </tr>
+                  </thead>
+                  <tbody>
                     <tr class="border-b hover:bg-gray-50" v-for="item in users.data">
                         <td class="p-4">
                             <h1 class="text-md font-bold">{{ item.first_name }} {{ item.last_name }}</h1>
@@ -96,8 +99,8 @@ const checkPermission = (permission) => {
                           <div>{{ item.user_type }}<span v-if="item.user_type === 'business'" class="font-bold text-primary">: {{ item.business_name }}</span></div>
                         </td>
                         <td class="p-4">{{ item.roles[0]?.name }}</td>
-                        <td class="p-4">{{ naira.format(item.credit_limit) }}</td>
-                        <td class="p-4 text-primary font-semibold">{{ naira.format(item.wallet.balance) }}</td>
+                        <td class="p-4">{{ Helper.nairaFormat(item.credit_limit) }}</td>
+                        <td class="p-4 text-primary font-semibold">{{ Helper.nairaFormat(item.wallet.balance) }}</td>
                         <td class="p-4">
                           <div class="hs-dropdown relative inline-flex">
                             <button id="hs-dropdown-custom-icon-trigger" type="button" class="hs-dropdown-toggle p-3 inline-flex justify-center items-center gap-2 rounded-md border border-background font-medium bg-white text-gray-700 shadow-sm align-middle hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-background transition-all text-sm sdark:bg-slate-900 sdark:hover:bg-slate-800 sdark:border-gray-700 sdark:text-gray-400 sdark:hover:text-white sdark:focus:ring-offset-gray-800">
@@ -117,8 +120,8 @@ const checkPermission = (permission) => {
                           </div>
                         </td>
                     </tr>
-                    </tbody>
-                </table>
+                  </tbody>
+              </table>
             </div>
         </div>
       <Pagination :links="users.links"/>

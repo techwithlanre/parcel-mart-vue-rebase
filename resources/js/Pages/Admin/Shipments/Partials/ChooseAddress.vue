@@ -7,10 +7,7 @@ import {
     TransitionChild,
     TransitionRoot
 } from "@headlessui/vue";
-import {CloseOutlined} from "@ant-design/icons";
-import QuoteTabs from "@/Pages/Home/Partials/QuoteTabs.vue";
-import {computed, ref} from "vue";
-import TextInput from "@/Components/TextInput.vue";
+import {computed} from "vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {useForm, usePage} from "@inertiajs/vue3";
 
@@ -48,7 +45,7 @@ const filter = computed(() => {
         <Dialog as="div" @close="$emit('closeQuoteModal', false)" class="relative z-10">
             <TransitionChild
                 as="template"
-                enter="duration-300 ease-out"
+                enter="duration-500 ease-out"
                 enter-from="opacity-0"
                 enter-to="opacity-100"
                 leave="duration-200 ease-in"

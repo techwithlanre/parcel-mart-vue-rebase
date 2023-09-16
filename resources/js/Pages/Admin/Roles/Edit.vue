@@ -6,7 +6,6 @@ import InputError from "@/Components/InputError.vue";
 import TextInput from "@/Components/TextInput.vue";
 import SelectInput from "@/Components/SelectInput.vue";
 import {useForm} from "@inertiajs/vue3";
-import {toast} from "vue3-toastify";
 import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 
 export default {

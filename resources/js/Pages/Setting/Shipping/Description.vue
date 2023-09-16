@@ -1,9 +1,6 @@
 <script setup>
-import {Head, Link, useForm} from "@inertiajs/vue3";
+import {Head, useForm} from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import {TrashIcon, StarIcon} from "@heroicons/vue/24/solid/index.js";
-import InputError from "@/Components/InputError.vue";
-import TextInput from "@/Components/TextInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import {ref} from "vue";

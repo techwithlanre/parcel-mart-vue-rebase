@@ -1,6 +1,5 @@
 <script setup>
-import {defineComponent, onMounted, ref} from 'vue'
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import {onMounted, ref} from 'vue'
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import InputError from "@/Components/InputError.vue";

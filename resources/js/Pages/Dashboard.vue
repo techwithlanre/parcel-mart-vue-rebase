@@ -11,7 +11,6 @@ import InputError from "@/Components/InputError.vue";
 import Parcel from "../../images/parcel.png";
 import Pagination from "@/Components/Pagination.vue";
 import { notification } from 'ant-design-vue';
-import {onMounted} from "vue";
 
 export default {
     data() {
@@ -143,7 +142,7 @@ import Modal from "@/Components/Modal.vue";
 import {ref} from "vue";
 import {notification} from "ant-design-vue";
 import DashboardLayout from "@/Layouts/DashboardLayout.vue";
-import TestLayout from "@/Layouts/TestLayout.vue";
+import {toast} from "vue3-toastify";
 
 const isTrackingOpen = ref(false);
 
@@ -156,23 +155,17 @@ const trackShipment = () => {
   trackForm.post(route('shipment.track'), {
     onFinish: ()  => {
       trackForm.reset();
-      isTrackingOpen.value = false;
-      /*notification['success']({
-        message: 'success',
-        description: 'Request has been submitted, You will be contacted via email'
-      });*/
     },
   })
 }
 </script>
 
 <template>
-    <Head title="Dashboard" />
     <DashboardLayout page-title="Dashboard">
         <div class="flex lg:flex-row flex-col gap-x-5 gap-y-10 mt-10">
             <div class="w-full">
                 <div class="flex flex-col gap-y-10 lg:flex-row gap-x-10">
-                    <div class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-300">
+                    <div class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-500">
                         <div class="flex gap-5 items-center">
                             <div class="h-12 w-12">
                                 <img src="../../images/shipment.png" alt="">
@@ -183,7 +176,7 @@ const trackShipment = () => {
                             </div>
                         </div>
                     </div>
-                    <div v-if="!page.props.auth.user.is_admin" class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-300">
+                    <div class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-500">
                         <div class="flex justify-between">
                             <div class="flex gap-5 items-start">
                                 <div class="h-12 w-12">
@@ -197,67 +190,10 @@ const trackShipment = () => {
                             <div class="text-3xl"></div>
                         </div>
                     </div>
-                    <div v-if="page.props.auth.user.is_admin" class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-300">
-                        <div class="flex justify-between">
-                            <div class="flex gap-5 items-start">
-                                <div class="h-12 w-12">
-                                    <img src="../../images/wallet.png" alt="">
-                                </div>
-                                <div class="flex flex-col">
-                                    <h1 class="font-bold">Total Users</h1>
-                                    <h3 class="text-xl font-bold">{{ totalUsersCount }}</h3>
-                                </div>
-                            </div>
-                            <div class="text-3xl"></div>
-                        </div>
-                    </div>
-                    <div v-if="page.props.auth.user.is_admin" class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-300">
-                        <div class="flex justify-between">
-                            <div class="flex gap-5 items-start">
-                                <div class="h-12 w-12">
-                                    <img src="../../images/wallet.png" alt="">
-                                </div>
-                                <div class="flex flex-col">
-                                    <h1 class="font-bold">Individual Users</h1>
-                                    <h3 class="text-xl font-bold">{{ individualUsersCount }}</h3>
-                                </div>
-                            </div>
-                            <div class="text-3xl"></div>
-                        </div>
-                    </div>
-                    <div v-if="page.props.auth.user.is_admin" class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-300">
-                        <div class="flex justify-between">
-                            <div class="flex gap-5 items-start">
-                                <div class="h-12 w-12">
-                                    <img src="../../images/wallet.png" alt="">
-                                </div>
-                                <div class="flex flex-col">
-                                    <h1 class="font-bold">Business Users</h1>
-                                    <h3 class="text-xl font-bold">{{ businessUsersCount }}</h3>
-                                </div>
-                            </div>
-                            <div class="text-3xl"></div>
-                        </div>
-                    </div>
-                    <div v-if="page.props.auth.user.is_admin" class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-300">
-                        <div class="flex justify-between">
-                            <div class="flex gap-5 items-start">
-                                <div class="h-12 w-12">
-                                    <img src="../../images/wallet.png" alt="">
-                                </div>
-                                <div class="flex flex-col">
-                                    <h1 class="font-bold">Total Wallet Balance</h1>
-                                    <h3 class="text-xl font-bold">{{ totalWalletBalance }}</h3>
-                                </div>
-                            </div>
-                            <div class="text-3xl"></div>
-                        </div>
-                    </div>
                 </div>
-
-                <div v-if="!page.props.auth.user.is_admin" class="flex flex-col gap-y-10 sm:flex-row gap-x-10 mt-10">
-                    <div class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-300">
-                        <Link :href="route('shipment.start')" class="flex flex-col">
+                <div class="flex flex-col gap-y-10 sm:flex-row gap-x-10 mt-10">
+                    <div class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-500">
+                        <Link :href="route('shipment.origin')" class="flex flex-col">
                             <div class="border bg-background/50 rounded-full h-16 w-16 flex justify-center items-center">
                                 <img src="../../images/parcel.png" alt="" class="h-10 w-10">
                             </div>
@@ -265,13 +201,13 @@ const trackShipment = () => {
                             <div class="flex flex-row justify-between items-center">
                                 <div class="flex flex-col">
                                     <h1 class="font-medium text-md text-gray-600 mt-5">Book Shipments</h1>
-                                    <h3 class="text-xs text-gray-400">Send and receive item(s)</h3>
+                                    <h3 class="text-sm text-gray-400">Send and receive item(s)</h3>
                                 </div>
                                 <div class="text-primary"></div>
                             </div>
                         </link>
                     </div>
-                    <div class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-300">
+                    <div class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-500">
                         <a href="javascript:void(0)" id="" class="flex flex-col" @click="toggleQuote(true)">
                             <div class="border bg-background/50 rounded-full h-16 w-16 flex justify-center items-center">
                                 <img src="../../images/price-tag.png" alt="" class="h-10 w-10">
@@ -280,13 +216,13 @@ const trackShipment = () => {
                             <div class="flex flex-row justify-between items-center">
                                 <div class="flex flex-col">
                                     <h1 class="font-medium text-md text-gray-600 mt-5">Get Pricing</h1>
-                                    <h3 class="text-xs text-gray-400">Request a quote</h3>
+                                    <h3 class="text-sm text-gray-400">Request a quote</h3>
                                 </div>
                                 <div class="text-primary"></div>
                             </div>
                         </a>
                     </div>
-                    <a href="javascript:void(0)" @click="isTrackingOpen = true" class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-300">
+                    <a href="javascript:void(0)" @click="isTrackingOpen = true" class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-500">
                         <div class="flex gap-5 items-center">
                             <div class="flex flex-col">
                                 <div class="border bg-background/50 rounded-full h-16 w-16 flex justify-center items-center">
@@ -294,7 +230,7 @@ const trackShipment = () => {
                                 </div>
 
                                 <h1 class="font-medium text-md text-gray-600 mt-5">Tracking</h1>
-                                <h3 class="text-xs text-gray-400">Track your shipments</h3>
+                                <h3 class="text-sm text-gray-400">Track your shipments</h3>
                             </div>
                         </div>
                     </a>
@@ -307,7 +243,7 @@ const trackShipment = () => {
                 <h1 class="text-lg">Recent Shipments</h1>
                 <div class="relative overflow-x-auto shadow sm:rounded-lg">
                     <table class="w-full text-sm text-left text-gray-500 sdark:text-gray-400">
-                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 sdark:bg-gray-700 sdark:text-gray-400">
+                        <thead class="text-sm text-gray-700 uppercase bg-gray-50 sdark:bg-gray-700 sdark:text-gray-400">
                         <tr>
                             <th scope="col" class="px-6 py-3">Origin</th>
                             <th scope="col" class="px-6 py-3">Destination</th>
@@ -352,16 +288,16 @@ const trackShipment = () => {
         </div>
         <Modal :show="isQuoteOpen">
           <div class="">
-            <div class="relative w-full max-w-2xl max-h-full duration-300">
+            <div class="relative w-full max-w-2xl max-h-full duration-500">
               <!-- Modal content -->
               <div class="relative bg-white rounded-lg shadow sdark:bg-gray-700">
                 <!-- Modal header -->
                 <div class="flex items-start justify-between p-4 border-b rounded-t sdark:border-gray-600">
-                  <h3 class="text-xl font-semibold text-gray-900 sdark:text-white">
+                  <div class="text-xl font-semibold text-gray-900 sdark:text-white">
                     Get Pricing
-                    <p class="text-gray-500 font-normal text-xs mt-2">Use this form to get request for a quote</p>
-                  </h3>
-                  <button type="button" class="text-gray-400 bg-transparent duration-300 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center sdark:hover:bg-gray-600 sdark:hover:text-white" data-modal-hide="getQuoteModal">
+                    <p class="text-gray-500 font-normal text-sm mt-2">Use this form to get request for a quote</p>
+                  </div>
+                  <button type="button" class="text-gray-400 bg-transparent duration-500 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center sdark:hover:bg-gray-600 sdark:hover:text-white" data-modal-hide="getQuoteModal">
                     <svg @click="isQuoteOpen = false" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-red-900 cursor-pointer" fill="none" viewBox="0 0 24 24"
                          stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -372,7 +308,7 @@ const trackShipment = () => {
                 <div class="">
                   <form @submit.prevent="submitQuote">
                     <div class="px-6 mb-5">
-                      <div class="grid lg:grid-cols-3 gap-y-3 mt-3 gap-x-5 w-full">
+                      <div class="gap-y-3 mt-3 gap-x-5 w-full">
                         <div>
                           <TextInput
                               id="quantity"
@@ -404,8 +340,7 @@ const trackShipment = () => {
                         </div>
                       </div>
                       <div class="mt-4">
-
-                        <div class="grid lg:grid-cols-3 gap-y-3 mt-3 gap-x-5 w-full">
+                        <div class="grid lg:grid-cols-1 gap-y-3 mt-3 gap-x-5 w-full">
                           <div>
                             <InputLabel value="Origin Country" class="mb-2" />
                             <SelectInput
@@ -441,7 +376,7 @@ const trackShipment = () => {
                         </div>
                       </div>
                       <div class="mt-4">
-                        <div class="grid lg:grid-cols-3 gap-y-3 gap-x-5 w-full">
+                        <div class="grid lg:grid-cols-1 gap-y-3 gap-x-5 w-full">
                           <div>
                             <InputLabel value="Destination Country" class="mb-2" />
                             <SelectInput
@@ -455,7 +390,7 @@ const trackShipment = () => {
                           </div>
 
                           <div>
-                            <InputLabel value="Destination City" class="mb-2" />
+                            <InputLabel value="Destination State" class="mb-2" />
                             <SelectInput
                                 place-holder="Select State"
                                 class="block w-full"
@@ -485,7 +420,7 @@ const trackShipment = () => {
                           <TextInput
                               id="quantity"
                               type="number"
-                              class="mt-2 w-full"
+                              class=" w-full"
                               required
                               autocomplete="off"
                               placeholder="Quantity"
@@ -497,7 +432,7 @@ const trackShipment = () => {
                           <TextInput
                               id="email"
                               type="number"
-                              class="mt-2 w-full"
+                              class="w-full"
                               required
                               autocomplete="off"
                               placeholder="Weight"
@@ -509,20 +444,20 @@ const trackShipment = () => {
                           <TextInput
                               id=""
                               type="number"
-                              class="mt-2 w-full block"
+                              class="w-full"
                               required
                               autocomplete="off"
                               placeholder="Length"
                               v-model="form.length"/>
                         </div>
                       </div>
-                      <div class="grid lg:grid-cols-3 gap-y-3 mt-4 gap-x-5">
+                      <div class="grid lg:grid-cols-2 gap-y-3 mt-4 gap-x-5">
                         <div>
                           <InputLabel value="Width" class="mb-2" />
                           <TextInput
                               id=""
                               type="number"
-                              class="mt-1 w-full"
+                              class="w-full"
                               required
                               autocomplete="off"
                               placeholder="Width"
@@ -533,7 +468,7 @@ const trackShipment = () => {
                           <TextInput
                               id=""
                               type="number"
-                              class="mt-1 w-full"
+                              class="w-full"
                               required
                               autocomplete="off"
                               placeholder="Height"
@@ -567,7 +502,7 @@ const trackShipment = () => {
                       <button
                           type="submit"
                           class="inline-flex justify-center rounded-md border border-transparent bg-background px-4 py-2 text-sm font-medium text-primary hover:text-white
-                                         hover:bg-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-all duration-300"
+                                         hover:bg-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-all duration-500"
                           :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
                         Get Pricing
                       </button>
@@ -579,14 +514,14 @@ const trackShipment = () => {
           </div>
         </Modal>
          <Modal :show="isTrackingOpen">
-          <div class="relative w-full max-w-2xl max-h-full duration-300">
+          <div class="relative w-full max-w-2xl max-h-full duration-500">
             <!-- Modal content -->
-            <div class="relative bg-white rounded-lg shadow sdark:bg-gray-700">
+            <div class="relative bg-white rounded-lg shadow">
               <!-- Modal header -->
-              <div class="flex items-start justify-between p-4 border-b rounded-t sdark:border-gray-600">
+              <div class="flex items-start justify-between p-4 border-b rounded-t">
                 <h3 class="text-xl font-semibold text-gray-900 sdark:text-white">
                   Track Shipment
-                  <p class="text-gray-500 font-normal text-xs">Use this form to track your shipment, enter your tracking number below</p>
+                  <p class="text-gray-500 font-normal text-sm">Use this form to track your shipment, enter your tracking number below</p>
                 </h3>
                 <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center sdark:hover:bg-gray-600 sdark:hover:text-white" data-modal-hide="trackingModal">
                   <svg @click="isTrackingOpen = false" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-red-900 cursor-pointer" fill="none" viewBox="0 0 24 24"
@@ -600,14 +535,15 @@ const trackShipment = () => {
                 <div class="p-6">
                   <InputLabel value="Tracking Number" />
                   <TextInput v-model="trackForm.number" required type="text" class="mt-2" placeholder="Enter tracking number" />
+                  <InputError class="mt-2" :message="trackForm.errors.number" />
                 </div>
                 <!-- Modal footer -->
                 <div class="flex justify-end items-center p-6 space-x-2 border-t border-gray-200 rounded-b sdark:border-gray-600">
                   <button
                       type="submit"
                       class="inline-flex justify-center rounded-md border border-transparent bg-background px-4 py-2 text-sm font-medium text-primary hover:text-white
-                                         hover:bg-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-all duration-300"
-                      :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+                                         hover:bg-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-all duration-500"
+                      :class="{ 'opacity-25': trackForm.processing }" :disabled="trackForm.processing">
                     Continue
                   </button>
                 </div>

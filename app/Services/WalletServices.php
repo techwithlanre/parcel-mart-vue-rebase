@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Http\Requests\PayInitializeRequest;
 use App\Models\PaystackTransaction;
 use App\Models\WalletOverdraft;
+use App\Models\WalletTransaction;
 use Bavix\Wallet\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
@@ -17,17 +18,23 @@ class WalletServices
     private PaystackTransaction $paystackTransaction;
 
     private Transaction $transaction;
+    private WalletTransaction $walletTransaction;
     public function logInitPayment(PayInitializeRequest $request)
     {
         $this->transaction = auth()->user()->deposit($request->amount, null, false);
-        $data = [
+        $this->walletTransaction = WalletTransaction::create([
             'user_id' => auth()->user()->id,
             'transaction_id' => $this->transaction->id,
             'reference' => $this->transaction->uuid,
-            'status' => 'pending'
-        ];
-
-        $this->paystackTransaction = PaystackTransaction::create($data);
+            'status' => 'pending',
+            'amount' => $request->amount,
+            'before' => auth()->user()->balance,
+            'comment' => 'wallet funding',
+            'description' => 'deposit',
+            'currency' => 'NGN',
+            'time_initiated' => now(),
+            'channel' => 'paystack'
+        ]);
     }
 
     public function initializePay(PayInitializeRequest $request)
@@ -44,8 +51,8 @@ class WalletServices
 
             $response = json_decode($this->callPaystack($data), true);
             $payment_url = $response['data']['authorization_url'];
-            $this->paystackTransaction->status = 'processing';
-            $this->paystackTransaction->save();
+            $this->walletTransaction->status = 'processing';
+            $this->walletTransaction->save();
             return Inertia::location($payment_url);
         }catch(\Exception $e) {
             return Redirect::back()->withMessage(['error'=>'The paystack token has expired. Please refresh the page and try again.', 'type'=>'error']);
@@ -98,9 +105,12 @@ class WalletServices
                     return \redirect()->with('error', 'An error occurred, Please contact support');
                 }
 
-                $paystack_transaction = PaystackTransaction::where('reference', $url_ref_1)->first();
-                $transaction = Transaction::whereId($paystack_transaction->transaction_id)->first();
-                if ($paystack_transaction && $paystack_transaction['status'] == 'processing') {
+                $transaction = Transaction::where('uuid', $url_ref_1)->first();
+                $wallet_transaction = WalletTransaction::where([
+                    'transaction_id' => $transaction->id,
+                    'reference' => $transaction->uuid,
+                ])->first();
+                if ($wallet_transaction && $wallet_transaction->status == 'processing') {
                     $user = auth()->user();
                     $funding_amount = $transaction->amount;
                     $new_funding_amount = 0;
@@ -127,8 +137,10 @@ class WalletServices
                     }
 
                     if (!$transaction->confirmed) $user->confirm($transaction);
-                    $paystack_transaction->status = 'success';
-                    $paystack_transaction->save();
+                    $wallet_transaction->status = 'success';
+                    $wallet_transaction->after = auth()->user()->balance;
+                    $wallet_transaction->time_completed = now();
+                    $wallet_transaction->save();
                     return \redirect(route('wallet.index'))->with('message', 'Wallet funded successfully');
                 }
 

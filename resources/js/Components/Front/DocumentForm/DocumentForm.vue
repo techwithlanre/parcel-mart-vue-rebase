@@ -1,7 +1,6 @@
 <script setup>
 import {ref} from "vue";
 import {DownOutlined} from "@ant-design/icons-vue";
-import { UserOutlined, InfoCircleOutlined } from '@ant-design/icons-vue';
 
 const activeKey = ref('1');
 

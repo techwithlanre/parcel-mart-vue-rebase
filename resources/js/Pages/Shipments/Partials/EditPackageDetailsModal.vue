@@ -1,14 +1,12 @@
 <script setup>
 
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import InputError from "@/Components/InputError.vue";
 import TextInput from "@/Components/TextInput.vue";
 import SelectInput from "@/Components/SelectInput.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import {useForm, usePage} from "@inertiajs/vue3";
-import {onMounted, ref} from "vue";
+import {ref} from "vue";
 import TextAreaInput from "@/Components/TextAreaInput.vue";
-import {twMerge} from "tailwind-merge";
 import {toast} from "vue3-toastify";
 
 const props = defineProps({
@@ -26,7 +24,7 @@ const originCountries = ref(props.countries);
 const originStates = ref(props.states);
 const originCities = ref(props.cities);
 
-console.log(props.shipment);
+//console.log(props.shipment);
 
 const form = useForm({
   origin: {
@@ -96,7 +94,7 @@ const getOriginCities = function () {
 
 const getDestinationCountries = function () {
   axios.get('/api/allowed-countries/' + form.origin.country).then(function (response) {
-    console.log(response.data)
+    //console.log(response.data)
     props.countries = response.data;
   });
 }

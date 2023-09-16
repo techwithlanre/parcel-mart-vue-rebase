@@ -5,12 +5,8 @@ import plane from "../../../images/air.png";
 import aircraft from "../../../images/aircraft.png";
 import box from "../../../images/box.png";
 import delivery from "../../../images/delivery.png";
-import arrowRightUp from "../../../images/icons/arrow-right-up.svg";
-import ship from "../../../images/icons/ship.svg";
-import truck from "../../../images/icons/truck.svg";
 import warehouse from "../../../images/warehouse.png";
 import cargo from "../../../images/cargo.png";
-import smartSend from "../../../images/icons/smart-send.svg";
 
 
 const services = [

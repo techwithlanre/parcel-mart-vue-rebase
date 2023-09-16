@@ -8,6 +8,7 @@ import {twMerge} from "tailwind-merge";
 import AddFundModal from "@/Pages/Wallet/AddFundModal.vue";
 import Modal from "@/Components/Modal.vue";
 import DashboardLayout from "@/Layouts/DashboardLayout.vue";
+import Helper from "../../Helpers/Helper.js";
 
 
 const form = useForm({
@@ -87,8 +88,8 @@ let naira = new Intl.NumberFormat('en-US', {
                 </div>
             </div>
         </div>
-        <div class="rounded-xl shadow p-5 bg-white mt-10">
-            <div class="flex sm:flex-row flex-col justify-between mb-10 items-start">
+        <div class="rounded-xl shadow bg-white mt-10">
+            <div class="flex sm:flex-row flex-col p-5 justify-between items-center">
                 <h1 class="text-lg">Wallet History</h1>
                 <div>
                     <InputLabel value="Filter" class="mb-3" />
@@ -97,30 +98,39 @@ let naira = new Intl.NumberFormat('en-US', {
                         ref="select"
                         v-model:value="filterForm.type"
                         @focus="focus"
-                        @change="handleFilter"
-                    >
+                        @change="handleFilter">
                         <a-select-option v-for="item in shipmentStatusOptions" :value="item.id">{{ item.name }}</a-select-option>
                     </a-select>
 
                 </div>
             </div>
 
-            <div class="overflow-x-auto border-x border-t rounded-xl">
+            <div class="overflow-x-auto border-x rounded-t-0 rounded-b-xl">
               <table class="w-full text-sm text-left text-gray-500 sdark:text-gray-400">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 sdark:bg-gray-700 sdark:text-gray-400">
                     <tr class="bg-gray-100">
                         <th class="text-left p-4 font-medium">Amount</th>
+                        <th class="text-left p-4 font-medium">Wallet Before</th>
+                        <th class="text-left p-4 font-medium">Wallet After</th>
                         <th class="text-left p-4 font-medium">Type</th>
-                        <th class="text-left p-4 font-medium">Date</th>
+                        <th class="text-left p-4 font-medium">Comment</th>
+                        <th class="text-left p-4 font-medium">Channel</th>
+                        <th class="text-left p-4 font-medium">Time Initiated</th>
+                        <th class="text-left p-4 font-medium">Time Completed</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr class="border-b hover:bg-gray-50" v-for="item in transactions.data">
-                        <td class="p-4">
-                            <h1 class="text-md font-normal">{{ naira.format(Math.abs(item.amount)) }}</h1>
-                        </td>
-                        <td class="p-4">{{ item.type }}</td>
-                        <td class="p-4"><date-format :date="item.created_at" /></td>
+                      <td class="p-4">
+                          <h1 class="font-semibold">{{ Helper.nairaFormat(Math.abs(item.amount)) }}</h1>
+                      </td>
+                      <td class="p-4">{{ Helper.nairaFormat(item.before) }}</td>
+                      <td class="p-4">{{ Helper.nairaFormat(item.after) }}</td>
+                      <td class="p-4">{{ item.description }}</td>
+                      <td class="p-4">{{ item.comment }}</td>
+                      <td class="p-4 uppercase">{{ item.channel }}</td>
+                      <td class="p-4"><date-format :has-time="true" :date="item.time_initiated" /></td>
+                      <td class="p-4"><date-format :has-time="true" :date="item.time_completed" /></td>
                     </tr>
                     </tbody>
                 </table>

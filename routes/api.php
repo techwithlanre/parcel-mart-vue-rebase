@@ -27,10 +27,10 @@ Route::group(['middleware'], function () {
 
         // Password reset routes
         Route::post('password/email',  [UserAuthController::class, 'forget_password']);
-        Route::post('password/code/check', [MobileController::class, 'code_check']);
-        Route::post('password/reset', [MobileController::class, 'reset_password']);
-
-        Route::post('/deposit', [MobileController::class, 'deposit']);
+//        Route::post('password/code/check', [MobileController::class, 'code_check']);
+//        Route::post('password/reset', [MobileController::class, 'reset_password']);
+//
+//        Route::post('/deposit', [MobileController::class, 'deposit']);
     });
 
     Route::get('/country', [UserAuthController::class, 'country']);
@@ -39,10 +39,10 @@ Route::group(['middleware'], function () {
     // put all api protected routes here
     Route::middleware('auth:api')->group(function () {
         Route::get('/profile', [GeneralController::class, 'userprofile']);
-        Route::post('/update/profile', [MobileController::class, 'update_profile']);
-        Route::post('/update/password', [MobileController::class, 'update_password']);
-        Route::post('/upload/profile-picture', [MobileController::class, 'upload_profile_picture']);
+//        Route::post('/update/profile', [MobileController::class, 'update_profile']);
+//        Route::post('/update/password', [MobileController::class, 'update_password']);
+//        Route::post('/upload/profile-picture', [MobileController::class, 'upload_profile_picture']);
     });
 
-    Route::get('/deposit/gateway/callback', [MobileController::class, 'handleDepositGatewayCallback'])->name('handleDepositGatewayCallback');
+    //Route::get('/deposit/gateway/callback', [MobileController::class, 'handleDepositGatewayCallback'])->name('handleDepositGatewayCallback');
 });

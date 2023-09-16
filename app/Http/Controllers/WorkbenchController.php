@@ -1,10 +1,12 @@
 <?php
-
 namespace App\Http\Controllers;
 
+use App\Models\AramexCities;
+use App\Models\Country;
 use Carbon\Carbon;
 use DateTime;
 use Illuminate\Http\Request;
+use Octw\Aramex\Aramex;
 
 class WorkbenchController extends Controller
 {
@@ -61,5 +63,23 @@ class WorkbenchController extends Controller
     <input type="text" name="replace"><br><br>
     <input type="submit" value="Find and Replace">
  </form>';
+    }
+
+    public function aramexCountries()
+    {
+        set_time_limit(92000000000);
+        $countries = Country::skip(40)->take(20)->get();
+        foreach ($countries as $country) {
+            $response = Aramex::fetchCities($country->iso2);
+            if (!isset($response->error)) {
+                $cities = $response->Cities->string;
+                foreach ($cities as $city) {
+                    AramexCities::updateOrCreate([
+                        'name' => $city,'country_code' => $country->iso2],[
+                        'country_id' => $country->id,
+                    ]);
+                }
+            }
+        }
     }
 }

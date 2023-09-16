@@ -18,11 +18,19 @@ class ShippingRateLog extends Model
         'network_type_code',
         'courier_api_provider_id',
         'currency',
+        'provider_amount_before_tax',
+        'provider_tax',
+        'provider_total_amount',
+        'charge_before_tax',
+        'charge_tax',
+        'total_charge',
         'total_amount',
         'amount_before_tax',
         'tax',
         'created_at',
         'provider_code',
+        'insurance_amount',
+        'insurance_option_id',
         'pickup_number'
     ];
 

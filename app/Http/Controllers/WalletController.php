@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PayInitializeRequest;
 use App\Models\User;
 use App\Models\WalletOverdraft;
+use App\Models\WalletTransaction;
 use App\Services\PaystackServices;
 use App\Services\WalletServices;
 use Bavix\Wallet\Models\Transaction;
@@ -21,10 +22,9 @@ class WalletController extends Controller
     {
         $balance = number_format(auth()->user()->balance, 2);
         $user = User::whereId(auth()->user()->id)->first();
-        $transactions = Transaction::where([
-            'payable_id' => $user->id,
-            'confirmed' => 1
-        ])->orderBy('created_at', 'desc')->paginate(10);
+        $transactions = WalletTransaction::where(['user_id' => $user->id])
+            ->where('status', '!=', 'pending')
+            ->orderBy('created_at', 'desc')->paginate(10);
         $overdraft_wallet_balance = 0;
         if (auth()->user()->user_type == 'business') {
             $overdraft_wallet = WalletOverdraft::where('user_id', auth()->user()->id)->first();
@@ -32,21 +32,20 @@ class WalletController extends Controller
                 $overdraft_wallet_balance = number_format($overdraft_wallet->balance, 2);
             }
         }
+
         return Inertia::render('Wallet/Index', compact('balance','transactions', 'overdraft_wallet_balance'));
     }
 
     public function filterTransactions(Request $request): \Illuminate\Http\JsonResponse
     {
-        $transactions = Transaction::where([
-            'payable_id' => auth()->user()->id,
-            'confirmed' => 1
-        ])->where(function ($query) use ($request) {
-            $query->when($request->filled('type'), function ($query) use ($request) {
-                return $request->type == 'all'
-                    ? $query
-                    : $query->where('type', $request->type);
-            });
-        })->orderBy('created_at', 'desc')->paginate(10);
+        $transactions = WalletTransaction::where(['user_id' => auth()->user()->id])
+            ->where('status', '!=', 'pending')->where(function ($query) use ($request) {
+                $query->when($request->filled('type'), function ($query) use ($request) {
+                    return $request->type == 'all'
+                        ? $query
+                        : $query->where('description', $request->type);
+                });
+            })->orderBy('created_at', 'desc')->paginate(10);
         return response()->json($transactions);
     }
 

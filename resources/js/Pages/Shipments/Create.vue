@@ -1,6 +1,6 @@
 <script>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import {Head, Link, useRemember, usePage, useForm} from "@inertiajs/vue3";
+import {Head, Link, usePage, useForm} from "@inertiajs/vue3";
 import {
   Tab,
   TabGroup,
@@ -31,7 +31,7 @@ export default {
     categories: Array,
   },
   mounted() {
-    console.log('component mounted')
+    //console.log('component mounted')
   },
 
   data() {
@@ -141,7 +141,7 @@ export default {
     },
 
     populateOriginAddress: function (address) {
-      console.log(address)
+      //console.log(address)
       this.getOriginStates();
       this.form.origin.address_1 = address.address;
       this.form.origin.contact_name = address.address_contacts[0].contact_name;
@@ -197,7 +197,7 @@ export default {
     this.getOriginStates()
     this.form.destination.country = this.page.props.auth.user.country_id;
     this.getDestinationStates();
-    console.log(this.page.props.countries)
+    //console.log(this.page.props.countries)
   }
 }
 </script>
@@ -238,7 +238,7 @@ const tabs = [
           <ul class="flex mb-0 list-none flex-wrap gap-y-3 flex-row rounded-md">
             <li v-for="tab in tabs"
                 class="-mb-px mr-5 last:mr-0 flex-auto text-center rounded-lg bg-white shadow cursor-pointer">
-              <button :disabled="tab.disabled" class="text-xs w-full font-bold uppercase px-5 py-3 rounded-lg block leading-normal hover:text-gray-900 no-underline duration-300"
+              <button :disabled="tab.disabled" class="text-xs w-full font-bold uppercase px-5 py-3 rounded-lg block leading-normal hover:text-gray-900 no-underline duration-500"
                  @click="toggleTabs(tab.index)"
                  v-bind:class="{'text-gray-500 bg-white': currentTab !== tab.index, 'text-primary bg-background hover:text-background': currentTab === tab.index}">
                 {{ tab.index }}. {{ tab.name }}
@@ -247,7 +247,7 @@ const tabs = [
           </ul>
         </div>
         <div class="tab-content tab-space">
-          <div v-show="currentTab === 1" class="card shadow-sm shadow-background duration-300 hover:shadow-l border border-gray-50 bg-white rounded-xl">
+          <div v-show="currentTab === 1" class="card shadow-sm shadow-background duration-500 hover:shadow-l border border-gray-50 bg-white rounded-xl">
             <h3 class="p-5 text-lg">Enter origin address details</h3>
             <div class="p-0">
               <hr class="p-0">
@@ -268,7 +268,7 @@ const tabs = [
             <div class="flex justify-center">
               OR
             </div>
-            <form @submit.prevent="validateForm(2)" class="duration-300">
+            <form @submit.prevent="validateForm(2)" class="duration-500">
               <div class="p-6 flex flex-col gap-y-2">
                 <div class="">
                   <InputLabel value="Contact Name *"/>

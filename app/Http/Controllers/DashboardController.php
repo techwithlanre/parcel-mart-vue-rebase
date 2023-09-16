@@ -2,17 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Meta\Meta;
 use App\Models\Country;
 use App\Models\Shipment;
+use App\Models\ShipmentAddress;
 use App\Models\User;
 use App\Services\WalletServices;
 use Bavix\Wallet\Models\Wallet;
+use Illuminate\Support\Facades\Artisan;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(): \Inertia\Response
     {
+        Meta::addMeta('title', 'Dashboard');
+        Meta::addMeta('description', 'Parcels Mart: Dashboard');
         $balance = number_format(auth()->user()->balance, 2);
         $totalUsersCount = User::count();
         $businessUsersCount = User::where('user_type', 'business')->count();
@@ -30,8 +35,8 @@ class DashboardController extends Controller
                 ->with('shipment_rate')->latest()->take(5)->get();
         $log = [];
         foreach ($shipments as $shipment) {
-            $origin = json_decode($shipment->origin_address, true);
-            $destination = json_decode($shipment->destination_address, true);
+            $origin = ShipmentAddress::where(['shipment_id'=>$shipment->id, 'type'=>'origin'])->first();
+            $destination = ShipmentAddress::where(['shipment_id'=>$shipment->id, 'type'=>'destination'])->first();
             $log[] = [
                 'id' => $shipment->id,
                 'number' => $shipment->number,
@@ -40,16 +45,16 @@ class DashboardController extends Controller
                     'phone' => $origin['contact_phone'],
                     'email' => $origin['contact_email'],
                     'address_1' => $origin['address_1'],
-                    'city' => getCity('id' , $origin['city'])->name,
-                    'country' => getCountry('id' , $origin['country'])->name,
+                    'city' => getCity('id' , $origin['city_id'])->name,
+                    'country' => getCountry('id' , $origin['country_id'])->name,
                 ],
                 'destination' => [
                     'name' => $destination['contact_name'],
                     'phone' => $destination['contact_phone'],
                     'email' => $destination['contact_email'],
                     'address_1' => $destination['address_1'],
-                    'city' => getCity('id' , $destination['city'])->name,
-                    'country' => getCountry('id' , $destination['country'])->name,
+                    'city' => getCity('id' , $destination['city_id'])->name,
+                    'country' => getCountry('id' , $destination['country_id'])->name,
                 ],
                 'status' => $shipment->status
             ];
@@ -57,8 +62,7 @@ class DashboardController extends Controller
 
         $totalWalletBalance = number_format(Wallet::sum('balance'), 2);
         return Inertia::render('Dashboard', compact(
-            'balance', 'countries', 'log', 'shipmentCount',
-            'totalUsersCount', 'businessUsersCount','individualUsersCount', 'totalWalletBalance'
+            'balance', 'countries', 'log', 'shipmentCount', 'totalWalletBalance'
         ));
     }
 }

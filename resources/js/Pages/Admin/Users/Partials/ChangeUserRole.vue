@@ -2,9 +2,7 @@
 
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import InputLabel from "@/Components/InputLabel.vue";
-import TextInput from "@/Components/TextInput.vue";
 import SelectInput from "@/Components/SelectInput.vue";
-import TextAreaInput from "@/Components/TextAreaInput.vue";
 import {useForm} from "@inertiajs/vue3";
 import {toast} from "vue3-toastify";
 

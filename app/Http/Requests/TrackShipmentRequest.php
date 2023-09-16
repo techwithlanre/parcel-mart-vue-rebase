@@ -14,7 +14,7 @@ class TrackShipmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'number' => 'required|numeric'
+            'number' => 'required'
         ];
     }
 }

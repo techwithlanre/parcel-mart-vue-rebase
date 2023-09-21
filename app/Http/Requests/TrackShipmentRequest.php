@@ -14,7 +14,14 @@ class TrackShipmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'number' => 'required'
+            'number' => ''
+        ];
+    }
+
+    public function attributes()
+    {
+        return [
+            'number' => 'tracking number'
         ];
     }
 }

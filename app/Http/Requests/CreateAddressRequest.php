@@ -12,10 +12,8 @@ class CreateAddressRequest extends FormRequest
     /**
      * Determine if the user is authorized to make this request.
      */
-    protected Request $formRequest;
-    public function authorize(Request $formRequest): bool
+    public function authorize(): bool
     {
-        $this->formRequest = $formRequest;
         return true;
     }
 
@@ -26,7 +24,7 @@ class CreateAddressRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = [
+        return [
             'contact_name' => ['required', 'string', new FullNameRule],
             'contact_email' => 'required|email:rfc,dns',
             'contact_phone' => 'required|numeric|regex:/^([0-9\s\-\+\(\)]*)$/|min:10',
@@ -36,11 +34,8 @@ class CreateAddressRequest extends FormRequest
             'country_id' => 'required|numeric',
             'state_id' => 'required|numeric',
             'city_id' => 'required|numeric',
-            'postcode' => 'required|min:4'
+            'postcode' => 'required|min:4',
+            'business_name' => ['nullable', new BusinessNameRule],
         ];
-
-        if ($this->formRequest->filled('business_name')) $rules['business_name'] = [new BusinessNameRule];
-
-        return $rules;
     }
 }

@@ -72,7 +72,7 @@ class WalletServices
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => "GET",
             CURLOPT_HTTPHEADER => array(
-                "Authorization: Bearer sk_test_4a32e9e6a564687a548afd047f0429740edc267e",
+                "Authorization: Bearer sk_live_c07abf68f541c1dfa43d9260044dd47a7559bf87",
                 "Cache-Control: no-cache",
             ),
         ));
@@ -164,7 +164,7 @@ class WalletServices
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $fields_string);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            "Authorization: Bearer sk_test_4a32e9e6a564687a548afd047f0429740edc267e",
+            "Authorization: Bearer sk_live_c07abf68f541c1dfa43d9260044dd47a7559bf87",
             "Cache-Control: no-cache",
             "Access-Control-Allow-Origin: https://checkout.paystack.com"
         ));

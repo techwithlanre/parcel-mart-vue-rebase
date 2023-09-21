@@ -22,6 +22,6 @@ trait ValidateAramexAddress
             'postal_code' => '', // optional
             'city' => 'Amman',
         ]);
-        dd($response);
+        //dd($response);
     }
 }

@@ -67,4 +67,14 @@ class User extends Authenticatable implements Wallet, MustVerifyEmail
     {
         return $this->hasMany(Address::class);
     }
+
+    public function getRoleAttribute()
+    {
+        return $this->roles()->first()->name;
+    }
+
+    public function quotes(): HasMany
+    {
+        return $this->hasMany(Quote::class);
+    }
 }

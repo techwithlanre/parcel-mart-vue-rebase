@@ -22,7 +22,7 @@ use Ups\SimpleAddressValidation;
 
 class UpsServices
 {
-    public Request|TrackShipmentRequest|BookShipmentRequest|CreateShipmentRequest $request;
+    public Shipment $shipment;
     public array $originAddressPayload = [];
     public array $destinationAddressPayload = [];
     public array $shipmentDetailsPayload = [];
@@ -36,9 +36,9 @@ class UpsServices
     public string $accessToken = '';
     protected string $requestGrantType = '';
 
-    public function __construct(CreateShipmentRequest|BookShipmentRequest|TrackShipmentRequest|Request $request)
+    public function __construct(Shipment $shipment)
     {
-        $this->request = $request;
+        $this->shipment = $shipment;
         $this->init();
     }
 
@@ -85,6 +85,31 @@ class UpsServices
 
         if (Arr::has($result, 'access_token')) $this->setAccessToken($result['access_token']);
         return true;
+    }
+
+    public function validateAddress()
+    {
+        //dd($this->accessToken);
+        $payload = [
+            "XAVRequest" => [
+                "AddressKeyFormat" => [
+                    "ConsigneeName" => "RITZ CAMERA CENTERS-1749",
+                    "BuildingName" => "Innoplex",
+                    "AddressLine" => [
+                        "26601 ALISO CREEK ROAD",
+                        "STE D",
+                        "ALISO VIEJO TOWN CENTER"
+                    ],
+                    "Region" => "ROSWELL,GA,30076-1521",
+                    "PoliticalDivision2" => "ALISO VIEJO",
+                    "PoliticalDivision1" => "CA",
+                    "PostcodePrimaryLow" => "92656",
+                    "PostcodeExtendedLow" => "1521",
+                    "Urbanization" => "porto arundal",
+                    "CountryCode" => "US"
+                ]
+            ]
+        ];
     }
 
     public function calculateRate(): false|string

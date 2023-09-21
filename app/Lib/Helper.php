@@ -112,13 +112,11 @@ if (!function_exists('send_push_notification_to_topic')) {
 }
 
 if (!function_exists('date_time_formatter')) {
-    function date_time_formatter($datetime)
+    function date_time_formatter($datetime): string
     {
         $time_zone = 'UTC';
-
         try {
             return date('d-M-Y h:iA', strtotime($datetime->timezone($time_zone)->toDateTimeString()));
-
         } catch (\Exception $exception) {
             return date('d-M-Y h:iA', strtotime($datetime));
         }

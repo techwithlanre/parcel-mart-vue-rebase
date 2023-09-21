@@ -9,6 +9,7 @@ import SelectInput from "@/Components/SelectInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {onMounted, ref} from "vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
+import Checkbox from "@/Components/Checkbox.vue";
 
 //props
 const props = defineProps({
@@ -38,6 +39,7 @@ const form = useForm({
   state_id: '',
   city_id: '',
   postcode: '',
+  save_address: false
 });
 
 //methods
@@ -193,7 +195,7 @@ const populateAddress = (address) => {
               <InputError class="mt-2" :message="form.errors.landmark" />
             </div>
             <div class="mt-2">
-              <InputLabel value="Address Line 2"/>
+              <InputLabel value="Address Line 2 *"/>
               <TextInput
                   id="address_2"
                   type="text"
@@ -250,6 +252,14 @@ const populateAddress = (address) => {
               <InputError class="mt-2" :message="form.errors.postcode" />
             </div>
 
+            <div class="mt-2 flex  items-center gap-x-4">
+              <Checkbox
+                  id="postcode"
+                  v-model="form.save_address"
+                  placeholder=""
+                  autocomplete="postcode"/>
+              <InputLabel value="Save Address"/>
+            </div>
 
             <div class="flex lg:flex-row flex-col items-center w-full gap-x-10 gap-y-4 mt-10">
               <Link :href="route('shipment.origin', shipment_id)" class="w-full">

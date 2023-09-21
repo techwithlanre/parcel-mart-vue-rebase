@@ -63,7 +63,6 @@ export default {
                     class="mt-1 block w-full"
                     v-model="form.last_name"
                     required
-                    autofocus
                     placeholder="Last Name"
                     autocomplete="last_name" />
                 <InputError class="mt-2" :message="form.errors.last_name" />

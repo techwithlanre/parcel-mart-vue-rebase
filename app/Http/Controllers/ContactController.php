@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\ContactRequest;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class ContactController extends Controller
@@ -13,15 +14,15 @@ class ContactController extends Controller
         return Inertia::render('Contact/Contact');
     }
 
-    public function send(Request $request)
+    public function send(ContactRequest $request)
     {
-        $name = $request->name;
-        $email = $request->email;
-        $message = $request->message;
-        Mail::send('mail.contact', [
-            'name' => $name,
-            'email' => $email,
-            'message' => $message ]
-        );
+        $send = Mail::send('mail.contact', [
+            'name' => $request->name,
+            'email' => $request->email,
+            'message' => $request->message
+        ]);
+
+        if (!$send) throw ValidationException::withMessages(['email' => 'Oops!, we could not send your request.']);
     }
+
 }

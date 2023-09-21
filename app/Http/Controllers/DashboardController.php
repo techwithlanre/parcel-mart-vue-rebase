@@ -16,22 +16,13 @@ class DashboardController extends Controller
 {
     public function index(): \Inertia\Response
     {
-        Meta::addMeta('title', 'Dashboard');
-        Meta::addMeta('description', 'Parcels Mart: Dashboard');
         $balance = number_format(auth()->user()->balance, 2);
-        $totalUsersCount = User::count();
-        $businessUsersCount = User::where('user_type', 'business')->count();
-        $individualUsersCount = User::where('user_type', 'individual')->count();
         $countries = Country::all();
         $shipmentCount = !auth()->user()->is_admin
             ? Shipment::where('user_id', auth()->user()->id)->where('status', '!=', 'pending')->count()
             : Shipment::count();
 
-        $shipments = auth()->user()->is_admin ?
-            Shipment::where('status', '!=', 'failed')->where('has_rate', 1)->with('shipment_rate')->latest()->take(5)->get()
-        : Shipment::where('status', '!=', 'failed')
-                ->where('has_rate', 1)
-                ->where('user_id', auth()->user()->id)
+        $shipments = Shipment::where('status', '!=', 'failed')->where('user_id', auth()->user()->id)
                 ->with('shipment_rate')->latest()->take(5)->get();
         $log = [];
         foreach ($shipments as $shipment) {

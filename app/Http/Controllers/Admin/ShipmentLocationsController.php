@@ -20,14 +20,13 @@ class ShipmentLocationsController extends Controller
         foreach ($allowed_shipment_countries as $xx) {
             $origin = getCountry('id', $xx['country_id'])->name;
             $allowed_destinations = explode(',', $xx['allowed_destinations']);
-            $destinations = [];
             $x = 0;
+            $destination = [];
             foreach ($allowed_destinations as $yy) {
-                $destination[$x++] = [
+                $destination[] = [
                     'id' => $yy,
                     'country' => getCountry('id', $yy)->name
                 ];
-
             }
             $data[] = [
                 'origin' => [
@@ -48,7 +47,6 @@ class ShipmentLocationsController extends Controller
      */
     public function create()
     {
-
     }
 
     /**
@@ -67,7 +65,32 @@ class ShipmentLocationsController extends Controller
 
     public function show(string $id)
     {
+        $countries = Country::all();
+        $country = [];
+        foreach($countries as $country) {
+            $check = AllowedShipmentCountry::where('country_id', $country->id)->first();
+            if(!$check) {
+                $data = [
+                    'country_id' => $country->id,
+                    'allowed_destinations' => 161
+                ];
 
+                AllowedShipmentCountry::create($data);
+
+                dump($data);
+            }
+        }
+
+    
+        //dd($country);
+
+
+
+
+
+
+
+        exit;
     }
 
     public function edit(string $id)

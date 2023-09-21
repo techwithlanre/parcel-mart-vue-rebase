@@ -82,10 +82,10 @@ class ShipmentServices
                             'user_id' => auth()->user()->id,
                             'shipment_id' => $shipment->id,
                             'courier_api_provider_id' => $provider->value('id'),
-                            'product_name' => 'DHL - ' . $product['productName'],
-                            'product_code' => $product['productCode'],
-                            'local_product_code' => $product['localProductCode'],
-                            'network_type_code' => $product['networkTypeCode']
+                            //'product_name' => 'DHL - ' . $product['productName'],
+                            //'product_code' => $product['productCode'],
+                            //'local_product_code' => $product['localProductCode'],
+                            //'network_type_code' => $product['networkTypeCode']
                         ])->delete();
 
                         $rate_log = ShippingRateLog::create([
@@ -115,7 +115,7 @@ class ShipmentServices
                             'network_type_code' => $product['networkTypeCode'],
                         ])->delete();
 
-                        $dhl_rate_log = DhlRateLog::create([
+                        DhlRateLog::create([
                             'shipment_id' => $shipment->id,
                             'shipping_rate_log_id' => $rate_log->id,
                             'product_name' => $product['productName'],
@@ -212,8 +212,18 @@ class ShipmentServices
                         'action' => 'Aramex Shipment Cost'
                     ])
                     ->log($response);
+                ShippingRateLog::where([
+                    'user_id' => auth()->user()->id,
+                    'shipment_id'=>$shipment_id,
+                    'courier_api_provider_id' => $provider->value('id')
+                ])->delete();
             }
         } catch (\Throwable $e) {
+            ShippingRateLog::where([
+                'user_id' => auth()->user()->id,
+                'shipment_id'=>$shipment_id,
+                'courier_api_provider_id' => $provider->value('id')
+            ])->delete();
             activity()
                 ->performedOn(new Shipment())
                 ->causedBy(\request()->user())
@@ -223,6 +233,90 @@ class ShipmentServices
                 ])
                 ->log($e->getMessage());
             $this->errors[] = 'Aramex shipment is not available at the moment.';
+        }
+    }
+
+    private function ups_calculate_rate($shipment_id, $provider)
+    {
+        //dd($provider);
+        $shipment = Shipment::find($shipment_id);
+        $ups = new UpsServices($shipment);
+        try {
+            $response = $ups->calculateRate();
+            $data = json_decode($response, true);
+            if (array_key_exists('ResponseStatus', $data['RateResponse']['Response'])) {
+                if ($data['RateResponse']['Response']['ResponseStatus']['Code'] == 1) {
+                    $ratedShipment = $data['RateResponse']['RatedShipment'];
+                    if ($ratedShipment['TotalCharges']['MonetaryValue'] > 0) {
+                        $multiplier = ($provider->value('profit_margin') / 100) + 1;
+                        $shipmentAmount = $ratedShipment['TotalCharges']['MonetaryValue'] * $multiplier;
+                        $tax = $shipmentAmount * 0.075;
+                        ShippingRateLog::where([
+                            'user_id' => auth()->user()->id,
+                            'shipment_id'=>$shipment_id,
+                            'courier_api_provider_id' => $check_ups->value('id'),
+                            'provider_code' => 'ups',
+                        ])->delete();
+
+                        $rate_log = ShippingRateLog::create([
+                            'user_id' => auth()->user()->id,
+                            'shipment_id' => $shipment->id,
+                            'courier_api_provider_id' => $check_ups->value('id'),
+                            'product_name' => 'UPS Shipment',
+                            'product_code' => '',
+                            'provider_code' => 'ups',
+                            'currency' => 'NGN',
+                            'total_amount' => $shipmentAmount,
+                            'amount_before_tax' => number_format($shipmentAmount - $tax),
+                            'tax' => number_format($tax),
+                            'created_at' => now()
+                        ]);
+
+                        UpsRateLog::create([
+                            'shipment_id' => $shipment->id,
+                            'shipping_rate_log_id' => $rate_log->id,
+                            'service_code' => $ratedShipment['Service']['Code'],
+                            'packaging_type_code' => '02',
+                            'billing_weight' => json_encode($ratedShipment['BillingWeight']),
+                            'total_price' => json_encode($ratedShipment['TotalCharges']),
+                            'total_price_breakdown' => json_encode($ratedShipment),
+                            'pricing_date' => now(),
+                        ]);
+
+                        $shipment->has_rate = 1;
+                        $shipment->save();
+                        $ups_rate_found = true;
+                    } else {
+                        activity()
+                            ->performedOn(new Shipment())
+                            ->causedBy(\request()->user())
+                            ->withProperties([
+                                'method' => __FUNCTION__,
+                                'action' => 'UPS Shipment Cost'
+                            ])
+                            ->log($response);
+                    }
+
+                    if (!$ups_rate_found) {
+                        ShippingRateLog::where([
+                            'user_id' => auth()->user()->id,
+                            'shipment_id'=>$shipment_id,
+                            'courier_api_provider_id' => $check_ups->value('id'),
+                            'provider_code' => 'ups',
+                        ])->delete();
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            activity()
+                ->performedOn(new Shipment())
+                ->causedBy(\request()->user())
+                ->withProperties([
+                    'method' => __FUNCTION__,
+                    'action' => 'UPS Shipment Cost'
+                ])
+                ->log($e->getMessage());
+            $this->errors[] = 'UPS shipment is not available at the moment.';
         }
     }
 
@@ -336,7 +430,7 @@ class ShipmentServices
     /**
      * @throws ValidationException
      */
-    public function trackShipment(TrackShipmentRequest $request): \Illuminate\Foundation\Application|\Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
+    public function trackShipment(TrackShipmentRequest $request)
     {
         $shipment_number = trim($request->number);
         $shipment = Shipment::where([
@@ -350,7 +444,7 @@ class ShipmentServices
         return redirect()->back()->with('error', 'An error occurred. Please try again later');
     }
 
-    private function trackAramex(Shipment $shipment): \Illuminate\Foundation\Application|\Illuminate\Routing\Redirector|\Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse
+    private function trackAramex(Shipment $shipment)
     {
         $aramex_shipment = AramexShipmentLog::where('shipment_id', $shipment->id)->first();
         try {
@@ -384,7 +478,8 @@ class ShipmentServices
                 return \redirect(route('shipment.track.details', $shipment->id));
             }
 
-            return redirect()->back()->with('error', 'We are working on tracking info. Please check back later');
+            //return redirect()->back()->with('error', 'We are working on tracking info. Please check back later');
+            throw ValidationException::withMessages(['number' => 'We are working on tracking info. Please check back later']);
         } catch (\Throwable  $e) {
             activity()
                 ->performedOn(new Shipment())
@@ -394,12 +489,12 @@ class ShipmentServices
                     'action' => 'Aramex Track Shipment'
                 ])
                 ->log($e->getMessage());
-            return redirect()->back()->with('error', 'We are working on tracking info. Please check back later');
+            throw ValidationException::withMessages(['number' => 'We are working on tracking info. Please check back later xxxxxxx']);
         }
 
     }
 
-    private function trackDhl(TrackShipmentRequest $request, Shipment $shipment): \Illuminate\Foundation\Application|\Illuminate\Routing\Redirector|\Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse
+    private function trackDhl(TrackShipmentRequest $request, Shipment $shipment)
     {
         $dhl_shipment = DhlShipmentLog::where('shipment_id', $shipment->id)->first();
         if (!$dhl_shipment) return redirect()->back()->with('error', 'An error occurred. Please try again later');
@@ -435,7 +530,8 @@ class ShipmentServices
                 }
             }
             if ($tracking_log) return \redirect(route('shipment.track.details', $shipment->id));
-            return redirect()->back()->with('message', 'We are working on tracking info. Please check back later');
+            throw ValidationException::withMessages(['number' => 'We are working on tracking info. Please check back later']);
+            //return redirect()->back()->with('message', 'We are working on tracking info. Please check back later');
         } catch (\Throwable $e) {
             activity()
                 ->performedOn(new Shipment())
@@ -445,7 +541,7 @@ class ShipmentServices
                     'action' => 'DHL Track Shipment'
                 ])
                 ->log($e->getMessage());
-            return redirect()->back()->with('error', 'We are working on tracking info. Please check back later');
+            throw ValidationException::withMessages(['number' => 'We are working on tracking info. Please check back later']);
         }
     }
 
@@ -475,6 +571,7 @@ class ShipmentServices
      */
     public function validateAddress(CreateShipmentOriginRequest | CreateShipmentDestinationRequest $request, $shipment_id, $type = 'pickup'): bool
     {
+        $shipment = Shipment::find($shipment_id);
         $check_aramex = CourierApiProvider::where('alias', 'aramex');
         if ($check_aramex->value('status') == 'active') {
             try {
@@ -522,6 +619,43 @@ class ShipmentServices
                     'cityName' => getCity('id', $request->city_id)->name,
                     'strictValidation' => "true"
                 ]);
+
+                if ($response->status() == 200) {
+                    ShipmentProvider::updateOrCreate([
+                        'shipment_id' => $shipment_id,
+                        'provider' => 'dhl'
+                    ]);
+                } else {
+                    ShipmentProvider::where([
+                        'shipment_id' => $shipment_id,
+                        'provider' => 'dhl'
+                    ])->delete();
+                }
+            } catch(\Throwable $e) {
+                activity()
+                    ->causedBy(\request()->user())
+                    ->withProperties([
+                        'class' => __CLASS__,
+                        'method' => __FUNCTION__,
+                        'action' => 'DHL Validate Address rate',
+                        'line' => $e->getLine()
+                    ])
+                    ->log($e->getMessage());
+            }
+        }
+
+        $check_ups = CourierApiProvider::where('alias', 'ups');
+        if ($check_ups->value('status') == 'active') {
+            $ups = new UpsServices($shipment);
+            try {
+                $validate = $ups->validateAddress();
+                $response = Http::post('https://wwwcie.ups.com/rest/AV', [
+                        'type' => $type,
+                        'countryCode' => getCountry('id', $request->country_id)->iso2,
+                        'postalCode' => $request->postcode,
+                        'cityName' => getCity('id', $request->city_id)->name,
+                        'strictValidation' => "true"
+                    ]);
 
                 if ($response->status() == 200) {
                     ShipmentProvider::updateOrCreate([

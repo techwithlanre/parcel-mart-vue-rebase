@@ -51,11 +51,14 @@ Route::get('tracking', function () {
 Route::post('contact', [\App\Http\Controllers\ContactController::class, 'send'])->name('contact.send');
 
 Route::post('/send-quote-form', function(\Illuminate\Http\Request $request) {
-    $path = $request->file('commercial_invoice')->store('quotes');
-    $path = $request->file('commercial_invoice')->store('quotes');
-    Mail::to('quotes@parcelsmartsolution.com')->send(new \App\Mail\QuoteForm($request));
+    //$path = $request->file('commercial_invoice')->store('quotes');
+    //$path = $request->file('commercial_invoice')->store('quotes');
+    //Mail::to('quotes@parcelsmartsolution.com')->send(new \App\Mail\QuoteForm($request));
     return redirect(\route('dashboard'))->with('message', 'Your request has been sent');
 })->name('send.quote.form');
+
+
+Route::post('send-quote', [\App\Http\Controllers\QuoteController::class, 'requestQuote'])->name('request-quote');
 
 
 Route::get('states/{country_id}', function () {
@@ -84,6 +87,8 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('quotes', [\App\Http\Controllers\QuoteController::class, 'index'])->name('quotes');
 
     /*Address Book*/
     Route::resource('address-book',\App\Http\Controllers\AddressBookController::class);
@@ -150,7 +155,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::get('verify-email', EmailVerificationPromptController::class)->name('verification.notice');
-Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
+Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)->middleware(['auth','signed', 'throttle:6,1'])->name('verification.verify');
 Route::post('email/verification-notification', [EmailVerificationNotificationController::class, 'store'])->middleware('throttle:6,1')->name('verification.send');
 Route::get('confirm-password', [ConfirmablePasswordController::class, 'show'])->name('password.confirm');
 Route::post('confirm-password', [ConfirmablePasswordController::class, 'store']);

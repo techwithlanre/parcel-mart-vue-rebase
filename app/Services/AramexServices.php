@@ -255,7 +255,7 @@ class AramexServices
                 "volume" => $volume, // volume of the pickup  (in CM^3)
             ]);
         } catch (\Throwable $e) {
-            dd($e->getMessage());
+            //dd($e->getMessage());
             activity()
                 ->performedOn(new Shipment())
                 ->causedBy(\request()->user())

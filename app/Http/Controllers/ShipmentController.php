@@ -38,7 +38,7 @@ class ShipmentController extends Controller
         //Mail::to(auth()->user()->email)->send(new OrderConfirmation(''));
         $filter = request();
         $log = [];
-        $shipments = Shipment::with('shipping_rate_log')->where('user_id', auth()->user()->id)->where('has_rate', 1)
+        $shipments = Shipment::with('shipping_rate_log')->where('user_id', auth()->user()->id)
         ->where('status', '!=', 'failed')->where(function ($query) use ($filter) {
             $query->when($filter->filled('status'), function ($query) use ($filter) {
                 return $filter->get('status') !== 'all'
@@ -208,7 +208,6 @@ class ShipmentController extends Controller
 
     public function checkout($id) {
         $shipment = Shipment::whereId($id)->with('shipment_items', 'country', 'city', 'state')->first();
-        //dd($shipment->shipment_items[0]->id);
         if ($shipment->status == 'processing') return redirect(route('shipment.details', $id));
         $shipping_rate_log = ShippingRateLog::where(['shipment_id' => $id, 'user_id' => auth()->user()->id])->with('courier_api_provider')->get();
         $shipment_item = ShipmentItem::find($shipment->shipment_items[0]->id);
@@ -375,6 +374,7 @@ class ShipmentController extends Controller
     public function storePackageInformation(CreatePackageInformationRequest $request, ShipmentServices $services, $id = null): \Illuminate\Foundation\Application|\Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
         $shipment = Shipment::find($request->shipment_id);
+        if ($shipment->status == 'processing') return redirect(route('shipment.details', $id));
         ShipmentItem::updateOrCreate(['shipment_id' => $shipment->id],[
             'item_category_id' => $request->category,
             'description' => $request->description,

@@ -73,30 +73,29 @@ const isOpenCreate = ref(false)
               <a @click="isOpenCreate = true" class="mt-5"><PrimaryButton>Create Address</PrimaryButton></a>
             </div>
           </div>
-            <Pagination v-if="addresses.data.length > 0" :links="addresses.links"/>
+          <Pagination v-if="addresses.data.length > 0" :links="addresses.links"/>
         </div>
-      <Modal :show="isOpenCreate">
-        <div>
-          <div class="flex flex-row justify-between items-start p-5">
-            <div class="">
-              <h3>Create address</h3>
-              <p class="text-sm">Use this form to create a new address</p>
+        <Modal :show="isOpenCreate">
+          <div>
+            <div class="flex flex-row justify-between items-start p-5">
+              <div class="">
+                <h3>Create address</h3>
+                <p class="text-sm">Use this form to create a new address</p>
+              </div>
+              <div>
+                <button @click="isOpenCreate = false">
+                  <svg  xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-red-900 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                </button>
+              </div>
             </div>
-            <div>
-              <button @click="isOpenCreate = false">
-                <svg  xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-red-900 cursor-pointer" fill="none" viewBox="0 0 24 24"
-                     stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-              </button>
+            <hr>
+            <div class="p-5">
+              <CreateAddress :countries="countries" @is-open-create="(value) => isOpenCreate = value" />
             </div>
           </div>
-          <hr>
-          <div class="p-5">
-            <CreateAddress :countries="countries" />
-          </div>
-        </div>
-      </Modal>
+        </Modal>
     </DashboardLayout>
 </template>
 

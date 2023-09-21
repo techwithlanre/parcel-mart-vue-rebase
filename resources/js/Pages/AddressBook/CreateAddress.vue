@@ -1,7 +1,7 @@
 <script setup>
 import InputError from "@/Components/InputError.vue";
 import TextInput from "@/Components/TextInput.vue";
-import {useForm} from "@inertiajs/vue3";
+import {useForm, usePage} from "@inertiajs/vue3";
 import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SelectInput from "@/Components/SelectInput.vue";
@@ -11,6 +11,8 @@ defineProps({
     countries: Array,
 })
 
+const page = usePage();
+const emit = defineEmits(['isOpenCreate'])
 const states = ref([]);
 const cities = ref([]);
 
@@ -30,9 +32,12 @@ const form = useForm({
 
 const submit = () => {
     form.post(route('address-book.store'), {
-        onSuccess: () => {
-          form.reset();
-        },
+      onFinish: (response) => {
+        emit('isOpenCreate', false);
+        // if (page.props.flash?.error?.length > 0) {
+        //   toast.error(page.props.flash.error);
+        // }
+      },
     })
 }
 
@@ -77,16 +82,17 @@ const getStates = () => {
               class="mt-2 flex"
               required
               placeholder=""
-              autocomplete="contact_email" />
+              autocomplete="contact_phone" />
 
           <InputError :message="form.errors.contact_phone" class="mt-2" />
         </div>
         <div class="w-full lg:mt-0 mt-3">
-          <InputLabel value="Contact Email (Optional)"  />
+          <InputLabel value="Contact Email *"  />
           <TextInput
               id="contact_email"
               v-model="form.contact_email"
               type="text"
+              required
               class="mt-2 flex"
               placeholder=""
               autocomplete="contact_email" />
@@ -109,7 +115,7 @@ const getStates = () => {
       <div class="mt-3">
         <InputLabel value="Address Line 1 *"  />
         <TextInput
-            id="address"
+            id="address_1"
             type="text"
             class="mt-2 flex"
             v-model="form.address_1"
@@ -120,7 +126,7 @@ const getStates = () => {
         <InputError :message="form.errors.address_1" class="mt-2" />
       </div>
       <div class="mt-3">
-        <InputLabel value="Address Line 2"  />
+        <InputLabel value="Address Line 2 *"  />
         <TextInput
             id="address_2"
             type="text"
@@ -132,7 +138,7 @@ const getStates = () => {
         <InputError :message="form.errors.address_2" class="mt-2" />
       </div>
       <div class="mt-3">
-        <InputLabel value="Nearest Landmark"  />
+        <InputLabel value="Nearest Landmark *"  />
         <TextInput
             id="landmark"
             type="text"
@@ -146,7 +152,7 @@ const getStates = () => {
       </div>
       <div class="mt-3 flex justify-between gap-x-5 lg:flex-row flex-col">
         <div class="w-full">
-          <InputLabel value="Country"  />
+          <InputLabel value="Country *"  />
           <SelectInput
               id="country"
               type="text"
@@ -158,7 +164,7 @@ const getStates = () => {
           <InputError :message="form.errors.country_id" class="mt-2" />
         </div>
         <div class="w-full lg:mt-0 mt-3">
-          <InputLabel value="State"  />
+          <InputLabel value="State *"  />
           <SelectInput
               id="state"
               type="text"
@@ -170,7 +176,7 @@ const getStates = () => {
           <InputError :message="form.errors.state_id" class="mt-2" />
         </div>
         <div class="w-full lg:mt-0 mt-3">
-          <InputLabel value="City"  />
+          <InputLabel value="City *"  />
           <SelectInput
               id="city"
               type="text"
@@ -182,12 +188,13 @@ const getStates = () => {
         </div>
       </div>
       <div class="mt-3">
-        <InputLabel value="Postcode"  />
+        <InputLabel value="Postcode *"  />
         <TextInput
             id="postcode"
             type="text"
             class="mt-2 flex"
             v-model="form.postcode"
+            required
             placeholder=""
             autocomplete="postcode" />
         <InputError :message="form.errors.postcode" class="mt-2" />

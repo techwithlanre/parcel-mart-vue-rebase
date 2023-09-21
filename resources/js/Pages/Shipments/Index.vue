@@ -116,7 +116,7 @@ const handleFilter = () => {
 
                             </td>
                             <td class="px-6 py-4">
-                                <Link :href="route('shipment.origin', item.id)" v-if="item.status === 'pending'" class="text-primary font-medium hover:text-green-600">Checkout</Link>
+                                <Link :href="route('shipment.origin', item.id)" v-if="item.status === 'pending'" class="text-primary font-medium hover:text-green-600">Continue</Link>
                                 <Link :href="route('shipment.details', item.id)" v-else class="btn btn-sm rounded-xl bg-green-400 text-white px-5 py-1 text-sm font-medium hover:text-green-600">View</Link>
                             </td>
                         </tr>

@@ -8,7 +8,7 @@ import SelectInput from "@/Components/SelectInput.vue";
 import TextAreaInput from "@/Components/TextAreaInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import InputError from "@/Components/InputError.vue";
-import Parcel from "../../images/parcel.png";
+import Parcel from "../../../images/parcel.png";
 import Pagination from "@/Components/Pagination.vue";
 import { notification } from 'ant-design-vue';
 
@@ -173,7 +173,7 @@ const trackShipment = () => {
                     <div class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-500">
                         <div class="flex gap-5 items-center">
                             <div class="h-12 w-12">
-                                <img src="../../images/shipment.png" alt="">
+                                <img src="../../../images/shipment.png" alt="">
                             </div>
                             <div class="flex flex-col">
                                 <h1 class="font-bold">Shipments</h1>
@@ -185,7 +185,7 @@ const trackShipment = () => {
                         <div class="flex justify-between">
                             <div class="flex gap-5 items-start">
                                 <div class="h-12 w-12">
-                                    <img src="../../images/wallet.png" alt="">
+                                    <img src="../../../images/wallet.png" alt="">
                                 </div>
                                 <div class="flex flex-col">
                                     <h1 class="font-bold">Wallet Balance</h1>
@@ -199,7 +199,7 @@ const trackShipment = () => {
                         <div class="flex justify-between">
                             <div class="flex gap-5 items-start">
                                 <div class="h-12 w-12">
-                                    <img src="../../images/wallet.png" alt="">
+                                    <img src="../../../images/wallet.png" alt="">
                                 </div>
                                 <div class="flex flex-col">
                                     <h1 class="font-bold">Total Users</h1>
@@ -213,7 +213,7 @@ const trackShipment = () => {
                         <div class="flex justify-between">
                             <div class="flex gap-5 items-start">
                                 <div class="h-12 w-12">
-                                    <img src="../../images/wallet.png" alt="">
+                                    <img src="../../../images/wallet.png" alt="">
                                 </div>
                                 <div class="flex flex-col">
                                     <h1 class="font-bold">Individual Users</h1>
@@ -227,7 +227,7 @@ const trackShipment = () => {
                         <div class="flex justify-between">
                             <div class="flex gap-5 items-start">
                                 <div class="h-12 w-12">
-                                    <img src="../../images/wallet.png" alt="">
+                                    <img src="../../../images/wallet.png" alt="">
                                 </div>
                                 <div class="flex flex-col">
                                     <h1 class="font-bold">Business Users</h1>
@@ -241,7 +241,7 @@ const trackShipment = () => {
                         <div class="flex justify-between">
                             <div class="flex gap-5 items-start">
                                 <div class="h-12 w-12">
-                                    <img src="../../images/wallet.png" alt="">
+                                    <img src="../../../images/wallet.png" alt="">
                                 </div>
                                 <div class="flex flex-col">
                                     <h1 class="font-bold">Total Wallet Balance</h1>
@@ -257,7 +257,7 @@ const trackShipment = () => {
                     <div class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-500">
                         <Link :href="route('shipment.start')" class="flex flex-col">
                             <div class="border bg-background/50 rounded-full h-16 w-16 flex justify-center items-center">
-                                <img src="../../images/parcel.png" alt="" class="h-10 w-10">
+                                <img src="../../../images/parcel.png" alt="" class="h-10 w-10">
                             </div>
 
                             <div class="flex flex-row justify-between items-center">
@@ -272,7 +272,7 @@ const trackShipment = () => {
                     <div class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-500">
                         <a href="javascript:void(0)" id="" class="flex flex-col" @click="toggleQuote(true)">
                             <div class="border bg-background/50 rounded-full h-16 w-16 flex justify-center items-center">
-                                <img src="../../images/price-tag.png" alt="" class="h-10 w-10">
+                                <img src="../../../images/price-tag.png" alt="" class="h-10 w-10">
                             </div>
 
                             <div class="flex flex-row justify-between items-center">
@@ -288,7 +288,7 @@ const trackShipment = () => {
                         <div class="flex gap-5 items-center">
                             <div class="flex flex-col">
                                 <div class="border bg-background/50 rounded-full h-16 w-16 flex justify-center items-center">
-                                    <img src="../../images/location.png" alt="" class="h-10 w-10">
+                                    <img src="../../../images/location.png" alt="" class="h-10 w-10">
                                 </div>
 
                                 <h1 class="font-medium text-md text-gray-600 mt-5">Tracking</h1>
@@ -600,7 +600,7 @@ const trackShipment = () => {
                   <TextInput v-model="trackForm.number" required type="text" class="mt-2" placeholder="Enter tracking number" />
                 </div>
                 <!-- Modal footer -->
-                <div class="flex justify-end items-center p-6 space-x-2 border-t border-gray-200 rounded-b sdark:border-gray-600">
+                <div class="flex justify-end items-center p-6 space-x-2 border-t border-gray-200 rounded-b">
                   <button
                       type="submit"
                       class="inline-flex justify-center rounded-md border border-transparent bg-background px-4 py-2 text-sm font-medium text-primary hover:text-white

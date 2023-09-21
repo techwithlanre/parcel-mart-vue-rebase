@@ -120,8 +120,8 @@ export default {
         },
 
       submitQuote: function () {
-        this.form.post(route('send.quote.form'), {
-          onFinish: () => {
+        this.form.post(route('request-quote'), {
+          onSuccess: () => {
             this.form.reset()
             this.toggleQuote(false);
             notification['success']({
@@ -137,7 +137,7 @@ export default {
 
 <script setup>
 
-import {useForm} from "@inertiajs/vue3";
+import {Link, useForm} from "@inertiajs/vue3";
 import Modal from "@/Components/Modal.vue";
 import {ref} from "vue";
 import {notification} from "ant-design-vue";
@@ -243,16 +243,17 @@ const trackShipment = () => {
                 <h1 class="text-lg">Recent Shipments</h1>
                 <div class="relative overflow-x-auto shadow sm:rounded-lg">
                     <table class="w-full text-sm text-left text-gray-500 sdark:text-gray-400">
-                        <thead class="text-sm text-gray-700 uppercase bg-gray-50 sdark:bg-gray-700 sdark:text-gray-400">
+                        <thead class="text-sm text-gray-700 uppercase bg-gray-50">
                         <tr>
                             <th scope="col" class="px-6 py-3">Origin</th>
                             <th scope="col" class="px-6 py-3">Destination</th>
                             <th scope="col" class="px-6 py-3">Number</th>
                             <th scope="col" class="px-6 py-3">Status</th>
+                            <th scope="col" class="px-6 py-3">Actions</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr v-if="log.length > 0" v-for="item in log" class="bg-white border-b sdark:bg-gray-800 sdark:border-gray-700 hover:bg-gray-50 sdark:hover:bg-gray-600">
+                        <tr v-if="log.length > 0" v-for="item in log" class="bg-white border-b hover:bg-gray-50">
                             <td class="px-6 py-4">
                                 <div class="font-bold">{{ item.origin['name']}}</div>
                                 <span class="text-gray-600">{{ item.origin['phone'] }}</span>
@@ -269,16 +270,19 @@ const trackShipment = () => {
                                 {{ item.number }}
                             </td>
                             <td class="px-6 py-4">
-                              <span
-                                  class="px-3 py-1 rounded-full text-white font-medium"
-                                  :class="{'bg-orange-400' : item.status ==='processing', 'bg-yellow-400' : item.status ==='pending', 'bg-green-400' : item.status ==='delivered'}">
-                                {{ item.status}}
-                              </span>
+                               <span
+                                   :class="{'bg-blue-100 text-blue-800' : item.status ==='processing',
+                                  'bg-orange-100 text-orange-800' : item.status ==='pending', 'bg-green-100 text-green-800' : item.status ==='delivered'}"
+                                   class="px-3 rounded-xl py-1">{{ item.status}}</span>
                             </td>
+                          <td class="px-6 py-4">
+                            <Link :href="route('shipment.origin', item.id)" v-if="item.status === 'pending'" class="text-primary font-medium hover:text-green-600">Continue</Link>
+                            <Link :href="route('shipment.details', item.id)" v-else class="btn btn-sm rounded-xl bg-green-400 text-white px-5 py-1 text-sm font-medium hover:text-green-600">View</Link>
+                          </td>
                         </tr>
                         <tr v-else>
                           <td colspan="5" class="px-6 py-4 text-center sm:text-lg text-sm">
-                            You have not shipped any package with us! Click the <Link class="font-semibold text-primary" :href="route('shipment.start')">here</Link> to start your shipment
+                            You have not shipped any package with us! Click the <Link class="font-semibold text-primary" :href="route('shipment.origin')">here</Link> to start your shipment
                           </td>
                         </tr>
                         </tbody>
@@ -290,16 +294,15 @@ const trackShipment = () => {
           <div class="">
             <div class="relative w-full max-w-2xl max-h-full duration-500">
               <!-- Modal content -->
-              <div class="relative bg-white rounded-lg shadow sdark:bg-gray-700">
+              <div class="relative bg-white rounded-lg shadow">
                 <!-- Modal header -->
-                <div class="flex items-start justify-between p-4 border-b rounded-t sdark:border-gray-600">
-                  <div class="text-xl font-semibold text-gray-900 sdark:text-white">
+                <div class="flex items-start justify-between p-4 border-b rounded-t">
+                  <div class="text-xl font-semibold text-gray-900">
                     Get Pricing
                     <p class="text-gray-500 font-normal text-sm mt-2">Use this form to get request for a quote</p>
                   </div>
                   <button type="button" class="text-gray-400 bg-transparent duration-500 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center sdark:hover:bg-gray-600 sdark:hover:text-white" data-modal-hide="getQuoteModal">
-                    <svg @click="isQuoteOpen = false" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-red-900 cursor-pointer" fill="none" viewBox="0 0 24 24"
-                         stroke="currentColor">
+                    <svg @click="isQuoteOpen = false" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-red-900 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                   </button>
@@ -318,6 +321,7 @@ const trackShipment = () => {
                               autocomplete="off"
                               readonly
                               v-model="form.name"/>
+                          <InputError class="mt-2" :message="form.errors.name" />
                         </div>
                         <div class="">
                           <TextInput
@@ -328,6 +332,7 @@ const trackShipment = () => {
                               autocomplete="off"
                               readonly
                               v-model="form.phone"/>
+                          <InputError class="mt-2" :message="form.errors.phone" />
                         </div>
                         <div class="">
                           <TextInput
@@ -337,6 +342,7 @@ const trackShipment = () => {
                               autocomplete="off"
                               readonly
                               v-model="form.email"/>
+                          <InputError class="mt-2" :message="form.errors.email" />
                         </div>
                       </div>
                       <div class="mt-4">
@@ -349,8 +355,8 @@ const trackShipment = () => {
                                 v-model="form.country_from"
                                 required
                                 :options="countries"
-                                v-on:change="getOriginStates"
-                            />
+                                v-on:change="getOriginStates" />
+                            <InputError class="mt-2" :message="form.errors.country_from" />
                           </div>
                           <div>
                             <InputLabel value="Origin State" class="mb-2" />
@@ -360,8 +366,8 @@ const trackShipment = () => {
                                 required
                                 v-model="form.state_from"
                                 :options="originStates"
-                                v-on:change="getOriginCities"
-                            />
+                                v-on:change="getOriginCities" />
+                            <InputError class="mt-2" :message="form.errors.state_from" />
                           </div>
                           <div>
                             <InputLabel value="Origin City" class="mb-2" />
@@ -370,8 +376,8 @@ const trackShipment = () => {
                                 class="block w-full"
                                 required
                                 v-model="form.city_from"
-                                :options="originCities"
-                            />
+                                :options="originCities" />
+                            <InputError class="mt-2" :message="form.errors.city_from" />
                           </div>
                         </div>
                       </div>
@@ -387,6 +393,7 @@ const trackShipment = () => {
                                 :options="countries"
                                 v-on:change="getDestinationStates"
                             />
+                            <InputError class="mt-2" :message="form.errors.country_to" />
                           </div>
 
                           <div>
@@ -397,8 +404,8 @@ const trackShipment = () => {
                                 required
                                 v-model="form.state_to"
                                 :options="destinationStates"
-                                v-on:change="getDestinationCities"
-                            />
+                                v-on:change="getDestinationCities" />
+                            <InputError class="mt-2" :message="form.errors.state_to" />
                           </div>
 
                           <div>
@@ -410,6 +417,7 @@ const trackShipment = () => {
                                 v-model="form.city_to"
                                 :options="destinationCities"
                             />
+                            <InputError class="mt-2" :message="form.errors.city_to" />
                           </div>
                         </div>
                       </div>
@@ -425,6 +433,7 @@ const trackShipment = () => {
                               autocomplete="off"
                               placeholder="Quantity"
                               v-model="form.quantity"/>
+                          <InputError class="mt-2" :message="form.errors.quantity" />
                         </div>
 
                         <div>
@@ -437,6 +446,7 @@ const trackShipment = () => {
                               autocomplete="off"
                               placeholder="Weight"
                               v-model="form.weight"/>
+                          <InputError class="mt-2" :message="form.errors.weight" />
                         </div>
 
                         <div>
@@ -449,6 +459,7 @@ const trackShipment = () => {
                               autocomplete="off"
                               placeholder="Length"
                               v-model="form.length"/>
+                          <InputError class="mt-2" :message="form.errors.length" />
                         </div>
                       </div>
                       <div class="grid lg:grid-cols-2 gap-y-3 mt-4 gap-x-5">
@@ -462,6 +473,7 @@ const trackShipment = () => {
                               autocomplete="off"
                               placeholder="Width"
                               v-model="form.width"/>
+                          <InputError class="mt-2" :message="form.errors.width" />
                         </div>
                         <div>
                           <InputLabel value="Height" class="mb-2" />
@@ -473,6 +485,7 @@ const trackShipment = () => {
                               autocomplete="off"
                               placeholder="Height"
                               v-model="form.height"/>
+                          <InputError class="mt-2" :message="form.errors.height" />
                         </div>
                       </div>
                       <div class="grid lg:grid-cols-2 gap-y-3 mt-4 gap-x-5">
@@ -482,9 +495,9 @@ const trackShipment = () => {
                               id=""
                               type="file"
                               class="mt-1 w-full"
-                              required
                               @input="form.commercial_invoice = $event.target.files[0]"
                               />
+                          <InputError class="mt-2" :message="form.errors.commercial_invoice" />
                         </div>
                         <div>
                           <InputLabel value="Parking List" class="mb-2" />
@@ -492,15 +505,14 @@ const trackShipment = () => {
                               id=""
                               type="file"
                               class="mt-1 w-full"
-                              required
                               @input="form.parking_list = $event.target.files[0]"
                               />
+                          <InputError class="mt-2" :message="form.errors.parking_list" />
                         </div>
                       </div>
                     </div>
                     <div class="flex justify-end items-center p-6 space-x-2 border-t border-gray-200 rounded-b sdark:border-gray-600">
-                      <button
-                          type="submit"
+                      <button type="submit"
                           class="inline-flex justify-center rounded-md border border-transparent bg-background px-4 py-2 text-sm font-medium text-primary hover:text-white
                                          hover:bg-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-all duration-500"
                           :class="{ 'opacity-25': form.processing }" :disabled="form.processing">

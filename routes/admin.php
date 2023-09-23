@@ -13,7 +13,9 @@ Route::prefix('admin')->middleware('check.admin.user')->group(function () {
        Route::get('payments', [\App\Http\Controllers\Admin\ReportsController::class, 'paymentReport'])->name('reports.payments');
        Route::get('tax', [\App\Http\Controllers\Admin\ReportsController::class, 'taxReport'])->name('reports.tax');
     });
-
+    Route::prefix('feedback')->group(function () {
+    Route::get('/tickets', [\App\Http\Controllers\CustomerFeedbackController::class, 'allTicket'])->name('feedback.tickets');
+    });
     Route::get('admin-filter-shipments', [\App\Http\Controllers\Admin\ShipmentController::class, 'filterShipment'])->name('admin.shipment.filter');
 
     Route::prefix('users')->group(function () {

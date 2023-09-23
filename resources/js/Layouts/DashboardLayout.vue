@@ -25,6 +25,7 @@ const sidebar = [
     { name: "Address Book", icon: LocationIcon, route: '/address-book', admin: false  },
     { name: "FAQs", icon: FAQ, route: '/faq', admin: false  },
     { name: "Invite & Earn", icon: InviteIcon, route: '/invite', admin: false  },
+    { name: "Feedback", icon: FAQ, route: '/account/feedback/tickets/user', admin: false  },
   ],
 ];
 
@@ -34,6 +35,7 @@ const adminMenu = [
   { name: "Roles", icon: ShoppingBagIcon, route: "/admin/roles", admin: true, permissionKey: ["read-role", "create-role", 'edit-role', 'delete-role'] },
   { name: "Reports", icon: WalletIcon, route: "/admin/reports/shipments" , admin: true, permissionKey: ['read-shipment-report'] },
   { name: "Providers", icon: OverviewIcon, route: "/admin/settings/rate", admin: false, permissionKey: ["read-provider"] },
+  { name: "All Tickets", icon: FAQ, route: '/admin/feedback/tickets', admin: true,   permissionKey: ['read-dashboard'] },
 ];
 
 const toggleSidebar = () => {

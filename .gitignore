@@ -6,6 +6,7 @@
 /storage/*.key
 parcel-mart-vue.zip
 /vendor
+/vendorlopi
 .env
 .env.backup
 .env.production

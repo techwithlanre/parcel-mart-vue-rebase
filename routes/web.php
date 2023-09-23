@@ -130,7 +130,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
        });
     });
 
+    Route::prefix('account/feedback')->group(function () {
+        Route::get('/', [\App\Http\Controllers\CustomerFeedbackController::class, 'index'])->name('feedback.index');
+        Route::get('/ticket/{ticket}/reply', [\App\Http\Controllers\CustomerFeedbackController::class, 'replyTicket'])->name('feedback.tickets.reply');
+        Route::post('/ticket/{ticket}/reply', [\App\Http\Controllers\CustomerFeedbackController::class, 'saveTicketReply'])->name('feedback.tickets.reply.save');
+        Route::get('/tickets/user', [\App\Http\Controllers\CustomerFeedbackController::class, 'allUserTicket'])->name('feedback.tickets.user');
+        Route::get('/ticket/{CustomerFeedback}', [\App\Http\Controllers\CustomerFeedbackController::class, 'showTicket'])->name('feedback.ticket.show');
+        Route::get('/ticket/{CustomerFeedback}/download', [\App\Http\Controllers\CustomerFeedbackController::class, 'getTicketmedia'])->name('feedback.ticket.media');
+        Route::post('save', [\App\Http\Controllers\CustomerFeedbackController::class, 'storeForm'])->name('feedback.store');
+        Route::post('/mark/{ticket}/{reply}/reply', [\App\Http\Controllers\CustomerFeedbackController::class, 'markReplyAsread'])->name('feedback.reply.read');
+        
+
+});
     Route::get('faq', [\App\Http\Controllers\FaqController::class, 'index'])->name('faq.index');
+
 
 
     Route::prefix('billing')->group(function (){

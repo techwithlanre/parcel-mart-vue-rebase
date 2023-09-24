@@ -1,3 +1,4 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office">
 
@@ -1024,22 +1025,15 @@ button.es-button {
                                                                         <table cellpadding="0" cellspacing="0" width="100%">
                                                                             <tbody>
                                                                                 <tr>
-                                                                                    <td align="left" class="esd-block-text h-auto" height="210">
-                                                                                        <p><strong>Dear {{$ticketReplyData->feedback_name}},</strong></p>
+                                                                                    <td align="left" class="esd-block-text h-auto" height="100">
+                                                                                        <p><strong>Response from {{$ticketReplyData->feedback_name}},</strong></p>
                                                                                         <p><br></p>
-                                                                                        <p style="font-size: 14px;">Thank you for reaching out to us with your inquiry. We appreciate your feedback and the opportunity to assist you.&nbsp;</p>
-                                                                                        <p style="font-size: 14px;"><br></p>
-                                                                                        <p style="font-size: 14px;">{{$ticketReplyData->feedback_message}}<br></p>
-                                                                                        <p style="font-size: 14px;"><br></p>
-                                                                                        <p style="font-size: 14px;">Our team is dedicated to providing the best support possible, and your input helps us improve our services. We have reviewed your request and are currently working on a solution to address your concerns.</p>
-                                                                                        <p><br></p>
-                                                                                        <p style="font-size: 14px;">If you have any more questions or need further assistance in the meantime, please don't hesitate to reach out. Your satisfaction is our top priority, and we are here to help.</p>
-                                                                                        <p style="font-size: 14px;"><br></p>
-                                                                                        <p style="font-size: 14px;">Thank you for choosing Parcels Mart. We value your business and appreciate your patience.</p>
+                                                                                        <p style="font-size: 14px;">{{$ticketReplyData->feedback_message}}</p>
+                                                                                     
                                                                                         <p><br></p>
                                                                                         <p style="font-size: 14px;">Best regards,</p>
-                                                                                        <p style="font-size: 14px;"><br><strong>{{env('MAIL_ADMIN')}}</strong></p>
-                                                                                        <p style="font-size: 14px;"><br></p>
+                                                                                        <p style="font-size: 14px;"><br><strong>{{$ticketReplyData->feedback_email}}</strong></p>
+                                                                                        <br>
                                                                                         <p style="font-size: 14px;">Parcels Mart</p>
                                                                                     </td>
                                                                                 </tr>

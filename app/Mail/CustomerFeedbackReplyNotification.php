@@ -10,8 +10,7 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Address;
 
-
-class FeedbackReplyNotification extends Mailable
+class CustomerFeedbackReplyNotification extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -30,7 +29,7 @@ class FeedbackReplyNotification extends Mailable
     {
         return new Envelope(
             from: new Address(env('MAIL_FROM_ADDRESS'),'Parcels Mart'),
-            subject: $this->ticket . ' - Ticket Support Notification',
+            subject:  'Customer Feedback Response Notification',
             metadata: ['ticket_id' => $this->ticket]
         );
     }
@@ -41,7 +40,7 @@ class FeedbackReplyNotification extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.feedback_notify_reply',
+            view: 'emails.feedback_customer_reply',
         );
     }
 

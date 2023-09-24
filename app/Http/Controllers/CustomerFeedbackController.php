@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\CustomerFeedbackReplyNotification;
 use App\Mail\FeedbackNotification;
 use App\Mail\FeedbackReplyNotification;
 use App\Models\CustomerFeedback;
@@ -105,12 +106,12 @@ class CustomerFeedbackController extends Controller
         $data['customer_feedback_id'] = $main_ticket->id;
     
        $reply =  CustomerFeedbackReply::create($data);
-        if ($user->is_admin || !$user->hasPermissionTo('create-user')) {
+        if ($user->is_admin || $user->hasPermissionTo('create-user')) {
             Mail::to($main_ticket->feedback_email)->send(new FeedbackReplyNotification($reply,$ticket));
         }
 
         if (!$user->is_admin && !$user->hasPermissionTo('create-user')) {
-            Mail::to(env('MAIL_ADMIN'))->send(new FeedbackReplyNotification($reply,$ticket));
+            Mail::to(env('MAIL_ADMIN'))->send(new CustomerFeedbackReplyNotification($reply,$ticket));
         }
 
             return to_route('feedback.ticket.show', $ticket);

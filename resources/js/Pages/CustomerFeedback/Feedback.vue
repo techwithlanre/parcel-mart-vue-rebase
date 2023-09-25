@@ -19,12 +19,11 @@ const page = usePage();
 const form = useForm({
   feedback_message: '',
   feedback_subject: '',
-  'feedback_file': '',
+  feedback_file: '',
 });
 
 //methods
 const submit = () => {
-
   form.post(route('feedback.store'), { forceFormData: true,});
 }
 
@@ -32,8 +31,6 @@ const submit = () => {
 
 <template>
     <DashboardLayout page-title="Customer Feedback">
-        <Head title="Customer Feedback" />
-
     <FeedbackLayout>
         <div class="w-full">
           <div class="p-5">
@@ -57,8 +54,8 @@ const submit = () => {
 
               <div class="mt-2 mb-2">
                 <input type="file" @input="form.feedback_file = $event.target.files[0]" />
-                <progress v-if="form.feedback_file" :value="form.progress.percentage" max="100">
-                  {{ form.progress.percentage }}%
+                <progress v-if="form.processing" :value="form?.progress?.percentage" max="100">
+                  {{ form.progress?.percentage }}%
                 </progress>
 
                 <InputError class="mt-2" :message="form.errors.feedback_file" />

@@ -185,7 +185,7 @@ class AramexServices
             //'cash_on_delivery_amount' => 10.32, // in case of CODS (in USD only "as they want")
             'insurance_amount' => $insuranceOption->amount, // optional
             //'collect_amount' => 0, // optional
-            'customs_value_amount' => (int) $shipmentItem->weight, //optional (required for express shipping) TODO
+            'customs_value_amount' => (float) $shipmentItem->weight, //optional (required for express shipping) TODO
             //'cash_additional_amount' => 0, // optional
             //'cash_additional_amount_description' => 'Something here',
             'product_group' => $product_group, // or EXP (defined in config file, if you don't pass it will take the config value)

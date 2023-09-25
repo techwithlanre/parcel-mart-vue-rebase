@@ -3,6 +3,8 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -26,5 +28,21 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+
+//        $this->renderable(function (Throwable $e) {
+//
+//            return response()->json([
+//                'success' => false,
+//                'error' => $e->getMessage()
+//            ], ResponseAlias::HTTP_BAD_REQUEST);
+//        });
+//
+//        $this->renderable(function (NotFoundHttpException $e) {
+//
+//            return response()->json([
+//                'success' => false,
+//                'error' => $e->getMessage()
+//            ], $e->getCode());
+//        });
     }
 }

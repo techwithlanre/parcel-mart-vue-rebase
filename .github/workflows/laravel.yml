@@ -15,8 +15,8 @@ jobs:
       run: composer update --ignore-platform-reqs
     - name: Installing project dependencies
       run: npm install
-    - name: Database Migration
-      run: php artisan migrate
+    #- name: Database Migration
+      #run: php artisan migrate
     - name: Building the project
       run: npm run build
     - name: Copy .env

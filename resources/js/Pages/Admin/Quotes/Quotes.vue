@@ -4,7 +4,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {ref} from "vue";
 import Modal from "@/Components/Modal.vue";
 import TextInput from "@/Components/TextInput.vue";
-import {useForm} from "@inertiajs/vue3";
+import {useForm, Link} from "@inertiajs/vue3";
 import InputError from "@/Components/InputError.vue";
 import Helper from "../../../Helpers/Helper.js";
 
@@ -17,6 +17,10 @@ const currentlyEditing = ref(0);
 
 const form = useForm({
   amount: '',
+})
+
+const convertForm = useForm({
+
 })
 
 const openModal = (id) => {
@@ -32,6 +36,14 @@ const submitSetPrice = () => {
       isOpenModal.value = false;
     }
   })
+}
+
+
+
+const convertQuoteToShipment = (quote_id) => {
+  convertForm.post(route('admin.convert-quote-to-shipment', quote_id), {
+
+  });
 }
 
 </script>
@@ -59,7 +71,7 @@ const submitSetPrice = () => {
             <th class="text-left p-4 font-medium">Package Information</th>
             <th class="text-left p-4 font-medium">Documents</th>
             <th class="text-left p-4 font-medium">Amount</th>
-            <th class="text-left p-4 font-medium">Shipping Cost</th>
+            <th class="text-left p-4 font-medium">Actions</th>
           </tr>
           </thead>
           <tbody>
@@ -107,7 +119,24 @@ const submitSetPrice = () => {
                 <div>Parking List: <a :href="quote.parking_list" class="text-primary">View</a></div>
               </td>
               <td class="p-4">{{ Helper.nairaFormat(quote.amount) }}</td>
-              <td class="p-4"><a @click="openModal(quote.id)" href="javascript:void(0)" class="px-3 py-1 bg-background text-primary rounded-full">Set Pricing</a></td>
+              <td class="p-4">
+                <div class="hs-dropdown relative inline-flex">
+                  <button id="hs-dropdown-custom-icon-trigger" type="button" class="hs-dropdown-toggle p-3 inline-flex justify-center items-center gap-2 rounded-md border border-background font-medium bg-white text-gray-700 shadow-sm align-middle hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-background transition-all text-sm sdark:bg-slate-900 sdark:hover:bg-slate-800 sdark:border-gray-700 sdark:text-gray-400 sdark:hover:text-white sdark:focus:ring-offset-gray-800">
+                    <svg class="w-4 h-4 text-gray-600" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                      <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                    </svg>
+                  </button>
+
+                  <div class="hs-dropdown-menu z-40 transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-[15rem] bg-white shadow-md rounded-lg p-2 mt-2 sdark:bg-gray-800 sdark:border sdark:border-gray-700" aria-labelledby="hs-dropdown-custom-icon-trigger">
+                    <a @click="openModal(quote.id)"  href="javascript:void(0)"  class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-background sdark:text-gray-400 sdark:hover:bg-gray-700 sdark:hover:text-gray-300">
+                      Set Pricing
+                    </a>
+                    <Link v-if="!quote.shipment_id" @click="convertQuoteToShipment(quote.id)"  class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-background sdark:text-gray-400 sdark:hover:bg-gray-700 sdark:hover:text-gray-300">
+                      Convert To Shipment
+                    </Link>
+                  </div>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>

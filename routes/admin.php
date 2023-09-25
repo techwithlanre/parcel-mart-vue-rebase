@@ -5,7 +5,12 @@ use \App\Http\Controllers\Admin\UserController;
 use \App\Http\Controllers\Admin\ShipmentController;
 
 Route::prefix('admin')->middleware('check.admin.user')->group(function () {
-    Route::get('dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('admin.dashboard');
+    Route::prefix('analytics')->group(function () {
+        Route::get('', [\App\Http\Controllers\Admin\AnalyticController::class, 'index'])->name('admin.dashboard');
+        Route::get('users', [\App\Http\Controllers\Admin\AnalyticController::class, 'users'])->name('admin.analytics.users');
+        Route::get('shipments', [\App\Http\Controllers\Admin\AnalyticController::class, 'shipments'])->name('admin.analytics.shipments');
+        Route::get('filter-shipments', [\App\Http\Controllers\Admin\AnalyticController::class, 'filterShipments'])->name('admin.analytics.shipments.filter');
+    });
 
     Route::prefix('reports')->group(function () {
        Route::get('shipments', [\App\Http\Controllers\Admin\ReportsController::class, 'shipmentsReport'])->name('reports.shipment');
@@ -37,4 +42,9 @@ Route::prefix('admin')->middleware('check.admin.user')->group(function () {
 
     Route::get('quotes', [\App\Http\Controllers\QuoteController::class, 'adminQuotes'])->name('admin.quotes');
     Route::put('set-quote-price/{id}', [\App\Http\Controllers\QuoteController::class, 'setPrice'])->name('admin.set-quote-price');
+    Route::post('convert-quote-to-shipment/{id}', [\App\Http\Controllers\QuoteController::class, 'convertQuoteToShipment'])->name('admin.convert-quote-to-shipment');
+
+    Route::prefix('feedback')->group(function () {
+        Route::get('/tickets', [\App\Http\Controllers\CustomerFeedbackController::class, 'allTicket'])->name('feedback.tickets');
+    });
 });

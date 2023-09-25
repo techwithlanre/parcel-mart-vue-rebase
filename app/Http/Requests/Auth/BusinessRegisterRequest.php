@@ -23,6 +23,8 @@ class BusinessRegisterRequest extends FormRequest
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'country' => ['required', 'exists:countries,id'],
             'ref_by' => ['nullable', 'exists:users,ref_code'],
+            'dob' => 'required|date',
+            'gender' => 'required|string',
         ];
     }
 
@@ -30,6 +32,13 @@ class BusinessRegisterRequest extends FormRequest
     {
         return [
 
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'dob' => 'date of birth'
         ];
     }
 }

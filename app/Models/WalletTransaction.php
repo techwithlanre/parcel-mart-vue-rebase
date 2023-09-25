@@ -23,4 +23,9 @@ class WalletTransaction extends Model
         'channel',
         'time_initiated'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

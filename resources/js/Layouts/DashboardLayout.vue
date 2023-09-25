@@ -8,7 +8,11 @@ import FAQ from "../../images/icons/_faq.svg";
 import InviteIcon from "../../images/icons/_invite.svg";
 import LogoutIcon from "../../images/icons/_logout.svg";
 import ShoppingBagIcon from "../../images/icons/shopping-bag.svg";
+import ChartIcon from "../../images/icons/graph.svg";
+import PencilIcon from "../../images/icons/pencil.svg";
+import OptionsIcon from "../../images/icons/options.svg";
 import {computed, ref} from "vue";
+import {DocumentIcon, DocumentTextIcon, CursorArrowRippleIcon, UsersIcon} from "@heroicons/vue/20/solid/index.js";
 
 const page = usePage();
 defineProps({
@@ -25,16 +29,19 @@ const sidebar = [
     { name: "Address Book", icon: LocationIcon, route: '/address-book', admin: false},
     { name: "FAQs", icon: FAQ, route: '/faq', admin: false  },
     { name: "Invite & Earn", icon: InviteIcon, route: '/invite', admin: false  },
+    { name: "Feedback", icon: FAQ, route: '/feedback/tickets/user', admin: false  },
   ],
 ];
 
 const adminMenu = [
-  { name: "Dashboard", icon: OverviewIcon, route: "/admin/dashboard", admin: false, permissionKey: ['read-dashboard'] },
-  { name: "Users", icon: OverviewIcon, route: "/admin/users", admin: true, permissionKey: ["read-user", "create-user"] },
-  { name: "Quotes", icon: OverviewIcon, route: "/admin/quotes", admin: true, permissionKey: ["read-user", "create-user"] },
-  { name: "Roles", icon: ShoppingBagIcon, route: "/admin/roles", admin: true, permissionKey: ["read-role", "create-role", 'edit-role', 'delete-role'] },
-  { name: "Reports", icon: WalletIcon, route: "/admin/reports/shipments" , admin: true, permissionKey: ['read-shipment-report'] },
-  { name: "Providers", icon: OverviewIcon, route: "/admin/settings/rate", admin: false, permissionKey: ["read-provider"] },
+  { name: "Analytics", icon: ChartIcon, route: "/admin/analytics", admin: false, permissionKey: ['read-dashboard'] },
+  { name: "Reports", icon: DocumentTextIcon, route: "/admin/reports/shipments" , admin: true, permissionKey: ['read-shipment-report'] },
+  { name: "Users", icon: UsersIcon, route: "/admin/users", admin: true, permissionKey: ["read-user", "create-user"] },
+  { name: "Quotes", icon: PencilIcon, route: "/admin/quotes", admin: true, permissionKey: ["read-user", "create-user"] },
+  { name: "Roles", icon: CursorArrowRippleIcon, route: "/admin/roles", admin: true, permissionKey: ["read-role", "create-role", 'edit-role', 'delete-role'] },
+  { name: "Shipment Locations", icon: LocationIcon, route: "/admin/shipment-locations", admin: true, permissionKey: ["read-role", "create-role", 'edit-role', 'delete-role'] },
+  { name: "Providers", icon: OptionsIcon, route: "/admin/settings/rate", admin: false, permissionKey: ["read-provider"] },
+  { name: "All Tickets", icon: FAQ, route: '/admin/feedback/tickets', admin: true,   permissionKey: ['read-dashboard'] },
 ];
 
 const toggleSidebar = () => {
@@ -42,7 +49,7 @@ const toggleSidebar = () => {
 }
 
 const checkPermission = (featurePermissions) => {
-  return page.props.auth.permissions.some( ai => featurePermissions.includes(ai));
+  return page.props.auth.permissions.some( permission => featurePermissions.includes(permission));
 }
 
 const fullName = computed(() => {
@@ -95,7 +102,7 @@ const fullName = computed(() => {
                   :class="{'text-primary bg-[#004e4f] border-l border-white outline-non group font-bold hover:text-primary hover:bg-background': $page.url === item.route}"
                   class="relative flex flex-row items-center h-11 focus:outline-none  text-white hover:text-white border-l-4 border-transparent hover:bg-[#008083]/50 hover:border-background pr-6 duration-500">
                 <span class="inline-flex justify-center items-center sm:ml-4 ml-2.5">
-                  <Component :is="item.icon" />
+                  <Component :is="item.icon" class="w-5 h-5 fill-current" />
                 </span>
                 <span class="ml-2 text-sm tracking-wide truncate">{{ item.name }}</span>
             </Link>
@@ -108,7 +115,7 @@ const fullName = computed(() => {
                   :class="{'text-primary bg-[#004e4f] border-l border-white outline-non group font-bold hover:text-primary hover:bg-background': $page.url === item.route}"
                   class="relative flex flex-row items-center h-11 focus:outline-none  text-white hover:text-white border-l-4 border-transparent hover:bg-[#008083]/50 hover:border-background pr-6 duration-500">
                 <span class="inline-flex justify-center items-center sm:ml-4 ml-2.5">
-                  <Component :is="item.icon" />
+                  <Component :is="item.icon" class="w-5 h-5 fill-current" />
                 </span>
               <span class="ml-2 text-sm tracking-wide truncate">{{ item.name }}</span>
             </Link>

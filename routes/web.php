@@ -97,7 +97,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('shipments')->group(function () {
         Route::get('', [\App\Http\Controllers\ShipmentController::class, 'index'])->name('shipment.index');
         Route::get('filter', [\App\Http\Controllers\ShipmentController::class, 'filterShipment'])->name('shipment.filter');
-        Route::get('start', [\App\Http\Controllers\ShipmentController::class, 'create'])->name('shipment.start');
         Route::post('calculate', [\App\Http\Controllers\ShipmentController::class, 'calculateShipment'])->name('shipment.initialize');
         Route::put('update/{id}', [\App\Http\Controllers\ShipmentController::class, 'recalculateShipment'])->name('shipment.recalculate');
         Route::get('checkout/{id}', [\App\Http\Controllers\ShipmentController::class, 'checkout'])->name('shipment.checkout');
@@ -107,8 +106,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('tracking-details/{shipment_id}', [\App\Http\Controllers\ShipmentController::class, 'trackingDetails'])->name('shipment.track.details');
         Route::get('pickup', [\App\Http\Controllers\ShipmentController::class, 'calculatePickup'])->name('shipment.calculate.pickup');
 
-
-        //new routes
         Route::get('origin/{id?}', [\App\Http\Controllers\ShipmentController::class, 'origin'])->name('shipment.origin');
         Route::get('destination/{id}', [\App\Http\Controllers\ShipmentController::class, 'destination'])->name('shipment.destination');
         Route::get('package-information/{id}', [\App\Http\Controllers\ShipmentController::class, 'packageInformation'])->name('shipment.package-information');
@@ -133,6 +130,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
            Route::post('description', [\App\Http\Controllers\ShippingSettingController::class, 'createDescription'])->name('shipping.setting.description.post');
            Route::get('measurement', [\App\Http\Controllers\ShippingSettingController::class, 'measurement'])->name('shipping.setting.measurement');
        });
+    });
+
+    Route::prefix('feedback')->group(function () {
+        Route::get('', [\App\Http\Controllers\CustomerFeedbackController::class, 'index'])->name('feedback.index');
+        Route::get('ticket/{ticket}/reply', [\App\Http\Controllers\CustomerFeedbackController::class, 'replyTicket'])->name('feedback.tickets.reply');
+        Route::post('ticket/{ticket}/reply', [\App\Http\Controllers\CustomerFeedbackController::class, 'saveTicketReply'])->name('feedback.tickets.reply.save');
+        Route::get('tickets/user', [\App\Http\Controllers\CustomerFeedbackController::class, 'allUserTicket'])->name('feedback.tickets.user');
+        Route::get('ticket/{CustomerFeedback}', [\App\Http\Controllers\CustomerFeedbackController::class, 'showTicket'])->name('feedback.ticket.show');
+        Route::get('ticket/{CustomerFeedback}/download', [\App\Http\Controllers\CustomerFeedbackController::class, 'getTicketmedia'])->name('feedback.ticket.media');
+        Route::post('save', [\App\Http\Controllers\CustomerFeedbackController::class, 'storeForm'])->name('feedback.store');
+        Route::post('mark/{ticket}/{reply}/reply', [\App\Http\Controllers\CustomerFeedbackController::class, 'markReplyAsread'])->name('feedback.reply.read');
     });
 
     Route::get('faq', [\App\Http\Controllers\FaqController::class, 'index'])->name('faq.index');

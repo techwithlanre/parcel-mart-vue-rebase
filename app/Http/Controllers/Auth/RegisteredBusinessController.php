@@ -24,9 +24,7 @@ class RegisteredBusinessController extends Controller
     public function store(BusinessRegisterRequest $businessRegisterRequest): RedirectResponse
     {
         $request = $businessRegisterRequest->validated();
-        $ref_by = $businessRegisterRequest->has('ref_by')
-            ? User::where('ref_code', $request['ref_by'])->value('id')
-            : NULL;
+        $ref_by = $businessRegisterRequest->has('ref_by') ? User::where('ref_code', $request['ref_by'])->value('id') : NULL;
 
         $user = User::create([
             'business_name' => $request['business_name'],
@@ -39,15 +37,13 @@ class RegisteredBusinessController extends Controller
             'country_id' => $request['country'],
             'credit_limit' => 0,
             'ref_code' => Str::lower(Str::random(8)),
-            'ref_by_id' => $ref_by
+            'ref_by_id' => $ref_by,
+            'dob' => $request['dob'],
+            'gender' => $request['gender'],
         ]);
 
         if ($ref_by != NULL) {
-            ReferralLog::create([
-                'user_id' => $user->id,
-                'referred_by_id' => $ref_by,
-                'is_paid' => 0,
-            ]);
+            $this->createReferral($user, $ref_by);
         }
 
         event(new Registered($user));
@@ -56,5 +52,14 @@ class RegisteredBusinessController extends Controller
 
         Auth::login($user);
         return redirect(RouteServiceProvider::HOME);
+    }
+
+    private function createReferral(User $user, $ref_by): void
+    {
+        ReferralLog::create([
+            'user_id' => $user->id,
+            'referred_by_id' => $ref_by,
+            'is_paid' => 0,
+        ]);
     }
 }

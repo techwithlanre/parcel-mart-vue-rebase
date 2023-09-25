@@ -10,6 +10,7 @@ use App\Http\Requests\CreateShipmentRequest;
 use App\Http\Requests\TrackShipmentRequest;
 use App\Mail\OrderConfirmation;
 use App\Models\Address;
+use App\Models\AddressContact;
 use App\Models\AllowedShipmentCountry;
 use App\Models\AramexShipmentLog;
 use App\Models\City;
@@ -62,20 +63,20 @@ class ShipmentController extends Controller
                 'id' => $shipment->id,
                 'number' => $shipment->number,
                 'origin' => [
-                    'name' => $origin->contact_name,
-                    'phone' => $origin->contact_phone,
-                    'email' => $origin->contact_email,
-                    'address_1' => $origin->address_1,
-                    'city' => getCity('id' , $origin->city_id)->name,
-                    'country' => getCountry('id' , $origin->country_id)->name,
+                    'name' => $origin?->contact_name,
+                    'phone' => $origin?->contact_phone,
+                    'email' => $origin?->contact_email,
+                    'address_1' => $origin?->address_1,
+                    'city' => getCity('id' , $origin?->city_id)?->name,
+                    'country' => getCountry('id' , $origin?->country_id)?->name,
                 ],
                 'destination' => [
-                    'name' => $destination->contact_name,
-                    'phone' => $destination->contact_phone,
-                    'email' => $destination->contact_email,
-                    'address_1' => $destination->address_1,
-                    'city' => getCity('id' , $destination->city_id)->name,
-                    'country' => getCountry('id' , $destination->country_id)->name,
+                    'name' => $destination?->contact_name,
+                    'phone' => $destination?->contact_phone,
+                    'email' => $destination?->contact_email,
+                    'address_1' => $destination?->address_1,
+                    'city' => getCity('id' , $destination?->city_id)?->name,
+                    'country' => getCountry('id' , $destination?->country_id)?->name,
                 ],
                 'status' => $shipment->status
             ];
@@ -303,6 +304,30 @@ class ShipmentController extends Controller
         ]);
 
         $services->validateAddress($request, $shipment->id);
+
+        if ($request->save_address) {
+            $address = Address::updateOrCreate([
+                'address_1' => $request->address_1,
+                'city_id' => $request->city_id,
+                'shipment_id'=>$shipment->id,],
+                [
+                    'user_id'=>auth()->user()->id,
+                    'address_2' => $request->address_2,
+                    'country_id' => $request->country_id,
+                    'state_id' => $request->state_id,
+                    'landmark' => $request->landmark,
+                    'postcode' => $request->postcode
+                ]);
+
+            AddressContact::updateOrCreate(['address_id' => $address->id],[
+                'contact_name' => $request->contact_name,
+                'business_name' => $request->business_name,
+                'contact_email' => $request->contact_email,
+                'contact_phone' => $request->contact_phone,
+                'is_default' => $address->address_contacts()->count() > 0 ? 0 : 1,
+            ]);
+        }
+
         return redirect(route('shipment.destination', $shipment->id));
     }
 
@@ -339,7 +364,6 @@ class ShipmentController extends Controller
             $cities = City::where('state_id', $destination_address->state_id)->get();
         }
 
-
         return Inertia::render('Shipments/Destination', compact('shipment_id', 'countries', 'destination_address', 'states', 'cities', 'addresses'));
     }
 
@@ -361,6 +385,26 @@ class ShipmentController extends Controller
         ]);
 
         $services->validateAddress($request, $shipment->id, 'delivery');
+
+        if ($request->save_address) {
+            $address = Address::updateOrCreate(['address_1' => $request->address_1, 'city_id' => $request->city_id,],[
+                'shipment_id'=>$shipment->id,
+                'user_id'=>auth()->user()->id,
+                'address_2' => $request->address_2,
+                'country_id' => $request->country_id,
+                'state_id' => $request->state_id,
+                'landmark' => $request->landmark,
+                'postcode' => $request->postcode,
+            ]);
+
+            AddressContact::updateOrCreate(['address_id' => $address->id],[
+                'contact_name' => $request->contact_name,
+                'business_name' => $request->business_name,
+                'contact_email' => $request->contact_email,
+                'contact_phone' => $request->contact_phone,
+                'is_default' => $address->address_contacts()->count() > 0 ? 0 : 1,
+            ]);
+        }
         return redirect(route('shipment.package-information', $shipment->id));
     }
 

@@ -19,3 +19,15 @@ Route::get('allowed-countries/{country_id}', function (\Illuminate\Http\Request 
     return response()->json([]);
 
 });
+
+Route::get('country/{id}', function (\Illuminate\Http\Request $request) {
+    return \App\Models\Country::find($request->id);
+});
+
+Route::get('state/{id}', function (\Illuminate\Http\Request $request) {
+    return \App\Models\State::find($request->id);
+});
+
+Route::get('city/{id}', function (\Illuminate\Http\Request $request) {
+    return \App\Models\City::find($request->id);
+});

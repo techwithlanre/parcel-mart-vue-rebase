@@ -10,6 +10,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Bavix\Wallet\Traits\HasWallet;
 use Bavix\Wallet\Interfaces\Wallet;
+use Illuminate\Support\Carbon;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 use Laravel\Passport\HasApiTokens;
@@ -37,6 +38,8 @@ class User extends Authenticatable implements Wallet, MustVerifyEmail
         'ref_by_id',
         'point',
         'firebase_token',
+        'dob',
+        'gender',
     ];
 
     /**
@@ -76,5 +79,16 @@ class User extends Authenticatable implements Wallet, MustVerifyEmail
     public function quotes(): HasMany
     {
         return $this->hasMany(Quote::class);
+    }
+
+    public static function getRetentionRate($period)
+    {
+        $start = Carbon::now()->sub($period);
+        $end = Carbon::now();
+
+        $usersAtStart = User::where('created_at', '<=', $start)->count();
+        $usersAtEnd = User::where('created_at', '<=', $end)->count();
+
+        return ($usersAtEnd / $usersAtStart) * 100;
     }
 }

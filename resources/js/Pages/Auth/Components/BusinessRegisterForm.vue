@@ -4,9 +4,10 @@ import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import SelectInput from "@/Components/SelectInput.vue";
 import {Head, Link, useForm} from "@inertiajs/vue3";
+import InputLabel from "@/Components/InputLabel.vue";
 
 export default {
-    components: {SelectInput, PrimaryButton, InputError, TextInput, Link, Head},
+    components: {InputLabel, SelectInput, PrimaryButton, InputError, TextInput, Link, Head},
     data() {
         return {
             form: useForm({
@@ -16,6 +17,8 @@ export default {
               email: '',
               password: '',
               phone: '',
+              dob: '',
+              gender: '',
               country: '0',
               state: '0',
               password_confirmation: '',
@@ -25,7 +28,8 @@ export default {
     },
 
     props: {
-        countries: Array
+      countries: Array,
+      genderOptions: Array
     },
 
     methods: {
@@ -45,117 +49,136 @@ export default {
 <template>
     <form @submit.prevent="submit">
         <div class="">
+          <InputLabel value="Business Name *" />
             <TextInput
                 id="business_name"
                 type="text"
                 class="mt-1 block w-full"
                 v-model="form.business_name"
-                required
                 autofocus
-                placeholder="Business Name"
                 autocomplete="business_name" />
             <InputError class="mt-2" :message="form.errors.business_name" />
         </div>
-        <div class="flex lg:flex-row flex-col justify-between gap-4">
-            <div>
-                <TextInput
-                    id="first_name"
-                    type="text"
-                    class="mt-4 block w-full"
-                    v-model="form.first_name"
-                    
-                    placeholder="First Name"
-                    autocomplete="first_name" />
+        <div class="grid lg:grid-cols-2 grid-cols-1 justify-between gap-x-4 gap-y-3 mt-2">
+          <div>
+            <InputLabel value="First Name *" />
+            <TextInput
+                id="first_name"
+                type="text"
+                class="mt-1 block w-full"
+                v-model="form.first_name"
+                autocomplete="first_name" />
 
-                <InputError class="mt-2" :message="form.errors.first_name" />
-            </div>
-            <div class="lg:mt-3">
-                <TextInput
-                    id="last_name"
-                    type="text"
-                    class="mt-1 block w-full"
-                    v-model="form.last_name"
-                    required
-                    
-                    placeholder="Last Name"
-                    autocomplete="last_name" />
-                <InputError class="mt-2" :message="form.errors.last_name" />
-            </div>
+            <InputError class="mt-2" :message="form.errors.first_name" />
+          </div>
+          <div>
+            <InputLabel value="Last Name *" />
+            <TextInput
+                id="last_name"
+                type="text"
+                class="mt-1 block w-full"
+                v-model="form.last_name"
+                autocomplete="last_name" />
+            <InputError class="mt-2" :message="form.errors.last_name" />
+          </div>
         </div>
 
-        <div class="mt-4">
+        <div class="mt-2">
+          <InputLabel value="Email *" />
             <TextInput
                 id="email"
                 type="email"
                 class="mt-1 block w-full"
                 v-model="form.email"
-                required
-                placeholder="Email"
                 autocomplete="email" />
             <InputError class="mt-2" :message="form.errors.email" />
         </div>
 
-        <div class="mt-4">
-            <TextInput
-                id="phone"
-                type="tel"
-                class="mt-1 block w-full"
-                v-model="form.phone"
-                required
-                placeholder="Phone"
-                autocomplete="phone" />
+        <div class="mt-2">
+          <InputLabel value="Phone *" />
+          <TextInput
+              id="phone"
+              type="tel"
+              class="mt-1 block w-full"
+              v-model="form.phone"
+              autocomplete="phone" />
 
-            <InputError class="mt-2" :message="form.errors.phone" />
+          <InputError class="mt-2" :message="form.errors.phone" />
         </div>
 
-        <div class="flex lg:flex-row flex-col justify-between gap-4">
-            <div class="mt-4">
-                <TextInput
-                    id="password"
-                    type="password"
-                    class="mt-1 block w-full"
-                    v-model="form.password"
-                    required
-                    placeholder="Password"
-                    autocomplete="new-password" />
+        <div class="grid lg:grid-cols-2 grid-cols-1 justify-between gap-x-4 gap-y-3 mt-2">
+          <div class="">
+            <InputLabel value="Password *" />
+            <TextInput
+                id="password"
+                type="password"
+                class="mt-1 block w-full"
+                v-model="form.password"
+                autocomplete="new-password" />
 
-                <InputError class="mt-2" :message="form.errors.password" />
-            </div>
+            <InputError class="mt-2" :message="form.errors.password" />
+          </div>
 
-            <div class="mt-4">
-                <TextInput
-                    id="password_confirmation"
-                    type="password"
-                    class="mt-1 block w-full"
-                    v-model="form.password_confirmation"
-                    required
-                    placeholder="Confirm Password"
-                    autocomplete="new-password" />
+          <div class="">
+            <InputLabel value="Confirm Password *" />
+            <TextInput
+                id="password_confirmation"
+                type="password"
+                class="mt-1 block w-full"
+                v-model="form.password_confirmation"
+                autocomplete="new-password" />
 
-                <InputError class="mt-2" :message="form.errors.password_confirmation" />
-            </div>
+            <InputError class="mt-2" :message="form.errors.password_confirmation" />
+          </div>
+        </div>
+
+        <div class="grid lg:grid-cols-2 grid-cols-1 justify-between gap-x-4 gap-y-3 mt-2">
+          <div class="">
+            <InputLabel value="Date of Birth *" />
+            <TextInput
+                id="dob"
+                type="date"
+                class="mt-1 block w-full"
+                v-model="form.dob"
+                autocomplete="date_of_birth" />
+
+            <InputError class="mt-2" :message="form.errors.dob" />
+          </div>
+
+          <div class="">
+            <InputLabel value="Gender *" />
+            <SelectInput
+                place-holder=""
+                class="block w-full mt-1"
+                v-model="form.gender"
+                :options="genderOptions"
+            />
+
+            <InputError class="mt-2" :message="form.errors.gender" />
+          </div>
         </div>
 
         <div class="">
-            <div class="mt-4">
-                <SelectInput
-                    place-holder="Country"
-                    class="block w-full"
-                    v-model="form.country"
-                    :options="countries"
-                />
+          <div class="mt-2">
+            <InputLabel value="Country *" />
+            <SelectInput
+                place-holder=""
+                class="block w-full mt-1"
+                v-model="form.country"
+                :options="countries"
+            />
 
-                <InputError class="mt-2" :message="form.errors.country" />
-            </div>
+            <InputError class="mt-2" :message="form.errors.country" />
+          </div>
         </div>
 
-        <div class="mt-4">
+        <div class="mt-2">
+          <InputLabel value="Referral Code" />
           <TextInput
               id="ref_by"
               type="text"
               class="mt-1 block w-full"
               v-model="form.ref_by"
-              placeholder="Referral Code (Optional)"
               autocomplete="ref_by" />
 
           <InputError class="mt-2" :message="form.errors.ref_by" />

@@ -3,10 +3,15 @@ import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 import Helper from "@/Helpers/Helper.js";
 import ReportsLayout from "@/Layouts/ReportsLayout.vue";
 import {onMounted, ref, watch} from "vue";
-import {Link} from "@inertiajs/vue3";
+import {Link, router, useForm} from "@inertiajs/vue3";
 import TextInput from "@/Components/TextInput.vue";
 import SelectInput from "@/Components/SelectInput.vue";
 import {WalletIcon} from "@heroicons/vue/20/solid/index.js";
+import Loading from "@/Components/Loading.vue";
+import Pagination from "@/Components/Pagination.vue";
+import {Inertia} from "@inertiajs/inertia";
+import VueDatePicker from "@vuepic/vue-datepicker";
+import InputLabel from "@/Components/InputLabel.vue";
 
 const props = defineProps({
   totalShipmentCount: Number,
@@ -16,36 +21,36 @@ const props = defineProps({
   shipmentCost: Number,
   shipmentCharge: Number,
   insuranceAmount: Number,
+  log: Array,
+  shipments: Array,
+  dateRangeUrl: Array
 });
 
-const shipments = ref([]);
-const fetchingShipments = ref(false);
-
-onMounted(() => {
-  fetchingShipments.value = true;
-  axios.get(route('admin.shipment.filter')).then((response) => {
-    shipments.value = response.data;
-    fetchingShipments.value = false;
-  })
-})
-
 let trackingNumber = ref('');
-let status = ref('0')
+let status = ref('0');
+
+let dateRange = ref('');
+
+watch(dateRange, (value) => {
+  Inertia.get(route('reports.shipment'), { from: value[0], to: value[1] }, {
+    preserveState: true
+  });
+});
 
 watch(trackingNumber, (value) => {
-  fetchingShipments.value = true;
-  axios.get(route('admin.shipment.filter'), { params: { number: value } }).then((response) => {
-    shipments.value = response.data;
-    fetchingShipments.value = false;
+  router.get(route('reports.shipment'), {
+    number: value
+  }, {
+    preserveState: true
   })
 });
 
 
 watch(status, (value) => {
-  fetchingShipments.value = true;
-  axios.get(route('admin.shipment.filter'), { params: { status: value } }).then((response) => {
-    shipments.value = response.data;
-    fetchingShipments.value = false;
+  router.get(route('reports.shipment'), {
+    status: value
+  }, {
+    preserveState: true
   })
 });
 
@@ -74,44 +79,27 @@ const exportCsv = () => {
 }
 
 const cardsData = [
-  {
-    name: "Shipments",
-    data: props.totalShipmentCount
-  },
-  {
-    name: "Processing Shipments",
-    data: props.processingShipmentsCount
-  },
-  {
-    name: "Pending Shipments",
-    data: props.pendingShipmentsCount
-  },
-  {
-    name: "Delivered Shipments",
-    data: props.deliveredShipmentsCount
-  },
-  {
-    name: "Total Shipment Cost",
-    data: Helper.nairaFormat(props.shipmentCost)
-  },
-  {
-    name: "Total Shipment Charge",
-    data: Helper.nairaFormat(props.shipmentCharge)
-  },
-  {
-    name: "Profit On Shipments",
-    data: Helper.nairaFormat(props.shipmentCharge - props.shipmentCost)
-  },
-  {
-    name: "Total Insurance",
-    data: Helper.nairaFormat(props.insuranceAmount)
-  },
+  {name: "Shipments", data: props.totalShipmentCount},
+  {name: "Processing Shipments", data: props.processingShipmentsCount},
+  {name: "Pending Shipments", data: props.pendingShipmentsCount},
+  {name: "Delivered Shipments", data: props.deliveredShipmentsCount},
+  {name: "Total Shipment Charge", data: Helper.nairaFormat(props.shipmentCharge)},
+  {name: "Total Shipment Cost", data: Helper.nairaFormat(props.shipmentCost)},
+  {name: "Profit On Shipments", data: Helper.nairaFormat(props.shipmentCharge - props.shipmentCost)},
+  {name: "Total Insurance", data: Helper.nairaFormat(props.insuranceAmount)}
 ]
-
 </script>
 <template>
   <DashboardLayout page-title="Shipments Report">
     <ReportsLayout>
+      <div class="flex flex-col justify-end mb-20 w-max">
+        <InputLabel value="Filter Data" />
+        <VueDatePicker
+            v-model="dateRange"
+            :enable-time-picker="false"
+            :range="true"
+            class="mt-3" />
+      </div>
       <div class="flex flex-col w-full gap-5">
         <div class="grid sm:grid-cols-4 grid-cols-1 justify-between gap-5 w-full">
           <div v-for="item in cardsData" :key="item.name" class=" flex flex-row justify-between p-5 shadow shadow-background rounded-xl w-full">
@@ -171,50 +159,56 @@ const cardsData = [
                     <th class="text-left p-4 font-bold">User</th>
                     <th class="text-left p-4 font-bold">Origin</th>
                     <th class="text-left p-4 font-bold">Destination</th>
-                    <th class="text-left p-4 font-bold">Provider</th>
+                    <th class="text-left p-4 font-bold">Package</th>
                     <th class="text-left p-4 font-bold">Tracking Number</th>
                     <th class="text-left p-4 font-bold">Provider Cost</th>
                     <th class="text-left p-4 font-bold">Amount Paid</th>
+                    <th class="text-left p-4 font-bold">Profit</th>
                     <th class="text-left p-4 font-bold">Status</th>
                     <th class="text-left p-4 font-bold">Action</th>
                   </tr>
                 </thead>
+
                 <tbody v-if="fetchingShipments">
                   <tr>
                     <td colspan="8" class="text-center p-5">
-                      Fetching Shipments
+                      <Loading />
                     </td>
                   </tr>
                 </tbody>
                 <tbody v-else>
-                <tr v-if="shipments.length > 0"  class="bg-white border-t hover:bg-gray-50" v-for="item in shipments">
+                <tr v-if="log.length > 0"  class="bg-white border-t hover:bg-gray-50" v-for="item in log">
                   <td class="p-4 font-semibold">
-                    <div class="">{{ item.user.first_name}} {{ item.user.last_name}}</div>
-                    <div class="">{{ item.user.email}}</div>
-                    <div class="">{{ item.user.phone}}</div>
+                    <div class="">{{ item.shipment.user.first_name }} {{ item.shipment.user.last_name }} </div>
+                    <div class="">{{ item.shipment.user.email}}</div>
+                    <div class="">{{ item.shipment.user.phone }}</div>
                   </td>
                   <td class="p-4">
-<!--                    <span class="text-gray-600">{{ item.origin['phone'] }}</span>-->
-                    <div>{{ item.origin['address_1']}}</div>
-                    <div>{{item.origin['city']}}, {{ item.origin['country']}}</div>
+                    <div>{{ item.origin?.name}}</div>
+                    <div class="text-red-700">{{ item.origin?.phone}}</div>
+                    <div>{{ item.origin?.country}}</div>
+                    <div>{{ item.origin?.city }} {{ item.origin?.state}}</div>
                   </td>
                   <td class="p-4">
-<!--                    <span class="text-gray-600">{{ item.destination['phone'] }}</span>-->
-                    <div>{{ item.destination['address_1']}}</div>
-                    <div>{{item.destination['city']}}, {{ item.destination['country']}}</div>
+                    <div>{{ item.destination?.name}}</div>
+                    <div>{{ item.destination?.phone}}</div>
+                    <div>{{ item.destination?.country}}</div>
+                    <div>{{item.destination?.city}} {{ item.destination?.state }}</div>
                   </td>
-                  <td class="p-4">{{ item.rate?.provider_code}}</td>
+                  <td class="p-4">{{ item.shipment?.shipping_rate_log?.product_name}}</td>
                   <td class="p-4">
-                    <h1 class="text-md ">{{ item.number }}</h1>
+                    <h1 class="text-md text-primary">{{ item.shipment?.number }}</h1>
                   </td>
-                  <td class="p-4">{{ Helper.nairaFormat(item.rate?.provider_total_amount ?? 0) }}</td>
-                  <td class="p-4">{{ Helper.nairaFormat(item.rate?.total_charge ?? 0) }}</td>
-                  <td class="p-4"><span
-                      :class="{'bg-blue-100 text-blue-800' : item.status ==='processing',
-                                  'bg-orange-100 text-orange-800' : item.status ==='pending', 'bg-green-100 text-green-800' : item.status ==='delivered'}"
-                      class="px-3 rounded-xl py-1">{{ item.status}}</span></td>
+                  <td class="p-4">{{ Helper.nairaFormat(item.shipment?.shipping_rate_log?.provider_total_amount ?? 0) }}</td>
+                  <td class="p-4">{{ Helper.nairaFormat(item.shipment?.shipping_rate_log?.total_charge ?? 0) ?? '' }}</td>
+                  <td class="p-4">{{ Helper.nairaFormat(item.shipment?.shipping_rate_log?.total_charge - item.shipment?.shipping_rate_log?.provider_total_amount) }}</td>
                   <td class="p-4">
-                    <Link :href="route('shipment.details', item.id)" v-if="item.status !== 'pending'" class="btn btn-sm rounded-xl bg-green-400 text-white px-5 py-1 text-sm font-medium hover:text-green-600">View</Link>
+                    <span
+                      :class="{'bg-blue-100 text-blue-800' : item.shipment.status ==='processing',
+                                  'bg-orange-100 text-orange-800' : item.shipment.status ==='pending', 'bg-green-100 text-green-800' : item.shipment.status ==='delivered'}"
+                      class="px-3 rounded-xl py-1">{{ item.shipment.status}}</span></td>
+                  <td class="p-4">
+                    <Link :href="route('shipment.details', item.shipment.id)" v-if="item.shipment.status !== 'pending'" class="btn btn-sm rounded-xl bg-green-400 text-white px-5 py-1 text-sm font-medium hover:text-green-600">View</Link>
                   </td>
                 </tr>
                 <tr v-else>
@@ -225,10 +219,10 @@ const cardsData = [
                 </tbody>
               </table>
             </div>
-<!--            <Pagination :links="shipments.links" />-->
           </div>
         </div>
       </div>
+      <Pagination :links="shipments.links" />
     </ReportsLayout>
   </DashboardLayout>
 </template>

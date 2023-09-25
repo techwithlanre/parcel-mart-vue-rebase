@@ -64,55 +64,58 @@ class ShipmentController extends Controller
     public function filterShipment(Request $request): \Illuminate\Http\JsonResponse
     {
         $log = [];
-        $shipments = Shipment::where('has_rate', 1)
-            ->where(function ($query) use ($request) {
+
+        $shipments = Shipment::where(function ($query) use ($request) {
                 $query->when($request->filled('number'), function ($query) use ($request) {
-                    return $query->where('number', 'LIKE', '%'. $request->get('number'). '%');
+                    $query->where('number', 'LIKE', '%'. $request->get('number'). '%');
                 });
             })->where(function ($query) use ($request) {
                 $query->when($request->filled('status'), function ($query) use ($request) {
-                    return $request->get('status') !== 'all'
-                        ? $query->where('status', $request->get('status'))
-                        : $query;
+                    if ($request->get('status') !== 'all')
+                        $query->where('status', $request->get('status'));
                 });
-            })->with('shipment_rate')->orderBy('id', 'desc')->paginate(10);
+            })->with('user', 'origin', 'destination')->orderBy('id', 'desc')->paginate(10);
+//        foreach ($shipments as $shipment) {
+//            $origin = ShipmentAddress::where([
+//                'shipment_id'=>$shipment->id,
+//                'type'=>'origin'
+//            ])->first();
+//
+//            $destination = ShipmentAddress::where([
+//                'shipment_id'=>$shipment->id,
+//                'type'=>'destination'
+//            ])->first();
+//            $log[] = [
+//                'id' => $shipment->id,
+//                'number' => $shipment?->number,
+//                'origin' => [
+//                    'name' => $origin?->contact_name,
+//                    'phone' => $origin?->contact_phone,
+//                    'email' => $origin?->contact_email,
+//                    'address_1' => $origin?->address_1,
+//                    'city' => getCity('id' , $origin?->city_id)?->name,
+//                    'country' => getCountry('id' , $origin?->country_id)?->name,
+//                ],
+//                'destination' => [
+//                    'name' => $destination?->contact_name,
+//                    'phone' => $destination?->contact_phone,
+//                    'email' => $destination?->contact_email,
+//                    'address_1' => $destination?->address_1,
+//                    'city' => getCity('id' , $destination?->city_id)?->name,
+//                    'country' => getCountry('id' , $destination?->country_id)?->name,
+//                ],
+//                'status' => $shipment->status,
+//                'rate' => $shipment?->shipping_rate_log,
+//                'user' => User::find($shipment->user_id),
+//            ];
+//        }
 
-        foreach ($shipments as $shipment) {
-            $origin = ShipmentAddress::where([
-                'shipment_id'=>$shipment->id,
-                'type'=>'origin'
-            ])->first();
+        $response = [
+            'data' => $log,
+            'links' => $shipments->links()
+        ];
 
-            $destination = ShipmentAddress::where([
-                'shipment_id'=>$shipment->id,
-                'type'=>'destination'
-            ])->first();
-            $log[] = [
-                'id' => $shipment->id,
-                'number' => $shipment->number,
-                'origin' => [
-                    'name' => $origin['contact_name'],
-                    'phone' => $origin['contact_phone'],
-                    'email' => $origin['contact_email'],
-                    'address_1' => $origin['address_1'],
-                    'city' => getCity('id' , $origin['city_id'])->name,
-                    'country' => getCountry('id' , $origin['country_id'])->name,
-                ],
-                'destination' => [
-                    'name' => $destination['contact_name'],
-                    'phone' => $destination['contact_phone'],
-                    'email' => $destination['contact_email'],
-                    'address_1' => $destination['address_1'],
-                    'city' => getCity('id' , $destination['city_id'])->name,
-                    'country' => getCountry('id' , $destination['country_id'])->name,
-                ],
-                'status' => $shipment->status,
-                'rate' => $shipment->shipping_rate_log,
-                'user' => User::find($shipment->user_id),
-            ];
-        }
-
-        return response()->json($log);
+        return response()->json($shipments);
     }
 
     public function export(Request $request): \Illuminate\Http\JsonResponse

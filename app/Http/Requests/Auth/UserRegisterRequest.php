@@ -15,23 +15,30 @@ class UserRegisterRequest extends FormRequest
 
     public function rules(): array
     {
-        $rules = [
+        return [
             'first_name' => 'required|string|max:255|alpha',
             'last_name' => 'required|string|max:255|alpha',
             'phone' => 'required|numeric|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:users',
             'email' => 'required|string|email:rfc,dns|max:255|unique:'.User::class,
+            'dob' => 'required|date',
+            'gender' => 'required|string',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'country' => ['required', 'exists:countries,id'],
             'ref_by' => ['nullable', 'exists:users,ref_code'],
         ];
-
-        return $rules;
     }
 
     public function messages(): array
     {
         return [
 
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'dob' => 'date of birth'
         ];
     }
 }

@@ -8,7 +8,6 @@ import SelectInput from "@/Components/SelectInput.vue";
 import TextAreaInput from "@/Components/TextAreaInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import InputError from "@/Components/InputError.vue";
-import Parcel from "../../../../images/parcel.png";
 import Pagination from "@/Components/Pagination.vue";
 import { notification } from 'ant-design-vue';
 import { Bar } from 'vue-chartjs'
@@ -66,7 +65,7 @@ export default {
     Pagination,
     TransitionRoot, TextAreaInput, PrimaryButton, SelectInput, Tab,
     TabPanel, TabPanels, TabList, TabGroup, AuthenticatedLayout,
-    InputError, InputLabel, TextInput, Link, Head, Parcel, Bar
+    InputError, InputLabel, TextInput, Link, Head, Bar
   },
 
   computed: {
@@ -173,28 +172,10 @@ export default {
 <script setup>
 
 import {useForm} from "@inertiajs/vue3";
-import Modal from "@/Components/Modal.vue";
-import {ref} from "vue";
 import {notification} from "ant-design-vue";
 import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 import TopNav from "@/Components/TopNav.vue";
-import {UsersIcon, WalletIcon} from "@heroicons/vue/20/solid/index.js";
-
-const isTrackingOpen = ref(false);
-
-const trackForm = useForm({
-  number: ''
-})
-
-
-const trackShipment = () => {
-  trackForm.post(route('shipment.track'), {
-    onFinish: ()  => {
-      trackForm.reset();
-      isTrackingOpen.value = false;
-    },
-  })
-}
+import {WalletIcon} from "@heroicons/vue/20/solid/index.js";
 
 const tabs = [
   { name: "Users Analytics", icon: WalletIcon, route: "/admin/analytics/users", permissionKey: ['read-shipment-report']},
@@ -213,7 +194,7 @@ const tabs = [
           <div class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-500">
             <div class="flex gap-5 items-center">
               <div class="h-12 w-12">
-                <img src="../../../../images/shipment.png" alt="">
+                <img src="../../../../../images/shipment.png" alt="">
               </div>
               <div class="flex flex-col">
                 <h1 class="font-bold">Shipments</h1>
@@ -225,7 +206,7 @@ const tabs = [
             <div class="flex justify-between">
               <div class="flex gap-5 items-start">
                 <div class="h-12 w-12">
-                  <img src="../../../../images/wallet.png" alt="">
+                  <img src="../../../../../images/wallet.png" alt="">
                 </div>
                 <div class="flex flex-col">
                   <h1 class="font-bold">Wallet Balance</h1>
@@ -239,7 +220,7 @@ const tabs = [
             <div class="flex justify-between">
               <div class="flex gap-5 items-start">
                 <div class="h-12 w-12">
-                  <img src="../../../../images/wallet.png" alt="">
+                  <img src="../../../../../images/wallet.png" alt="">
                 </div>
                 <div class="flex flex-col">
                   <h1 class="font-bold">Total Users</h1>
@@ -253,7 +234,7 @@ const tabs = [
             <div class="flex justify-between">
               <div class="flex gap-5 items-start">
                 <div class="h-12 w-12">
-                  <img src="../../../../images/wallet.png" alt="">
+                  <img src="../../../../../images/wallet.png" alt="">
                 </div>
                 <div class="flex flex-col">
                   <h1 class="font-bold">Individual Users</h1>
@@ -267,7 +248,7 @@ const tabs = [
             <div class="flex justify-between">
               <div class="flex gap-5 items-start">
                 <div class="h-12 w-12">
-                  <img src="../../../../images/wallet.png" alt="">
+                  <img src="../../../../../images/wallet.png" alt="">
                 </div>
                 <div class="flex flex-col">
                   <h1 class="font-bold">Business Users</h1>
@@ -281,7 +262,7 @@ const tabs = [
             <div class="flex justify-between">
               <div class="flex gap-5 items-start">
                 <div class="h-12 w-12">
-                  <img src="../../../../images/wallet.png" alt="">
+                  <img src="../../../../../images/wallet.png" alt="">
                 </div>
                 <div class="flex flex-col">
                   <h1 class="font-bold">Total Wallet Balance</h1>

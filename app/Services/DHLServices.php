@@ -115,17 +115,17 @@ class DHLServices
             "monetaryAmount" => [
                 [
                     "typeCode" => "declaredValue",
-                    "value" => (int) $item->value,
+                    "value" => (float) $item->value,
                     "currency" => "NGN"
                 ]
             ],
             "packages" => [
                 [
-                    "weight" => (int) $item->weight,
+                    "weight" => (float) $item->weight,
                     "dimensions" => [
-                        "length" => (int) $item->length,
-                        "width" => (int) $item->width,
-                        "height" => (int) $item->height
+                        "length" => (float) $item->length,
+                        "width" => (float) $item->width,
+                        "height" => (float) $item->height
                     ]
                 ]
             ]
@@ -313,7 +313,7 @@ class DHLServices
                 "incoterm" => "DAP",
                 "unitOfMeasurement" => "metric",
                 "declaredValueCurrency" => "NGN",
-                "declaredValue" => (int) $shipmentItem->value
+                "declaredValue" => (float) $shipmentItem->value
             ]
         ];
 

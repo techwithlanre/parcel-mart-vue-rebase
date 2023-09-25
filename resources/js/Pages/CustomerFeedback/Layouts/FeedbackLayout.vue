@@ -10,8 +10,7 @@ const tabs = [
 
 <template>
   <div class="sm:w-3/5 mx-auto">
-    <div class="flex flex-col min-h-screeqn gap-x-10">
-   
+    <div class="flex flex-col min-h-screen gap-x-10">
       <div class="shadow-md flex flex-1 border rounded-xl">
         <slot />
       </div>

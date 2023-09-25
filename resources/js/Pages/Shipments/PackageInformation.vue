@@ -78,7 +78,7 @@ onMounted(() => {
               </div>
               <div class="w-full">
                 <InputLabel value="Item value (NGN)" class="font-normal"/>
-                <TextInput  type="number" v-model="form.value"  min="1"
+                <TextInput  type="text" v-model="form.value" min="0"
                            placeholder="" :class="{'border-orange-300': form.errors.value}" class="mt-2"/>
                 <InputError class="mt-2" :message="form.errors.value" />
               </div>
@@ -92,13 +92,13 @@ onMounted(() => {
             <div class="flex lg:flex-row flex-col w-full gap-x-10 gap-y-4">
               <div class="w-full">
                 <InputLabel value="Quantity" class="font-normal"/>
-                <TextInput  type="number" v-model="form.quantity" min="1" placeholder=""
+                <TextInput  type="text" v-model="form.quantity" min="0" placeholder=""
                             :class="{'border-orange-300': form.errors.quantity}" class="mt-2"/>
                 <InputError class="mt-2" :message="form.errors.quantity" />
               </div>
               <div class="w-full">
                 <InputLabel value="Weight (KG)" class="font-normal"/>
-                <TextInput  type="number" v-model="form.weight" min="1" placeholder=""
+                <TextInput  type="text" v-model="form.weight" min="0" placeholder=""
                             :class="{'border-orange-300': form.errors.weight}" class="mt-2"/>
                 <InputError class="mt-2" :message="form.errors.weight" />
               </div>
@@ -106,19 +106,19 @@ onMounted(() => {
             <div class="flex lg:flex-row flex-col w-full gap-x-10 gap-y-4">
               <div class="w-full">
                 <InputLabel value="Length (CM)" class="font-normal"/>
-                <TextInput  type="number" v-model="form.length" min="1" placeholder=""
+                <TextInput type="text" v-model="form.length" min="0" placeholder=""
                             :class="{'border-orange-300': form.errors.length}" class="mt-2"/>
                 <InputError class="mt-2" :message="form.errors.length" />
               </div>
               <div class="w-full">
                 <InputLabel value="Width (CM)" class="font-normal"/>
-                <TextInput  type="number" v-model="form.width" min="1" placeholder=""
+                <TextInput  type="text" v-model="form.width" min="0" placeholder=""
                             :class="{'border-orange-300': form.errors.width}" class="mt-2"/>
                 <InputError class="mt-2" :message="form.errors.width" />
               </div>
               <div class="w-full">
                 <InputLabel value="Height (CM)" class="font-normal"/>
-                <TextInput  type="number" v-model="form.height" min="1" placeholder=""
+                <TextInput  type="text" v-model="form.height" min="0" placeholder=""
                             :class="{'border-orange-300': form.errors.height}" class="mt-2"/>
                 <InputError class="mt-2" :message="form.errors.height" />
               </div>

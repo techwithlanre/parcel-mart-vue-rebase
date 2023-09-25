@@ -25,11 +25,11 @@ class CreatePackageInformationRequest extends FormRequest
             'category' => ['required', 'exists:item_categories,id'],
             'description' => ['required', ''],
             'quantity' => ['required', 'numeric'],
-            'weight' => ['required', 'numeric'],
-            'height' => ['required', 'numeric'],
-            'length' => ['required', 'numeric'],
-            'width' => ['required', 'numeric'],
-            'value' => ['required', 'numeric'],
+            'weight' => ['required', 'between:0,99.99'],
+            'height' => ['required', 'between:0,99.99'],
+            'length' => ['required', 'between:0,99.99'],
+            'width' => ['required', 'between:0,99.99'],
+            'value' => ['required', 'between:0,99.99'],
         ];
     }
 }

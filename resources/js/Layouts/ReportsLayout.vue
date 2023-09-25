@@ -7,7 +7,6 @@ const tabs = [
   { name: "Shipments Report", icon: WalletIcon, route: "/admin/reports/shipments", permissionKey: ['read-shipment-report']},
   { name: "Users Report", icon: UsersIcon, route: "/admin/reports/users", permissionKey: ['read-user-report']},
   { name: "Payment Report", icon: WalletIcon, route: "/admin/reports/payments", permissionKey: ['read-payment-report']},
-  { name: "Tax Report", icon: WalletIcon, route: "/admin/reports/tax", permissionKey: ['read-tax-report']},
 ];
 
 </script>

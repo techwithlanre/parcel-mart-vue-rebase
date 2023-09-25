@@ -34,8 +34,8 @@ Route::group(['middleware'], function () {
     });
 
     Route::get('/country', [UserAuthController::class, 'country']);
-    Route::get('/states/{id}', [UserAuthController::class, 'states']);
-    Route::get('/cities/{id}', [UserAuthController::class, 'city']);
+    Route::get('/states/{id}', [UserAuthController::class, 'states'])->name('get.state');
+    Route::get('/cities/{id}', [UserAuthController::class, 'city'])->name('get.city');
     // put all api protected routes here
     Route::middleware('auth:api')->group(function () {
         Route::get('/profile', [GeneralController::class, 'userprofile']);

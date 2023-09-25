@@ -39,7 +39,7 @@ class RegisteredUserController extends Controller
     public function store(UserRegisterRequest $userRegisterRequest): RedirectResponse
     {
         $request = $userRegisterRequest->validated();
-        $ref_by = $userRegisterRequest->has('ref_by')
+        $ref_by = $userRegisterRequest->filled('ref_by')
             ? User::where('ref_code', $request['ref_by'])->value('id')
             : NULL;
 
@@ -52,7 +52,9 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request['password']),
             'user_type' => 'individual',
             'ref_code' => Str::lower(Str::random(8)),
-            'ref_by_id' => $ref_by
+            'ref_by_id' => $ref_by,
+            'dob' => $request['dob'],
+            'gender' => $request['gender'],
         ]);
 
         if ($ref_by != NULL) {

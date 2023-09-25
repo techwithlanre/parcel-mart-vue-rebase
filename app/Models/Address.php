@@ -18,10 +18,11 @@ class Address extends Model
         'postcode',
         'city_id',
         'landmark',
-        'status'
+        'status',
+        'shipment_id'
     ];
 
-    public function address_contacts()
+    public function address_contacts(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(AddressContact::class);
     }

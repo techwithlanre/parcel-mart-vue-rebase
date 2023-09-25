@@ -24,6 +24,11 @@ class Shipment extends Model
         'reference'
     ];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function shipment_items(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ShipmentItem::class);
@@ -52,5 +57,20 @@ class Shipment extends Model
     public function shipment_rate()
     {
         return $this->hasMany(ShippingRateLog::class);
+    }
+
+    public function origin(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ShipmentAddress::class)->where('type', 'origin');
+    }
+
+    public function destination(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ShipmentAddress::class)->where('type', 'destination');
+    }
+
+    public function selected_shipment_rate()
+    {
+        return $this->hasMany(ShippingRateLog::class)->where('id', $this->shipping_rate_log_id);
     }
 }

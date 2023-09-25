@@ -133,7 +133,7 @@ watch(status, (value) => {
                 <div class="flex flex-col items-center">
                     <img :src="parcel" alt="" class="h-52">
                     <h1 class="mt-5 text-center">You have not shipped any package with us! Click the button below to start your shipment</h1>
-                    <Link :href="route('shipment.start')" class="mt-5"><PrimaryButton>Start Shipment</PrimaryButton></Link>
+                    <Link :href="route('shipment.origin')" class="mt-5"><PrimaryButton>Start Shipment</PrimaryButton></Link>
                 </div>
             </div>
         </div>

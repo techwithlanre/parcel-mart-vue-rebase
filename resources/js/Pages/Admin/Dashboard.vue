@@ -252,51 +252,6 @@ const trackShipment = () => {
                         </div>
                     </div>
                 </div>
-
-                <div v-if="!page.props.auth.user.is_admin" class="flex flex-col gap-y-10 sm:flex-row gap-x-10 mt-10">
-                    <div class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-500">
-                        <Link :href="route('shipment.start')" class="flex flex-col">
-                            <div class="border bg-background/50 rounded-full h-16 w-16 flex justify-center items-center">
-                                <img src="../../../images/parcel.png" alt="" class="h-10 w-10">
-                            </div>
-
-                            <div class="flex flex-row justify-between items-center">
-                                <div class="flex flex-col">
-                                    <h1 class="font-medium text-md text-gray-600 mt-5">Book Shipments</h1>
-                                    <h3 class="text-xs text-gray-400">Send and receive item(s)</h3>
-                                </div>
-                                <div class="text-primary"></div>
-                            </div>
-                        </link>
-                    </div>
-                    <div class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-500">
-                        <a href="javascript:void(0)" id="" class="flex flex-col" @click="toggleQuote(true)">
-                            <div class="border bg-background/50 rounded-full h-16 w-16 flex justify-center items-center">
-                                <img src="../../../images/price-tag.png" alt="" class="h-10 w-10">
-                            </div>
-
-                            <div class="flex flex-row justify-between items-center">
-                                <div class="flex flex-col">
-                                    <h1 class="font-medium text-md text-gray-600 mt-5">Get Pricing</h1>
-                                    <h3 class="text-xs text-gray-400">Request a quote</h3>
-                                </div>
-                                <div class="text-primary"></div>
-                            </div>
-                        </a>
-                    </div>
-                    <a href="javascript:void(0)" @click="isTrackingOpen = true" class="p-5 bg-white rounded-2xl w-full shadow hover:shadow-lg duration-500">
-                        <div class="flex gap-5 items-center">
-                            <div class="flex flex-col">
-                                <div class="border bg-background/50 rounded-full h-16 w-16 flex justify-center items-center">
-                                    <img src="../../../images/location.png" alt="" class="h-10 w-10">
-                                </div>
-
-                                <h1 class="font-medium text-md text-gray-600 mt-5">Tracking</h1>
-                                <h3 class="text-xs text-gray-400">Track your shipments</h3>
-                            </div>
-                        </div>
-                    </a>
-                </div>
             </div>
         </div>
         <!-- Table-->

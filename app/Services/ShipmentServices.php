@@ -22,6 +22,7 @@ use App\Models\TrackingLog;
 use App\Models\UpsRateLog;
 use App\Models\WalletOverdraft;
 use App\Models\WalletOverdraftLog;
+use App\Models\WalletTransaction;
 use App\Traits\ValidateAramexAddress;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Http;
@@ -392,8 +393,13 @@ class ShipmentServices
                 auth()->user()->withdraw($current_balance);
             }
 
-            if (auth()->user()->user_type === 'business' && auth()->user()->balance >= $total_amount)  auth()->user()->withdraw($total_amount);
-            if (auth()->user()->user_type === 'individual') auth()->user()->withdraw($total_amount);
+            $transaction = '';
+            if (auth()->user()->user_type === 'business' && auth()->user()->balance >= $total_amount)  {
+                $transaction = auth()->user()->withdraw($total_amount);
+            }
+            if (auth()->user()->user_type === 'individual') {
+                $transaction = auth()->user()->withdraw($total_amount);
+            }
 
 
             $rate->insurance_option_id = $insurance->id;
@@ -406,6 +412,23 @@ class ShipmentServices
             $shipment->is_paid = 1;
             $shipment->status = 'processing';
             $shipment->save();
+
+            //log transaction
+
+            WalletTransaction::create([
+                'user_id' => auth()->user()->id,
+                'transaction_id' => $transaction->id,
+                'reference' => $transaction->uuid,
+                'status' => 'success',
+                'amount' => $total_amount,
+                'before' => $current_balance,
+                'after' => auth()->user()->balance,
+                'comment' => 'shipment',
+                'description' => 'payment',
+                'currency' => 'NGN',
+                'time_initiated' => now(),
+                'channel' => 'paystack'
+            ]);
 
             //fire email
             //Mail::to(auth()->user()->email)->send(new OrderConfirmation(['shipment' => $shipment,'shipment_item' => $shipment_item]));

@@ -108,7 +108,7 @@ const populateAddress = (address) => {
                   class="mt-2 bg-transparent border-gray-300 rounded-md w-full outline-none focus:border-primary focus:ring-2 focus:ring-background">
             <option value="0" selected disabled></option>
             <option v-for="item in addresses" :value="item" :key="item">
-              {{ item.address_contacts[0].contact_name }} | {{ item.address_1 }}
+              {{ item.address_contacts[0]?.contact_name }} | {{ item.address_1 }}
             </option>
           </select>
           <InputError class="mt-2"/>

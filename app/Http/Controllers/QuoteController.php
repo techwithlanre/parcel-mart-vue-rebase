@@ -5,9 +5,13 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CreateQuoteRequest;
 use App\Http\Requests\SetQuotePriceRequest;
 use App\Models\Quote;
+use App\Models\Shipment;
+use App\Models\ShipmentAddress;
+use App\Models\ShipmentItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
@@ -81,5 +85,53 @@ class QuoteController extends Controller
         $quote->amount = $request->amount;
         $quote->save();
         return redirect()->back()->with('message', 'Quote price has been set successfully');
+    }
+
+    /**
+     * @throws ValidationException
+     */
+    public function convertQuoteToShipment($quote_id)
+    {
+        $quote = Quote::find($quote_id);
+        if ($quote) {
+            if ($quote->shipment_id) {
+                throw ValidationException::withMessages(['message' => 'This quote has already been converted to shipment']);
+            }
+
+            $shipment = new Shipment;
+            $shipment->user_id = auth()->user()->id;
+            $shipment->status = 'pending';
+            $shipment->reference = Str::uuid();
+            $shipment->created_at = now();
+            $shipment->save();
+
+            ShipmentAddress::create([
+                'shipment_id' => $shipment->id, 'type' => 'origin',
+                'country_id' => $quote->origin_country_id,
+                'state_id' => $quote->origin_state_id,
+                'city_id' => $quote->origin_city_id
+            ]);
+
+            ShipmentAddress::create([
+                'shipment_id' => $shipment->id, 'type' => 'destination',
+                'country_id' => $quote->destination_country_id,
+                'state_id' => $quote->destination_state_id,
+                'city_id' => $quote->destination_city_id
+            ]);
+
+            ShipmentItem::create(['shipment_id' => $shipment->id],[
+                'quantity' => $quote->quantity,
+                'weight' => $quote->weight,
+                'height' => $quote->height,
+                'length' => $quote->length,
+                'width' => $quote->width,
+            ]);
+
+            $quote->shipment_id = $shipment->id;
+            $quote->save();
+            return redirect()->back()->with('message', 'Quote has been converted to shipment');
+        }
+
+        throw ValidationException::withMessages(['error' => 'Selected quote is not found.']);
     }
 }

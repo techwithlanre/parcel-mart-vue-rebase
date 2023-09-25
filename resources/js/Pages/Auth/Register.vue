@@ -22,7 +22,12 @@ export default {
     },
     data() {
         return {
-            currentTab: 1,
+          currentTab: 1,
+          genderOptions: [
+            {'id': 'male','name': 'Male'},
+            {'id': 'female','name': 'Female'},
+            {'id': 'not_say','name': 'Rather Not Say'},
+          ]
         }
     },
 
@@ -50,14 +55,13 @@ export default {
     <GuestLayout title="Get Started" subtitle="Create an account to get started">
         <div class="mb-10 px-2 rounded-md py-2 border-2 border-background">
             <ul class="flex mb-0 list-none flex-wrap flex-row">
-
                 <li class="-mb-px mr-2 last:mr-0 flex-auto text-center">
-                    <a class="text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal hover:text-gray-900" @click="toggleTabs(1)" v-bind:class="{'text-gray-500 bg-white': currentTab !== 1, 'text-white bg-primary': currentTab === 1}">
+                    <a class="text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal hover:text-gray-900 cursor-pointer" @click="toggleTabs(1)" v-bind:class="{'text-gray-500 bg-white': currentTab !== 1, 'text-white bg-primary': currentTab === 1}">
                         Individual
                     </a>
                 </li>
                 <li class="-mb-px mr-2 last:mr-0 flex-auto text-center">
-                    <a class="text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal hover:text-gray-900" @click="toggleTabs(2)" v-bind:class="{'text-gray-500 bg-white': currentTab !== 2, 'text-white bg-primary': currentTab === 2}">
+                    <a class="text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal hover:text-gray-900 cursor-pointer" @click="toggleTabs(2)" v-bind:class="{'text-gray-500 bg-white': currentTab !== 2, 'text-white bg-primary': currentTab === 2}">
                         Business
                     </a>
                 </li>
@@ -65,10 +69,10 @@ export default {
         </div>
         <div class="tab-content tab-space">
             <div id="tab1" v-bind:class="{'hidden': currentTab !== 1, 'block': currentTab === 1}">
-                <IndividualRegisterForm :countries="countries" />
+                <IndividualRegisterForm :countries="countries" :gender-options="genderOptions" />
             </div>
             <div v-bind:class="{'hidden': currentTab !== 2, 'block': currentTab === 2}">
-                <BusinessRegisterForm :countries="countries" />
+                <BusinessRegisterForm :countries="countries" :gender-options="genderOptions" />
             </div>
         </div>
     </GuestLayout>

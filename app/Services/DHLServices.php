@@ -370,7 +370,7 @@ class DHLServices
             if (!isset($result['shipmentTrackingNumber'])) {
                 activity()
                     ->performedOn(new Shipment())
-                    ->causedBy(\request()->user())
+                    ->causedBy(request()->user())
                     ->withProperties([
                         'method' => __FUNCTION__,
                         'action' => 'DHL book shipment'

@@ -99,21 +99,23 @@ class QuoteController extends Controller
             }
 
             $shipment = new Shipment;
-            $shipment->user_id = auth()->user()->id;
+            $shipment->user_id = $quote->user_id;
             $shipment->status = 'pending';
             $shipment->reference = Str::uuid();
             $shipment->created_at = now();
             $shipment->save();
 
             ShipmentAddress::create([
-                'shipment_id' => $shipment->id, 'type' => 'origin',
+                'shipment_id' => $shipment->id,
+                'type' => 'origin',
                 'country_id' => $quote->origin_country_id,
                 'state_id' => $quote->origin_state_id,
                 'city_id' => $quote->origin_city_id
             ]);
 
             ShipmentAddress::create([
-                'shipment_id' => $shipment->id, 'type' => 'destination',
+                'shipment_id' => $shipment->id,
+                'type' => 'destination',
                 'country_id' => $quote->destination_country_id,
                 'state_id' => $quote->destination_state_id,
                 'city_id' => $quote->destination_city_id

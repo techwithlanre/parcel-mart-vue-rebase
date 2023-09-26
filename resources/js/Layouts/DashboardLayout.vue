@@ -41,7 +41,7 @@ const adminMenu = [
   { name: "Roles", icon: CursorArrowRippleIcon, route: "/admin/roles", admin: true, permissionKey: ["read-role", "create-role", 'edit-role', 'delete-role'] },
   { name: "Shipment Locations", icon: LocationIcon, route: "/admin/shipment-locations", admin: true, permissionKey: ["read-role", "create-role", 'edit-role', 'delete-role'] },
   { name: "Providers", icon: OptionsIcon, route: "/admin/settings/rate", admin: false, permissionKey: ["read-provider"] },
-  { name: "All Tickets", icon: FAQ, route: '/admin/feedback/tickets', admin: true,   permissionKey: ['read-dashboard'] },
+  { name: "All Tickets", icon: FAQ, route: '/admin/feedback/tickets', admin: true,   permissionKey: ['read-ticket']},
 ];
 
 const toggleSidebar = () => {

@@ -38,11 +38,11 @@ const checkPermission = (permission) => {
                   </p>
                 </div>
                 <div >
-                    <div v-show="checkPermission('create-user')">
+                    <div v-show="checkPermission('create-ticket')">
                   <div class="inline-flex gap-x-2">
-                    <PrimaryButton
-                                   class="py-2 px-3 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-background text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm sdark:focus:ring-offset-gray-800">
-                    
+                    <PrimaryButton class="py-2 px-3 inline-flex justify-center items-center gap-2 rounded-md border
+                        border-transparent font-semibold bg-background text-primary hover:bg-primary hover:text-white
+                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm">
                       <Link :href="route('feedback.index')"  class="">Add Ticket</Link>
                     </PrimaryButton>
                   </div>
@@ -84,9 +84,9 @@ const checkPermission = (permission) => {
                             </button>
                         
                             <div class="hs-dropdown-menu z-40 transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-[15rem] bg-white shadow-md rounded-lg p-2 mt-2 sdark:bg-gray-800 sdark:border sdark:border-gray-700" aria-labelledby="hs-dropdown-custom-icon-trigger">
-                                <Link :href="route('feedback.ticket.show', item.ticket_id)"  class="flex  font-medium items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-background sdark:text-gray-400 sdark:hover:bg-gray-700 sdark:hover:text-gray-300">View</Link>
+                                <Link v-if="checkPermission('read-ticket') || checkPermission('reply-ticket')" :href="route('feedback.ticket.show', item.ticket_id)"  class="flex  font-medium items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-background sdark:text-gray-400 sdark:hover:bg-gray-700 sdark:hover:text-gray-300">View</Link>
 
-                                <a :href="route('feedback.ticket.media', item.ticket_id)" v-if="item.feedback_file != null" class="flex  font-medium items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-background sdark:text-gray-400 sdark:hover:bg-gray-700 sdark:hover:text-gray-300">Download Attachment</a>
+                                <a :href="route('feedback.ticket.media', item.ticket_id)" v-if="item.feedback_file != null && checkPermission('read-ticket')" class="flex  font-medium items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-background sdark:text-gray-400 sdark:hover:bg-gray-700 sdark:hover:text-gray-300">Download Attachment</a>
                               </div>
                      
                           </div>

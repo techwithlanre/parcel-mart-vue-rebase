@@ -28,7 +28,7 @@ const markAsReply = (ticket, reply) => {
 </script>
 
 <template>
-  <DashboardLayout :page-title="`Ticket - ${customer_feedback.feedback_subject}`">
+  <DashboardLayout :page-title="`Ticket - ${customer_feedback.feedback_subject}`" v-if="checkPermission('read-ticket')">
 
     <div class="flex flex-col mx-auto sm:max-w-5xl">
       <div class="flex flex-col p-6">
@@ -64,7 +64,7 @@ const markAsReply = (ticket, reply) => {
                 <date-format short-month :has-time="true" :date="customer_feedback.submitted_on" />
               </p>
               <p class="text-center">
-                <Link :href="route('feedback.tickets.reply', customer_feedback.ticket_id)"
+                <Link v-if="checkPermission('reply-ticket')" :href="route('feedback.tickets.reply', customer_feedback.ticket_id)"
                       class="btn btn-sm bg-green-400 text-white  px-5 py-1 text-sm hover:text-green-600 rounded-md">
                   Reply
                 </Link>
@@ -72,13 +72,11 @@ const markAsReply = (ticket, reply) => {
             </div>
           </div>
           <hr class="">
-
           <div class="flex flex-col font-bold space-y-4 mt-5 px-5">
             <div>Message:</div>
           </div>
           <div class="mt-5 px-5 mb-10">&nbsp;&nbsp;&nbsp;&nbsp;{{ customer_feedback.feedback_message }}</div>
         </div>
-
       </div>
       <section v-show="getReplies.length > 0" class="shadow rounded-xl">
         <p class="uppercase text-center font-bold text-primary py-5 bg-background rounded-t-xl">all replies</p>

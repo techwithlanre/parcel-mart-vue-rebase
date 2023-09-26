@@ -39,6 +39,11 @@ export default {
               'read-tax-report': this.permissions['read-tax-report'],
               'read-payment-report': this.permissions['read-payment-report'],
               'read-user-report': this.permissions['read-user-report'],
+              'read-ticket': this.permissions['read-ticket'],
+              'create-ticket': this.permissions['create-ticket'],
+              'reply-ticket': this.permissions['reply-ticket'],
+              'delete-ticket': this.permissions['delete-ticket'],
+
             }),
             page: usePage(),
             userPermissions: []
@@ -62,7 +67,7 @@ export default {
 </script>
 
 <template>
-    <DashboardLayout page-title="User Parmissions">
+    <DashboardLayout page-title="User Permissions">
         <div class="mb-5 flex flex-row justify-end">
             <Link class="btn btn-primary" :href="route('roles.create')"><PrimaryButton class="w-max">Create Role</PrimaryButton></Link>
         </div>
@@ -170,6 +175,15 @@ export default {
                             <td class="p-4"><Checkbox v-model="form['read-tax-report']" :checked="form['read-tax-report']" /></td>
                             <td class="p-4">N/A</td>
                             <td class="p-4">N/A</td>
+                          </tr>
+                          <tr class="border-b hover:bg-gray-50">
+                            <td class="p-4">
+                              <h1 class="font-normal">Tickets</h1>
+                            </td>
+                            <td class="p-4"><Checkbox v-model="form['create-ticket']" :checked="form['create-ticket']" /></td>
+                            <td class="p-4"><Checkbox v-model="form['read-ticket']" :checked="form['read-ticket']" /></td>
+                            <td class="p-4"><Checkbox v-model="form['reply-ticket']" :checked="form['reply-ticket']" /> (Reply)</td>
+                            <td class="p-4"><Checkbox v-model="form['delete-ticket']" disabled="true" :checked="form['delete-ticket']" class="bg-red-500" /></td>
                           </tr>
                         </tbody>
                     </table>

@@ -15,6 +15,7 @@ use App\Models\DhlRateLog;
 use App\Models\DhlShipmentLog;
 use App\Models\InsuranceOption;
 use App\Models\Shipment;
+use App\Models\ShipmentAddress;
 use App\Models\ShipmentItem;
 use App\Models\ShipmentProvider;
 use App\Models\ShippingRateLog;
@@ -23,6 +24,7 @@ use App\Models\UpsRateLog;
 use App\Models\WalletOverdraft;
 use App\Models\WalletOverdraftLog;
 use App\Models\WalletTransaction;
+use App\Traits\TrackingTrait;
 use App\Traits\ValidateAramexAddress;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Http;
@@ -37,7 +39,7 @@ class ShipmentServices
 {
 
     use ValidateAramexAddress;
-
+    use TrackingTrait;
     protected array $errors = [];
     protected bool $aramex_rate_found = false;
     protected bool $dhl_rate_found = false;
@@ -401,7 +403,6 @@ class ShipmentServices
                 $transaction = auth()->user()->withdraw($total_amount);
             }
 
-
             $rate->insurance_option_id = $insurance->id;
             $rate->insurance_amount = $insurance_amount;
             $rate->save();
@@ -414,7 +415,6 @@ class ShipmentServices
             $shipment->save();
 
             //log transaction
-
             WalletTransaction::create([
                 'user_id' => auth()->user()->id,
                 'transaction_id' => $transaction->id,
@@ -431,7 +431,11 @@ class ShipmentServices
             ]);
 
             //fire email
-            //Mail::to(auth()->user()->email)->send(new OrderConfirmation(['shipment' => $shipment,'shipment_item' => $shipment_item]));
+            Mail::to(auth()->user()->email)->send(new OrderConfirmation([
+                'shipment' => $shipment,
+                'shipment_item' => $shipment_item,
+                'address' => ShipmentAddress::where('shipment_id', $shipment->id)->get()
+            ]));
         }
 
         if ($provider == 'dhl' && !$book_dhl) {
@@ -467,7 +471,7 @@ class ShipmentServices
         return redirect()->back()->with('error', 'An error occurred. Please try again later');
     }
 
-    private function trackAramex(Shipment $shipment)
+    private function trackAramex(Shipment $shipment): \Illuminate\Foundation\Application|\Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
         $aramex_shipment = AramexShipmentLog::where('shipment_id', $shipment->id)->first();
         try {
@@ -525,36 +529,9 @@ class ShipmentServices
             $dhl = new DHLServices($shipment);
             $response = $dhl->trackShipment($dhl_shipment);
             $tracking_data = json_decode($response, true);
-            $tracking_log = false;
-            foreach ($tracking_data['shipments'] as $td) {
-                if (isset($td['events']) && count($td['events']) > 0) {
-                    foreach ($td['events'] as $event) {
-                        $check = TrackingLog::where([
-                            'shipment_id' => $shipment->id,
-                            'update_code' => $event['typeCode'],
-                            'provider' => 'dhl',
-                        ])->first();
-                        if (!$check) {
-                            $tracking_log = TrackingLog::create([
-                                'shipment_id' => $shipment->id,
-                                'update_code' => $event['typeCode'],
-                                'waybill_number' => $td['pieces'][0]['trackingNumber'],
-                                'update_description' => $event['description'],
-                                'update_datetime' => $event['date'] . ' ' . $event['time'],
-                                'update_location' => $event['serviceArea'][0]['description'],
-                                'comment' => $td['description'],
-                                'gross_weight' => $td['totalWeight'],
-                                'chargeable_weight' => $td['totalWeight'],
-                                'weight_unit' => 'metric',
-                                'provider' => 'dhl',
-                            ]);
-                        }
-                    }
-                }
-            }
+            $tracking_log = $this->saveDhlTracking($tracking_data['shipments'], $shipment->id);
             if ($tracking_log) return \redirect(route('shipment.track.details', $shipment->id));
             throw ValidationException::withMessages(['number' => 'We are working on tracking info. Please check back later']);
-            //return redirect()->back()->with('message', 'We are working on tracking info. Please check back later');
         } catch (\Throwable $e) {
             activity()
                 ->performedOn(new Shipment())

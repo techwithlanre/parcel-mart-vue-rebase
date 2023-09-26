@@ -24,4 +24,9 @@ trait ValidateAramexAddress
         ]);
         //dd($response);
     }
+
+    public static function saveDhlTrackingTrait($shipments)
+    {
+
+    }
 }

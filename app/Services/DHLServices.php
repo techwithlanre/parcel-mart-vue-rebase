@@ -366,7 +366,6 @@ class DHLServices
                     'Content-Type: application/json',
                     'Accept: application/json',
                 ])->post('https://express.api.dhl.com/mydhlapi/test/shipments', $this->bookShipmentPayload);
-
             $result = json_decode($response->body(), true);
             if (!isset($result['shipmentTrackingNumber'])) {
                 activity()
@@ -375,8 +374,8 @@ class DHLServices
                     ->withProperties([
                         'method' => __FUNCTION__,
                         'action' => 'DHL book shipment'
-                    ])
-                    ->log($response);
+                    ])->log($response);
+
                 throw ValidationException::withMessages(['message' => 'Unable to book shipment. Please try again later']);
             }
             return $result;

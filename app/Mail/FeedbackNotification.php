@@ -3,7 +3,6 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
@@ -28,7 +27,7 @@ class FeedbackNotification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address(env('MAIL_FROM_ADDRESS'),'Parcels Mart '),
+            from: new Address(env('MAIL_FROM_ADDRESS'),'Parcels Mart'),
             subject: 'Ticket Feedback Notification',
             metadata: ['ticket_id' => $this->ticketData->ticket_id]
         );

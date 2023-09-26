@@ -1,13 +1,3 @@
-<?php
-$origin = json_decode($data['shipment']['origin_address'], true);
-$destination = json_decode($data['shipment']['destination_address'], true);
-
-$item = json_decode($data['shipment_item'], true);
-
-
-
-?>
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
@@ -163,7 +153,7 @@ $item = json_decode($data['shipment_item'], true);
                                                                 </table></td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="es-m-txt-c" align="left" style="padding:0;Margin:0"><p class="p_order" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#131313;font-size:16px">{{ $data['shipment']['number'] }}</p></td>
+                                                            <td class="es-m-txt-c" align="left" style="padding:0;Margin:0"><p class="p_order" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#131313;font-size:16px">{{ $data['shipment']->number }}</p></td>
                                                         </tr>
                                                         <tr>
                                                             <td class="es-m-txt-c" align="left" style="padding:0;Margin:0;padding-top:20px;padding-bottom:20px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#131313;font-size:16px"><strong>Origin</strong></p></td>
@@ -172,15 +162,15 @@ $item = json_decode($data['shipment_item'], true);
                                                             <td class="es-m-txt-c" align="left" style="padding:0;Margin:0"><p class="p_s_address" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#131313;font-size:16px">
                                                                 <div>
                                                                     <p>
-                                                                        {{ $origin['contact_name'] }} |
-                                                                        {{ $origin['contact_phone'] }} |
-                                                                        {{ $origin['contact_email'] }}
+                                                                        {{ $data['address'][0]->contact_name }} |
+                                                                        {{ $data['address'][0]->contact_phone }} |
+                                                                        {{ $data['address'][0]->contact_email }}
                                                                     </p>
                                                                     <p>
-                                                                        {{ $origin['address_1'] }} <br>
-                                                                        {{ $origin['landmark'] }} <br>
-                                                                        {{ getCity('id', $origin['city'])->name }}, {{ getState('id', $origin['state'])->name }}, {{ getCountry('id', $origin['country'])->name }} <br>
-                                                                        {{ $origin['postcode'] }}
+                                                                        {{ $data['address'][0]->address_1 }} <br>
+                                                                        {{ $data['address'][0]->landmark }} <br>
+                                                                        {{ getCity('id', $data['address'][0]->city_id)->name }}, {{ getState('id', $data['address'][0]->state_id)->name }}, {{ getCountry('id', $data['address'][0]->country_id)->name }} <br>
+                                                                        {{ $data['address'][0]->postcode }}
                                                                     </p>
                                                                 </div>
                                                             </td>
@@ -204,7 +194,7 @@ $item = json_decode($data['shipment_item'], true);
                                                                 </table></td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="es-m-txt-c" align="left" style="padding:0;Margin:0"><p class="p_date" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#131313;font-size:16px">{{ $data['shipment'] }}</p></td>
+                                                            <td class="es-m-txt-c" align="left" style="padding:0;Margin:0"><p class="p_date" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#131313;font-size:16px">{{ $data['shipment']->created_at }}</p></td>
                                                         </tr>
                                                         <tr>
                                                             <td class="es-m-txt-c" align="left" style="padding:0;Margin:0;padding-top:20px;padding-bottom:20px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#131313;font-size:16px"><strong>Destination</strong></p></td>
@@ -213,15 +203,15 @@ $item = json_decode($data['shipment_item'], true);
                                                             <td class="es-m-txt-c" align="left" style="padding:0;Margin:0"><p class="p_b_address" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#131313;font-size:16px">
                                                                 <div>
                                                                     <p>
-                                                                        {{ $destination['contact_name'] }} |
-                                                                        {{ $destination['contact_phone'] }} |
-                                                                        {{ $destination['contact_email'] }}
+                                                                        {{ $data['address'][1]->contact_name }} |
+                                                                        {{ $data['address'][1]->contact_phone }} |
+                                                                        {{ $data['address'][1]->contact_email }}
                                                                     </p>
                                                                     <p>
-                                                                        {{ $destination['address_1'] }} <br>
-                                                                        {{ $destination['landmark'] }} <br>
-                                                                        {{ getCity('id', $destination['city'])->name }}, {{ getState('id', $destination['state'])->name }}, {{ getCountry('id', $destination['country'])->name }} <br>
-                                                                        {{ $destination['postcode'] }}
+                                                                        {{ $data['address'][1]->address_1 }} <br>
+                                                                        {{ $data['address'][1]->landmark }} <br>
+                                                                        {{ getCity('id', $data['address'][1]->city_id)->name }}, {{ getState('id', $data['address'][1]->state_id)->name }}, {{ getCountry('id', $data['address'][1]->country_id)->name }} <br>
+                                                                        {{ $data['address'][1]->postcode }}
                                                                     </p>
                                                                 </div>
                                                             </td>
@@ -253,7 +243,7 @@ $item = json_decode($data['shipment_item'], true);
                                                             <td align="left" style="padding:0;Margin:0;width:270px">
                                                                 <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                                                                     <tr>
-                                                                        <td align="left" style="padding:0;Margin:0"><h4 style="Margin:0;line-height:120%;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif"><a target="_blank" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:none;color:#333333;font-size:16px" class="p_name" href="link_here">{{ $data['shipment']['number'] }} </a></h4><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#999999;font-size:16px"><span class="p_option"></span>Pickup Number: {{ $data['shipment']['pickup_number'] }}<br></p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#999999;font-size:16px"><span class="p_option">Width:</span> {{ $item['width'] }}cm</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#999999;font-size:16px"><span class="p_option">Length:</span>{{ $item['length'] }}cm</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#999999;font-size:16px"><span class="p_option">Height:</span> {{ $item['height'] }}cm</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#999999;font-size:16px"><span class="p_option">Weight:</span> {{ $item['weight'] }}kg</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#999999;font-size:16px">Quantity: {{ $item['quantity'] }}<br></p></td>
+                                                                        <td align="left" style="padding:0;Margin:0"><h4 style="Margin:0;line-height:120%;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif"><a target="_blank" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:none;color:#333333;font-size:16px" class="p_name" href="link_here">{{ $data['shipment']->number }} </a></h4><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#999999;font-size:16px"><span class="p_option"></span>Pickup Number: {{ $data['shipment']->pickup_number }}<br></p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#999999;font-size:16px"><span class="p_option">Width:</span> {{ $data['shipment_item']->width }}cm</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#999999;font-size:16px"><span class="p_option">Length:</span>{{ $data['shipment_item']->length }}cm</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#999999;font-size:16px"><span class="p_option">Height:</span> {{ $data['shipment_item']->height }}cm</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#999999;font-size:16px"><span class="p_option">Weight:</span> {{ $data['shipment_item']->weight }}kg</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#999999;font-size:16px">Quantity: {{ $data['shipment_item']->quantity }}<br></p></td>
                                                                     </tr>
                                                                 </table></td>
                                                         </tr>

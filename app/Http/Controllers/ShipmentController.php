@@ -24,6 +24,7 @@ use App\Models\ShipmentItem;
 use App\Models\ShippingRateLog;
 use App\Models\State;
 use App\Models\TrackingLog;
+use App\Models\User;
 use App\Services\ShipmentServices;
 use App\Services\UpsServices;
 use Illuminate\Http\Request;
@@ -167,7 +168,7 @@ class ShipmentController extends Controller
      */
     public function show(string $id)
     {
-        $shipment = Shipment::whereId($id)->with('shipment_items', 'country', 'city', 'state')->first();
+        $shipment = Shipment::whereId($id)->where('user_id', auth()->user()->id)->with('shipment_items', 'country', 'city', 'state')->first();
         $item_category = ItemCategory::find($shipment->shipment_items[0]->item_category_id);
         $origin = ShipmentAddress::where(['shipment_id'=>$shipment->id, 'type'=>'origin'])->first();
         $destination = ShipmentAddress::where(['shipment_id'=>$shipment->id, 'type'=>'destination'])->first();
@@ -208,7 +209,7 @@ class ShipmentController extends Controller
     }
 
     public function checkout($id) {
-        $shipment = Shipment::whereId($id)->with('shipment_items', 'country', 'city', 'state')->first();
+        $shipment = Shipment::whereId($id)->where('user_id', auth()->user()->id)->with('shipment_items', 'country', 'city', 'state')->first();
         if ($shipment->status == 'processing') return redirect(route('shipment.details', $id));
         $shipping_rate_log = ShippingRateLog::where(['shipment_id' => $id, 'user_id' => auth()->user()->id])->with('courier_api_provider')->get();
         $shipment_item = ShipmentItem::find($shipment->shipment_items[0]->id);

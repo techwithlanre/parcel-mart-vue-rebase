@@ -7,6 +7,7 @@ use App\Actions\Reports\ShipmentCost;
 use App\Actions\Reports\ShipmentCount;
 use App\Actions\Reports\ShipmentStatusCount;
 use App\Http\Controllers\Controller;
+use App\Models\Country;
 use App\Models\Shipment;
 use App\Models\ShipmentAddress;
 use App\Models\ShippingRateLog;
@@ -98,7 +99,11 @@ class ReportsController extends Controller
 
     public function usersReport()
     {
-        return Inertia::render('Admin/Reports/UserReport');
+        $totalUsersCount = User::count();
+        $businessUsersCount = User::where('user_type', 'business')->count();
+        $individualUsersCount = User::where('user_type', 'individual')->count();
+
+        return Inertia::render('Admin/Reports/UserReport', compact('totalUsersCount', 'businessUsersCount', 'individualUsersCount'));
     }
 
     public function paymentReport(Request $request): \Inertia\Response

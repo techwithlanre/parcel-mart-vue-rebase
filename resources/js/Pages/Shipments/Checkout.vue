@@ -34,20 +34,21 @@ watch(activeKey, val => {
 const page = usePage();
 
 defineProps({
-    shipment: Array,
-    origin: Object,
-    destination: Object,
-    insurance_options: Array,
-    shipping_rate_log: Array,
-    origin_location: Array,
-    destination_location: Array,
-    item_category: Object,
-    countries: Array,
-    origin_states: Array,
-    destination_states: Array,
-    origin_cities: Array,
-    destination_cities: Array,
-    categories: Array,
+  shipment: Array,
+  origin: Object,
+  destination: Object,
+  insurance_options: Array,
+  shipping_rate_log: Array,
+  origin_location: Array,
+  destination_location: Array,
+  item_category: Object,
+  countries: Array,
+  origin_states: Array,
+  destination_states: Array,
+  origin_cities: Array,
+  destination_cities: Array,
+  categories: Array,
+  user: Object
 });
 
 const form  = useForm({

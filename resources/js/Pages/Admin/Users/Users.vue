@@ -1,5 +1,5 @@
 <script setup>
-import {usePage} from "@inertiajs/vue3";
+import {usePage, Link} from "@inertiajs/vue3";
 import Pagination from "@/Components/Pagination.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Modal from "@/Components/Modal.vue";
@@ -109,11 +109,14 @@ const checkPermission = (permission) => {
                               </svg>
                             </button>
 
-                            <div class="hs-dropdown-menu z-40 transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-[15rem] bg-white shadow-md rounded-lg p-2 mt-2 sdark:bg-gray-800 sdark:border sdark:border-gray-700" aria-labelledby="hs-dropdown-custom-icon-trigger">
+                            <div class="hs-dropdown-menu z-40 transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-[15rem] bg-white shadow-md rounded-lg p-2 mt-2" aria-labelledby="hs-dropdown-custom-icon-trigger">
+                              <Link v-show="checkPermission('create-shipment')" :href="route('admin.shipment.origin') + '?user=' + item.id" class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-background sdark:text-gray-400 sdark:hover:bg-gray-700 sdark:hover:text-gray-300">
+                                Book Shipment
+                              </Link>
                               <a href="javascript:void(0)" v-if="item.user_type === 'business'" v-on:click="openSetCreditLimitModal(item)" class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-background sdark:text-gray-400 sdark:hover:bg-gray-700 sdark:hover:text-gray-300">
                                 Set Credit Limit
                               </a>
-                              <a v-show="checkPermission('edit-user') && item.is_admin === 1" href="javascript:void(0)"  v-on:click="openUserChangeRoleModal(item)" class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-background sdark:text-gray-400 sdark:hover:bg-gray-700 sdark:hover:text-gray-300">
+                              <a v-show="checkPermission('edit-user')" href="javascript:void(0)"  v-on:click="openUserChangeRoleModal(item)" class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-background sdark:text-gray-400 sdark:hover:bg-gray-700 sdark:hover:text-gray-300">
                                 Change User Role
                               </a>
                             </div>

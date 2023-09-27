@@ -8,6 +8,7 @@ use App\Http\Requests\TrackShipmentRequest;
 use App\Models\InsuranceOption;
 use App\Models\ItemCategory;
 use App\Models\Shipment;
+use App\Models\ShipmentAddress;
 use App\Models\ShipmentItem;
 use App\Models\ShippingRateLog;
 use Carbon\Carbon;
@@ -35,6 +36,8 @@ class UpsServices
     protected string $credentials = '';
     public string $accessToken = '';
     protected string $requestGrantType = '';
+    protected ShipmentAddress $origin;
+    protected ShipmentAddress $destination;
 
     public function __construct(Shipment $shipment)
     {
@@ -115,9 +118,10 @@ class UpsServices
     public function calculateRate(): false|string
     {
         //TODO rate will come in
-        $service_code = $this->serviceCode($this->request->origin, $this->request->destination);
+        $service_code = $this->serviceCode();
         if (!$service_code) return false;
-        $weightUnit = $this->weightUnit(getCountry('id', $this->request->destination['country'])->iso2);
+        $weightUnit = $this->weightUnit(getCountry('id', $this->origin->country_id)->iso2);
+        $shipment_item = ShipmentItem::where('shipment_id', $this->shipment->id)->first();
         try {
             $payload = [
                 "RateRequest" => [
@@ -142,23 +146,23 @@ class UpsServices
                             ]
                         ],
                         "ShipFrom" => [
-                            "Name" => $this->request->origin['contact_name'],
+                            "Name" => $this->origin->contact_name,
                             "Address" => [
-                                "AddressLine" => $this->request->origin['address_1'],
-                                "City" => getCity('id', $this->request->origin['city'])->name,
+                                "AddressLine" => $this->origin->address_1,
+                                "City" => getCity('id', $this->origin->city_id)->name,
                                 "StateProvinceCode" => "",
-                                "PostalCode" => $this->request->origin['postcode'],
-                                "CountryCode" => getCountry('id', $this->request->origin['country'])->iso2
+                                "PostalCode" => $this->origin->postcode,
+                                "CountryCode" => getCountry('id', $this->origin->country_id)->iso2
                             ]
                         ],
                         "ShipTo" => [
-                            "Name" => $this->request->destination['contact_name'],
+                            "Name" => $this->destination->contact_name,
                             "Address" => [
-                                "AddressLine" => $this->request->destination['address_1'],
-                                "City" => getCity('id', $this->request->destination['city'])->name,
+                                "AddressLine" => $this->destination->address_1,
+                                "City" => getCity('id', $this->destination->city_id)->name,
                                 "StateProvinceCode" => "",
-                                "PostalCode" => $this->request->destination['postcode'],
-                                "CountryCode" => getCountry('id', $this->request->destination['country'])->iso2
+                                "PostalCode" => $this->destination->postcode,
+                                "CountryCode" => getCountry('id', $this->destination->country_id)->iso2
                             ]
                         ],
                         "Service" => [
@@ -170,7 +174,7 @@ class UpsServices
                                 "Code" => $weightUnit,
                                 "Description" => $weightUnit == "KGS" ? "Kilogram" : "Ponds"
                             ],
-                            "Weight" => (string) $this->convertWeight($weightUnit, $this->request->shipment['weight'])
+                            "Weight" => (string) $this->convertWeight($weightUnit, $shipment_item->weight)
                         ],
                         "Package" => [
                             "PackagingType" => [
@@ -181,22 +185,22 @@ class UpsServices
                                 "UnitOfMeasurement" => [
                                     "Code" =>  $this->metric($weightUnit)
                                 ],
-                                "Length" => (string) $this->convertMetric($weightUnit, $this->request->shipment['length']),
-                                "Width" => (string) $this->convertMetric($weightUnit, $this->request->shipment['width']),
-                                "Height" => (string) $this->convertMetric($weightUnit, $this->request->shipment['height'])
+                                "Length" => (string) $this->convertMetric($weightUnit, $shipment_item->length),
+                                "Width" => (string) $this->convertMetric($weightUnit, $shipment_item->width),
+                                "Height" => (string) $this->convertMetric($weightUnit, $shipment_item->height)
                             ],
                             "PackageWeight" => [
                                 "UnitOfMeasurement" => [
                                     "Code" => $weightUnit
                                 ],
-                                "Weight" => (string) $this->convertWeight($weightUnit, $this->request->shipment['weight'])
+                                "Weight" => (string) $this->convertWeight($weightUnit, $shipment_item->weight)
                             ]
                         ]
                     ]
                 ]
             ];
 
-            //dd($this->accessToken);
+
             $response = Http::withToken($this->accessToken)->post("$this->baseUrl/api/rating/v2205/Rate", $payload);
             return ($response->status() == 200) ? $response->body() : false;
         } catch (\Throwable $throwable) {
@@ -212,14 +216,65 @@ class UpsServices
         }
     }
 
-    public function bookShipment(Shipment $shipment, ShipmentItem $shipmentItem, InsuranceOption $insuranceOption, ShippingRateLog $shippingRateLog, BookShipmentRequest $bookShipmentRequest)
+    public function pickup()
     {
-        $origin = json_decode($shipment->origin_address, true);
-        $destination = json_decode($shipment->destination_address, true);
-        $product_code = $this->productCode($origin, $destination, $shipment);
-        if (!$product_code) return false;
-        $type = $this->shipmentType($origin, $destination);
-        if (!$type) return false;
+        $service_code = $this->serviceCode();
+        if (!$service_code) return false;
+        $weightUnit = $this->weightUnit(getCountry('id', $this->origin->country_id)->iso2);
+        $shipment_item = ShipmentItem::where('shipment_id', $this->shipment->id)->first();
+        $jayParsedAry = [
+            "PickupCreationRequest" => [
+                "CustomerContext" => Str::uuid(),
+                "Request" => [
+                    "RequestOption" => "SCHEDULE"
+                ],
+                "Shipper" => [
+                    "Name" => "Parcels Mart Solutions",
+                    "ShipperNumber" => "A1226Y",
+                    "Address" => [
+                        "AddressLine" => "27, Sani Abacha Road, GRA",
+                        "City" => "Port Harcourt",
+                        "PostalCode" => "500001",
+                        "CountryCode" => "NG"
+                    ]
+                ],
+                "PickupDateInfo" => [
+                    "CloseTime" => "HH:MM:SS",
+                    "ReadyTime" => "HH:MM:SS",
+                    "PickupDate" => "YYYY-MM-DD"
+                ],
+                "PickupAddress" => [
+                    "CompanyName" => "Pickup Company Name",
+                    "ContactName" => "Pickup Contact Name",
+                    "PhoneNumber" => "Pickup Phone Number",
+                    "Address" => [
+                        "AddressLine" => "Pickup Address Line",
+                        "City" => "Pickup City",
+                        "StateProvinceCode" => "Pickup State",
+                        "PostalCode" => "Pickup Postal Code",
+                        "CountryCode" => "Pickup Country Code"
+                    ]
+                ],
+                "Package" => [
+                    [
+                        "TrackingNumber" => "Tracking Number (if applicable)",
+                        "Count" => "Number of Packages",
+                        "Weight" => "Package Weight (e.g., 10.0 LB)"
+                    ]
+                ],
+                "TotalWeight" => "Total Weight of all packages (e.g., 30.0 LB)"
+            ]
+        ];
+
+
+    }
+
+    public function bookShipment(ShipmentItem $shipmentItem, BookShipmentRequest $bookShipmentRequest)
+    {
+        $service_code = $this->serviceCode();
+        if (!$service_code) return false;
+        $weightUnit = $this->weightUnit(getCountry('id', $this->origin->country_id)->iso2);
+        $shipment_item = ShipmentItem::where('shipment_id', $this->shipment->id)->first();
         $shipment_date = Carbon::create($bookShipmentRequest->shipment_date)->timezone('GMT+1');
         $shipment_date = str_replace(' ', 'T', $shipment_date->toDateTimeString()) . " GMT+01:00";
 
@@ -237,9 +292,9 @@ class UpsServices
                     "Shipper" => [
                         "Name" => "Parcels Mart Solution",
                         "AttentionName" => "Parcels Mart Solutions",
-                        "TaxIdentificationNumber" => "123456",
+                        "TaxIdentificationNumber" => "",
                         "Phone" => [
-                            "Number" => "1115554758",
+                            "Number" => "08136437952",
                             "Extension" => ""
                         ],
                         "ShipperNumber" => "A1226Y",
@@ -251,33 +306,31 @@ class UpsServices
                         ]
                     ],
                     "ShipTo" => [
-                        "AttentionName" => "1160b_74",
+                        "Name" => $this->destination->contact_name,
+                        "AttentionName" => $this->destination->contact_name,
                         "Phone" => [
-                            "Number" => "9225377171"
+                            "Number" => $this->destination->contact_phone
                         ],
                         "Address" => [
-                            "AddressLine" => $this->request->origin['address_1'],
-                            "City" => "New York",
+                            "AddressLine" => $this->destination->address_1,
+                            "City" => getCity('id', $this->destination->city_id)->name,
                             "StateProvinceCode" => "",
-                            "PostalCode" => "95113",
-                            "CountryCode" => "US"
+                            "PostalCode" => $this->destination->postcode,
+                            "CountryCode" => getCountry('id', $this->destination->country_id)->iso2
                         ]
                     ],
                     "ShipFrom" => [
-                        "Name" => $origin['contact_name'],
-                        "AttentionName" => "1160b_74",
+                        "Name" => $this->origin->contact_name,
+                        "AttentionName" => $this->origin->contact_name,
                         "Phone" => [
-                            "Number" => $origin['contact_phone']
+                            "Number" => $this->origin->contact_phone
                         ],
-                        "FaxNumber" => "",
                         "Address" => [
-                            "AddressLine" => [
-                                "2311 York Rd"
-                            ],
-                            "City" => "Alpharetta",
-                            "StateProvinceCode" => "GA",
-                            "PostalCode" => "30005",
-                            "CountryCode" => "NG"
+                            "AddressLine" => $this->origin->address_1,
+                            "City" => getCity('id', $this->origin->city_id)->name,
+                            "StateProvinceCode" => "",
+                            "PostalCode" => $this->origin->postcode,
+                            "CountryCode" => getCountry('id', $this->origin->country_id)->iso2
                         ]
                     ],
                     "PaymentInformation" => [
@@ -289,32 +342,30 @@ class UpsServices
                         ]
                     ],
                     "Service" => [
-                        "Code" => "08",
+                        "Code" => $service_code,
                         "Description" => "Express"
                     ],
                     "Package" => [
-                        "Description" => " ",
+                        "Description" => "Package",
                         "Packaging" => [
                             "Code" => "02",
-                            "Description" => "Nails"
+                            "Description" => "Package"
                         ],
                         "Dimensions" => [
                             "UnitOfMeasurement" => [
-                                "Code" => "CM",
-                                "Description" => "Inches"
+                                "Code" =>  $this->metric($weightUnit)
                             ],
-                            "Length" => "10",
-                            "Width" => "30",
-                            "Height" => "45"
+                            "Length" => (string) $this->convertMetric($weightUnit, $shipment_item->length),
+                            "Width" => (string) $this->convertMetric($weightUnit, $shipment_item->width),
+                            "Height" => (string) $this->convertMetric($weightUnit, $shipment_item->height)
                         ],
                         "PackageWeight" => [
                             "UnitOfMeasurement" => [
-                                "Code" => "KGS",
-                                "Description" => "Pounds"
+                                "Code" => $weightUnit
                             ],
-                            "Weight" => "5"
+                            "Weight" => (string) $this->convertWeight($weightUnit, $shipment_item->weight)
                         ]
-                    ]
+                    ],
                 ],
                 "LabelSpecification" => [
                     "LabelImageFormat" => [
@@ -326,11 +377,21 @@ class UpsServices
             ]
         ];
 
+        $response = Http::withToken($this->accessToken)->post("$this->baseUrl/api/shipments/v2205/ship", $payload);
+        dd($response->body());
+        return ($response->status() == 200) ? $response->body() : false;
+
     }
 
-    private function serviceCode($origin, $destination): bool|string
+    private function serviceCode(): bool|string
     {
-        $type = $this->shipmentType($origin, $destination);
+        $this->origin = ShipmentAddress::where([
+            'shipment_id' => $this->shipment->id,
+            'type' => 'origin'])->first();
+        $this->destination = ShipmentAddress::where([
+            'shipment_id' => $this->shipment->id,
+            'type' => 'destination'])->first();
+        $type = $this->shipmentType();
         if (!$type) return false;
         return ($type == "DOMESTIC") ? '11' : '65';
     }
@@ -348,10 +409,10 @@ class UpsServices
         return $product_code;
     }
 
-    private function shipmentType($origin, $destination): string
+    private function shipmentType(): string
     {
-        $origin_country = getCountry('id', $origin['country'])->iso2;
-        $destination_country = getCountry('id', $destination['country'])->iso2;
+        $origin_country = getCountry('id', $this->origin->country_id)->iso2;
+        $destination_country = getCountry('id', $this->destination->country_id)->iso2;
 
         $type = '';
         if ($origin_country == 'NG') {

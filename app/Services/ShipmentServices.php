@@ -2,11 +2,9 @@
 
 namespace App\Services;
 
-
 use App\Http\Requests\BookShipmentRequest;
 use App\Http\Requests\CreateShipmentDestinationRequest;
 use App\Http\Requests\CreateShipmentOriginRequest;
-use App\Http\Requests\CreateShipmentRequest;
 use App\Http\Requests\TrackShipmentRequest;
 use App\Mail\OrderConfirmation;
 use App\Models\AramexShipmentLog;
@@ -21,6 +19,7 @@ use App\Models\ShipmentProvider;
 use App\Models\ShippingRateLog;
 use App\Models\TrackingLog;
 use App\Models\UpsRateLog;
+use App\Models\User;
 use App\Models\WalletOverdraft;
 use App\Models\WalletOverdraftLog;
 use App\Models\WalletTransaction;
@@ -30,10 +29,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Str;
 use Octw\Aramex\Aramex;
-use GuzzleHttp\Client;
 
 class ShipmentServices
 {
@@ -59,7 +55,8 @@ class ShipmentServices
         $shipment = Shipment::find($shipment_id);
         if ($shipment->has_rate == 0) throw ValidationException::withMessages(['message' => 'No package found for selected locations']);
 
-        return redirect(route('shipment.checkout', $shipment->id));
+        $route = (auth()->user()->is_admin == 1) ? 'admin.shipment.checkout' : 'shipment.checkout';
+        return redirect(route($route, $shipment->id));
     }
 
     private function dhl_calculate_rate($shipment_id, $provider)
@@ -82,17 +79,13 @@ class ShipmentServices
                         $total_charge = $charge_before_tax + $charge_tax;
 
                         ShippingRateLog::where([
-                            'user_id' => auth()->user()->id,
+                            'user_id' => $shipment->user_id,
                             'shipment_id' => $shipment->id,
                             'courier_api_provider_id' => $provider->value('id'),
-                            //'product_name' => 'DHL - ' . $product['productName'],
-                            //'product_code' => $product['productCode'],
-                            //'local_product_code' => $product['localProductCode'],
-                            //'network_type_code' => $product['networkTypeCode']
                         ])->delete();
 
                         $rate_log = ShippingRateLog::create([
-                            'user_id' => auth()->user()->id,
+                            'user_id' => $shipment->user_id,
                             'shipment_id' => $shipment->id,
                             'courier_api_provider_id' => $provider->value('id'),
                             'product_name' => 'DHL - ' . $product['productName'],
@@ -181,14 +174,14 @@ class ShipmentServices
                 $total_charge = $charge_before_tax + $charge_tax;
 
                 ShippingRateLog::where([
-                    'user_id' => auth()->user()->id,
+                    'user_id' => $shipment->user_id,
                     'shipment_id'=>$shipment_id,
                     'courier_api_provider_id' => $provider->value('id'),
                     'provider_code' => 'aramex',
                 ])->delete();
 
                 $rate = ShippingRateLog::create([
-                    'user_id' => auth()->user()->id,
+                    'user_id' => $shipment->user_id,
                     'shipment_id' => $shipment_id,
                     'product_name' => 'Aramex Shipping',
                     'courier_api_provider_id' => $provider->value('id'),
@@ -216,14 +209,14 @@ class ShipmentServices
                     ])
                     ->log($response);
                 ShippingRateLog::where([
-                    'user_id' => auth()->user()->id,
+                    'user_id' => $shipment->user_id,
                     'shipment_id'=>$shipment_id,
                     'courier_api_provider_id' => $provider->value('id')
                 ])->delete();
             }
         } catch (\Throwable $e) {
             ShippingRateLog::where([
-                'user_id' => auth()->user()->id,
+                'user_id' => $shipment->user_id,
                 'shipment_id'=>$shipment_id,
                 'courier_api_provider_id' => $provider->value('id')
             ])->delete();
@@ -241,7 +234,6 @@ class ShipmentServices
 
     private function ups_calculate_rate($shipment_id, $provider)
     {
-        //dd($provider);
         $shipment = Shipment::find($shipment_id);
         $ups = new UpsServices($shipment);
         try {
@@ -251,28 +243,36 @@ class ShipmentServices
                 if ($data['RateResponse']['Response']['ResponseStatus']['Code'] == 1) {
                     $ratedShipment = $data['RateResponse']['RatedShipment'];
                     if ($ratedShipment['TotalCharges']['MonetaryValue'] > 0) {
+                        $provider_total_amount = $ratedShipment['TotalCharges']['MonetaryValue'];
+                        $provider_tax = $ratedShipment['TotalCharges']['MonetaryValue'] * 0.075;
+                        $provider_amount_before_tax = $provider_total_amount - $provider_tax;
                         $multiplier = ($provider->value('profit_margin') / 100) + 1;
-                        $shipmentAmount = $ratedShipment['TotalCharges']['MonetaryValue'] * $multiplier;
-                        $tax = $shipmentAmount * 0.075;
+                        $total_charge = $ratedShipment['TotalCharges']['MonetaryValue'] * $multiplier;
+                        $charge_tax = $total_charge * 0.075;
+                        $charge_before_tax = $total_charge - $charge_tax;
+
                         ShippingRateLog::where([
-                            'user_id' => auth()->user()->id,
+                            'user_id' => $shipment->user_id,
                             'shipment_id'=>$shipment_id,
-                            'courier_api_provider_id' => $check_ups->value('id'),
+                            'courier_api_provider_id' => $provider->value('id'),
                             'provider_code' => 'ups',
                         ])->delete();
 
                         $rate_log = ShippingRateLog::create([
-                            'user_id' => auth()->user()->id,
+                            'user_id' => $shipment->user_id,
                             'shipment_id' => $shipment->id,
-                            'courier_api_provider_id' => $check_ups->value('id'),
+                            'courier_api_provider_id' => $provider->value('id'),
                             'product_name' => 'UPS Shipment',
                             'product_code' => '',
                             'provider_code' => 'ups',
                             'currency' => 'NGN',
-                            'total_amount' => $shipmentAmount,
-                            'amount_before_tax' => number_format($shipmentAmount - $tax),
-                            'tax' => number_format($tax),
-                            'created_at' => now()
+                            'provider_amount_before_tax' => $provider_amount_before_tax,
+                            'provider_tax' => $provider_tax,
+                            'provider_total_amount' => $provider_total_amount,
+                            'charge_before_tax' => $charge_before_tax,
+                            'charge_tax' => $charge_tax,
+                            'total_charge' => $total_charge,
+                            'created_at' => now(),
                         ]);
 
                         UpsRateLog::create([
@@ -302,9 +302,9 @@ class ShipmentServices
 
                     if (!$ups_rate_found) {
                         ShippingRateLog::where([
-                            'user_id' => auth()->user()->id,
+                            'user_id' => $shipment->user_id,
                             'shipment_id'=>$shipment_id,
-                            'courier_api_provider_id' => $check_ups->value('id'),
+                            'courier_api_provider_id' => $provider->value('id'),
                             'provider_code' => 'ups',
                         ])->delete();
                     }
@@ -329,29 +329,37 @@ class ShipmentServices
     public function bookShipment(BookShipmentRequest $request): \Illuminate\Foundation\Application|false|\Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
         $shipment = Shipment::whereId($request->shipment_id)->first();
+        $user = User::find($shipment->user_id);
         $shipment_item = ShipmentItem::where('shipment_id', $shipment->id)->first();
         $insurance = InsuranceOption::whereId($request->insurance)->first();
         $insurance_amount = $insurance->amount;
         $rate = ShippingRateLog::whereId($request->option_id)->first();
         $total_amount = $rate->total_charge + $insurance_amount;
 
-        if (auth()->user()->user_type === 'individual' && auth()->user()->balance < $total_amount) {
-            throw ValidationException::withMessages(['message' => 'Insufficient balance. Fund your wallet to continue']);
+        if ($user->user_type === 'individual' && $user->balance < $total_amount) {
+            $message = ($user->is_admin == 0) ? 'Insufficient balance. Notify user to fund their wallet' : 'Insufficient balance. Fund your wallet to continue';
+            throw ValidationException::withMessages(['message' => $message]);
         }
 
-        if (auth()->user()->user_type === 'business') {
-            $current_balance = auth()->user()->balance;
+        if ($user->user_type === 'business') {
+            $current_balance = $user->balance;
             $current_overdraft_amount = $total_amount - $current_balance; // loan amount at the moment
-            $overdraft_wallet = WalletOverdraft::where('user_id', auth()->user()->id)->first();
+            $overdraft_wallet = WalletOverdraft::where('user_id', $user->id)->first();
+            if (!$overdraft_wallet) {
+                $overdraft_wallet = WalletOverdraft::create([
+                    'user_id' => $user->id,
+                    'balance' => 0,
+                    ])->first();
+            }
             $previous_overdraft = $overdraft_wallet->balance;
             $total_overdraft = $current_overdraft_amount + $previous_overdraft;
-            if ($total_overdraft > auth()->user()->credit_limit) {
+            if ($total_overdraft > $user->credit_limit) {
                 throw ValidationException::withMessages(['message' => 'Insufficient balance: Order amount is above your credit limit']);
             }
         }
 
         $provider = $rate->provider_code;
-        $book_aramex = $book_dhl = false;
+        $book_aramex = $book_dhl = $book_ups =  false;
         if ($provider == 'aramex') {
             $aramex = new AramexServices($shipment);
             $pickup = $aramex->createPickup($request, $shipment_item);
@@ -364,7 +372,7 @@ class ShipmentServices
                         'action' => 'Aramex create pickup'
                     ])
                     ->log($pickup);
-                throw ValidationException::withMessages(['message' => 'We were not able to process your pickup. Please try again later']);
+                throw ValidationException::withMessages(['message' => 'We were not able to process pickup. Please try again later']);
             }
 
             if ($pickup->error == 0) {
@@ -379,28 +387,33 @@ class ShipmentServices
             $book_dhl = $dhl->bookShipment($shipment_item, $insurance, $rate, $request);
         }
 
+        if ($provider == 'ups') {
+            $ups = new UpsServices($shipment);
+            $book_ups = $ups->bookShipment($shipment_item, $request);
+        }
+
         if ($book_aramex || $book_dhl) {
-            if (auth()->user()->user_type === 'business' && auth()->user()->balance < $total_amount) {
-                $current_balance = auth()->user()->balance;
+            if ($user->user_type === 'business' && $user->balance < $total_amount) {
+                $current_balance = $user->balance;
                 $overdraft_amount = $total_amount - $current_balance;
-                $overdraft_wallet = WalletOverdraft::where('user_id', auth()->user()->id)->first();
+                $overdraft_wallet = WalletOverdraft::where('user_id', $user->id)->first();
                 $overdraft_wallet->balance += $overdraft_amount;
                 $overdraft_wallet->save();
 
                 WalletOverdraftLog::create([
-                    'user_id' => auth()->user()->id,
+                    'user_id' => $user->id,
                     'shipment_id' => $shipment->id,
                     'amount' => $overdraft_amount
                 ]);
-                auth()->user()->withdraw($current_balance);
+                $user->withdraw($current_balance);
             }
 
             $transaction = '';
-            if (auth()->user()->user_type === 'business' && auth()->user()->balance >= $total_amount)  {
-                $transaction = auth()->user()->withdraw($total_amount);
+            if ($user->user_type === 'business' && $user->balance >= $total_amount)  {
+                $transaction = $user->withdraw($total_amount);
             }
-            if (auth()->user()->user_type === 'individual') {
-                $transaction = auth()->user()->withdraw($total_amount);
+            if ($user->user_type === 'individual') {
+                $transaction = $user->withdraw($total_amount);
             }
 
             $rate->insurance_option_id = $insurance->id;
@@ -416,22 +429,22 @@ class ShipmentServices
 
             //log transaction
             WalletTransaction::create([
-                'user_id' => auth()->user()->id,
+                'user_id' => $user->id,
                 'transaction_id' => $transaction->id,
                 'reference' => $transaction->uuid,
                 'status' => 'success',
                 'amount' => $total_amount,
                 'before' => $current_balance,
-                'after' => auth()->user()->balance,
+                'after' => $user->balance,
                 'comment' => 'shipment',
                 'description' => 'payment',
                 'currency' => 'NGN',
                 'time_initiated' => now(),
-                'channel' => 'paystack'
+                'channel' => 'wallet'
             ]);
 
             //fire email
-            Mail::to(auth()->user()->email)->send(new OrderConfirmation([
+            Mail::to($user->email)->send(new OrderConfirmation([
                 'shipment' => $shipment,
                 'shipment_item' => $shipment_item,
                 'address' => ShipmentAddress::where('shipment_id', $shipment->id)->get()
@@ -439,14 +452,17 @@ class ShipmentServices
         }
 
         if ($provider == 'dhl' && !$book_dhl) {
-            return redirect(route('shipment.checkout', $request['shipment_id']))->with('error', 'DHL shipment is not available for selected locations at the moment. Please try again later');
+            $route = (auth()->user()->is_admin == 1) ? 'admin.shipment.checkout' : 'shipment.checkout';
+            return redirect(route($route, $request['shipment_id']))->with('error', 'DHL shipment is not available for selected locations at the moment. Please try again later');
         }
 
         if ($provider == 'aramex'  && !$book_aramex) {
-            return redirect(route('shipment.checkout', $request['shipment_id']))->with('error', 'Aramex shipment is not available for selected locations at the moment. Please try again later');
+            $route = (auth()->user()->is_admin == 1) ? 'admin.shipment.checkout' : 'shipment.checkout';
+            return redirect(route($route, $request['shipment_id']))->with('error', 'Aramex shipment is not available for selected locations at the moment. Please try again later');
         }
 
-        return \redirect(route('shipment.details', $shipment->id));
+        $route = (auth()->user()->is_admin == 1) ? 'admin.shipment.details' : 'shipment.details';
+        return \redirect(route($route, $shipment->id));
     }
 
     private function bookWithAramex($bookShipmentRequest, $shipment, $shipment_item)
@@ -582,6 +598,12 @@ class ShipmentServices
                     'country_code' => getCountry('id', $request->country_id)->iso2,
                     'postal_code' => $request->postcode,
                     'city' => getCity('id', $request->city_id)->name,
+                ]);
+
+                //ups does not allow for address validation, so we send request to them by default for rate calculation
+                ShipmentProvider::updateOrCreate([
+                    'shipment_id' => $shipment_id,
+                    'provider' => 'ups'
                 ]);
 
                 if (!isset($response->error)) {

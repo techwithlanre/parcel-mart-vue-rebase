@@ -44,13 +44,6 @@ class AnalyticController extends Controller
             ];
         });
 
-        $userRetention = $this->userRetentionChartData();
-        $balance = number_format(auth()->user()->balance, 2);
-        $totalUsersCount = User::count();
-        $businessUsersCount = User::where('user_type', 'business')->count();
-        $individualUsersCount = User::where('user_type', 'individual')->count();
-        $countries = Country::all();
-        $shipmentCount = Shipment::count();
         $shipments = Shipment::where('status', '!=', 'failed')->where('has_rate', 1)->with('shipment_rate')->latest()->take(5)->get();
         $log = [];
         foreach ($shipments as $shipment) {

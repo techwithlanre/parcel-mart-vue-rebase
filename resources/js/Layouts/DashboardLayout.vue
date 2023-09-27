@@ -11,7 +11,7 @@ import ShoppingBagIcon from "../../images/icons/shopping-bag.svg";
 import ChartIcon from "../../images/icons/graph.svg";
 import PencilIcon from "../../images/icons/pencil.svg";
 import OptionsIcon from "../../images/icons/options.svg";
-import {computed, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {DocumentIcon, DocumentTextIcon, CursorArrowRippleIcon, UsersIcon} from "@heroicons/vue/20/solid/index.js";
 
 const page = usePage();
@@ -55,6 +55,40 @@ const checkPermission = (featurePermissions) => {
 const fullName = computed(() => {
   return page.props.auth.user.first_name + " " + page.props.auth.user.last_name
 } )
+
+onMounted( async () => {
+  let headway = document.getElementById("headway-script");
+  if (headway) return; //Script already appended
+
+  //Create promise which resolves on script load
+  let promise = new Promise((resolve, reject) => {
+    let script = document.createElement("script");
+    script.src = "//cdn.headwayapp.co/widget.js";
+    script.id = "headway-script";
+    script.setAttribute("async", true);
+    document.head.appendChild(script);
+    script.onload = resolve; //Resolve when loaded
+    script.onerror = reject;
+  });
+  await promise; //Await for the script to be resolved
+
+  //Init the widget now that the script has loaded
+  // eslint-disable-next-line no-undef
+  Headway.init({
+    selector: ".changelog",
+    account: "7Kqg6y",
+    translations: {
+      title: "The Changelog",
+      readMore: "Read more",
+      labels: {
+        "new": "News",
+        "improvement": "Updates",
+        "fix": "Fixes"
+      },
+      footer: "Read more 👉"
+    }
+  });
+})
 </script>
 
 
@@ -79,8 +113,10 @@ const fullName = computed(() => {
         <div class="font-bold text-lg">
           {{ pageTitle }}
         </div>
-        <div class="">
-          <div>
+        <div class="bg-primary">
+          <div class="flex flex-row">
+<!--  TODO: Headway  -->
+            <div class="sm:block hidden changelog"></div>
             <Link :href="route('profile.edit')" class="sm:block hidden">
               {{ fullName }}
             </Link>

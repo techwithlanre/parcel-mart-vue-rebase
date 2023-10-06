@@ -84,7 +84,6 @@ Echo.private('shipments.29').listen('ShipmentStatusUpdated', (e) => {
         </div>
         <div class="">
           <div class="flex flex-row">
-            <!--  TODO: Headway  -->
             <div class="sm:block hidden">
 
             </div>

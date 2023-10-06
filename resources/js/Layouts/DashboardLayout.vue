@@ -53,10 +53,10 @@ const fullName = computed(() => {
 });
 
 
-Echo.private('shipments.29').listen('ShipmentStatusUpdated', (e) => {
+/*Echo.private('shipments.29').listen('ShipmentStatusUpdated', (e) => {
   let shipment = e.shipment;
   Swal.fire('Your shipment with tracking number 3456789 is being processed');
-});
+});*/
 
 </script>
 

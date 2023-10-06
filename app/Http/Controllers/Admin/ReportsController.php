@@ -3,14 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Actions\Reports\ShipmentAmountSum;
-use App\Actions\Reports\ShipmentCost;
 use App\Actions\Reports\ShipmentCount;
 use App\Actions\Reports\ShipmentStatusCount;
 use App\Http\Controllers\Controller;
-use App\Models\Country;
 use App\Models\Shipment;
 use App\Models\ShipmentAddress;
-use App\Models\ShippingRateLog;
 use App\Models\User;
 use App\Models\WalletTransaction;
 use Bavix\Wallet\Models\Wallet;
@@ -77,23 +74,25 @@ class ReportsController extends Controller
         ];
     }
 
-    private function shipmentQuery(Request $request)
+    private function shipmentQuery(Request $request, $user_id = null)
     {
         return Shipment::where(function ($query) use ($request) {
-            $query->when($request->filled('number'), function ($query) use ($request) {
+            if ($request->filled('number') && $request->filled('to')) {
                 $query->where('number', 'LIKE', '%'. $request->get('number'). '%');
-            });
+            }
         })->where(function ($query) use ($request) {
             $query->when($request->filled('status'), function ($query) use ($request) {
                 if ($request->get('status') !== 'all')
                     $query->where('status', $request->get('status'));
             });
         })->where(function ($query) use ($request) {
-            $query->when($request->filled('from'), function ($query) use ($request) {
-                $query->when($request->filled('to'), function ($query) use ($request) {
-                    return $query->whereBetween('created_at', [$request->from, $request->to]);
-                });
-            });
+            if ($request->filled('from') && $request->filled('to')) {
+                $query->whereBetween('created_at', [$request->from, $request->to]);
+            }
+        })->where(function ($query) use ($user_id) {
+            if ($user_id != null) {
+                $query->where('user_id', $user_id);
+            }
         })->with('user','shipping_rate_log')->orderBy('id', 'desc')->paginate(10);
     }
 
@@ -102,8 +101,8 @@ class ReportsController extends Controller
         $totalUsersCount = User::count();
         $businessUsersCount = User::where('user_type', 'business')->count();
         $individualUsersCount = User::where('user_type', 'individual')->count();
-
-        return Inertia::render('Admin/Reports/UserReport', compact('totalUsersCount', 'businessUsersCount', 'individualUsersCount'));
+        $users = User::with(['wallet', 'roles'])->latest()->paginate(10);
+        return Inertia::render('Admin/Reports/UserReport', compact('totalUsersCount', 'businessUsersCount', 'individualUsersCount', 'users'));
     }
 
     public function paymentReport(Request $request): \Inertia\Response
@@ -155,9 +154,36 @@ class ReportsController extends Controller
         return Inertia::render('Admin/Reports/PaymentReport', compact('dateRangeUrl','walletBalance','totalDeposits','paymentsCount','transactions', 'shipmentCost', 'shipmentRevenue', 'insuranceAmount', 'shipmentProfit', 'depositsCount'));
     }
 
-    public function taxReport()
+    public function userShipmentsReport(Request $request, $user_id)
     {
-        
+        $shipmentCountAction = new ShipmentCount();
+        $totalShipmentCount = $shipmentCountAction->handle($request, $user_id);
+
+        $shipmentStatusCount = new ShipmentStatusCount();
+        $processingShipmentsCount = $shipmentStatusCount->handle($request, 'processing', $user_id);
+        $pendingShipmentsCount = $shipmentStatusCount->handle($request, 'pending', $user_id);
+        $deliveredShipmentsCount = $shipmentStatusCount->handle($request, 'delivered', $user_id);
+
+        $shipmentAmountSum = new ShipmentAmountSum();
+        $shipmentCost = $shipmentAmountSum->handle($request, 'provider_total_amount', $user_id);
+        $shipmentCharge = $shipmentAmountSum->handle($request, 'total_charge', $user_id);
+        $insuranceAmount = $shipmentAmountSum->handle($request, 'insurance_amount', $user_id);
+
+        $shipments = $this->shipmentQuery($request, $user_id);
+
+        $log = [];
+        foreach ($shipments as $shipment) {
+            $log[] = [
+                'shipment' =>$shipment,
+                'origin' => $this->shipmentOrigin($shipment),
+                'destination' => $this->shipmentDestination($shipment),
+            ];
+        }
+
+        return Inertia::render('Admin/Reports/UserShipmentsReport', compact(
+            'totalShipmentCount', 'processingShipmentsCount', 'pendingShipmentsCount',
+            'deliveredShipmentsCount', 'shipmentCost', 'shipmentCharge', 'insuranceAmount', 'log', 'shipments', 'user_id'
+        ));
     }
 
     private function shipmentsList(Request $request): \Illuminate\Http\JsonResponse
@@ -211,4 +237,5 @@ class ReportsController extends Controller
 
         return response()->json($log);
     }
+
 }

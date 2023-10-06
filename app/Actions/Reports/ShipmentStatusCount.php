@@ -7,14 +7,16 @@ use Illuminate\Http\Request;
 
 class ShipmentStatusCount
 {
-    public function handle(Request $request, $status)
+    public function handle(Request $request, $status, $user_id = null)
     {
         return Shipment::where(function ($query) use ($request) {
-            $query->when($request->filled('from'), function ($query) use ($request) {
-                $query->when($request->filled('to'), function ($query) use ($request) {
-                    return $query->whereBetween('created_at', [$request->from, $request->to]);
-                });
-            });
+            if ($request->filled('from') && $request->filled('to')) {
+                $query->whereBetween('created_at', [$request->from, $request->to]);
+            }
+        })->where(function ($query) use ($user_id) {
+            if ($user_id != null) {
+                $query->where('user_id', $user_id);
+            }
         })->where('status', $status)->count();
     }
 }

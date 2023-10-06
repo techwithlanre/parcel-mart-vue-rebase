@@ -1,10 +1,12 @@
 <script setup>
 import DashboardLayout from "@/Layouts/DashboardLayout.vue";
-import {Head, usePage} from "@inertiajs/vue3";
+import {Head, useForm, usePage} from "@inertiajs/vue3";
 import {ref, computed} from "vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import Modal from "@/Components/Modal.vue"
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import SelectInput from "@/Components/SelectInput.vue";
 
 defineProps({
     data: Array,
@@ -13,14 +15,23 @@ defineProps({
 
 
 const page = usePage();
+const showCreateCityModal = ref(false);
 const visible = ref(false);
 const confirmLoading = ref(false);
 const currentlyEditing = ref({});
 const filteredOptions = computed(() => page.props.countries.filter(selected => !editForm.destinations.includes(selected)));
+const states = ref([]);
+
 const showModal = (item) => {
   currentlyEditing.value = item;
-    visible.value = true;
+  visible.value = true;
 };
+
+const form = useForm({
+  country_id: '',
+  state_id: '',
+  city_name: '',
+});
 
 
 
@@ -31,13 +42,35 @@ const handleOk = () => {
         confirmLoading.value = false;
     }, 2000);
 };
+
+const getStates = () => {
+  axios.get('/api/states/' + form.country_id).then(function (response) {
+    states.value = response.data.states;
+  });
+};
+
+const createState = () => {
+  form.post(route('city.store'), {
+    onSuccess: () => {
+      showCreateCityModal.value = false;
+      form.reset();
+    }
+  });
+}
+
+
 </script>
 
 <template>
 <DashboardLayout page-title="Shipment Locations">
     <div class="shadow rounded-xl">
-      <div class="">
-        <h1 class="text-lg p-5">Shipment Locations</h1>
+      <div class="flex flex-row items-center justify-between  px-5 ">
+        <div>
+          <h1 class="text-lg">Shipment Locations</h1>
+        </div>
+        <div>
+          <PrimaryButton v-on:click="showCreateCityModal = true">Create City</PrimaryButton>
+        </div>
       </div>
       <div>
         <div class="relative overflow-x-auto shadow sm:rounded-lg">
@@ -53,9 +86,9 @@ const handleOk = () => {
               <td class="px-6 py-4">
                 {{ item.origin.country }}
               </td>
-<!--              <td class="px-6 py-4">
+              <td class="px-6 py-4">
                 <a href="#" @click="showModal(item)" class="text-primary font-medium hover:text-green-600">Edit</a>
-              </td>-->
+              </td>
               <td class="px-6 py-4 flex flex-row gap-5 overflow-auto">
                 <div v-for="i in item.destination_countries" class="bg-background text-xs text-primary px-4 py-1 rounded-full h-max w-max">{{ i.country }} </div>
               </td>
@@ -70,8 +103,8 @@ const handleOk = () => {
             title="Edit Shipment Location">
             <div class="p-5">
                 <div>
-                    <InputLabel value="Origin" />
-                    <TextInput type="text" class="mt-2" v-model="currentlyEditing.origin.country" readonly disabled="" />
+                    <InputLabel value="Enter City" />
+                    <TextInput type="text" class="mt-2"  readonly disabled="" />
                 </div>
                 <div class="mt-4">
                     <InputLabel value="Allowed Destinations" />
@@ -83,6 +116,29 @@ const handleOk = () => {
                 </div>
             </div>
         </Modal>
+      <Modal :show="showCreateCityModal" title="Create City">
+        <div class="p-5">
+          <h3>Create City</h3>
+        </div>
+        <hr>
+        <form @submit.prevent="createState" class="px-5 pb-10">
+          <div class="mt-4">
+            <InputLabel value="Country" />
+            <SelectInput v-model="form.country_id" :options="countries" v-on:change="getStates" />
+          </div>
+          <div class="mt-4">
+            <InputLabel value="State" />
+            <SelectInput v-model="form.state_id" :options="states" > </SelectInput>
+          </div>
+          <div class="mt-4">
+            <InputLabel value="City" />
+            <TextInput type="text" v-model="form.city_name" />
+          </div>
+          <div class="mt-4">
+            <PrimaryButton type="text" model-value="" >Create</PrimaryButton>
+          </div>
+        </form>
+      </Modal>
     </div>
 </DashboardLayout>
 </template>

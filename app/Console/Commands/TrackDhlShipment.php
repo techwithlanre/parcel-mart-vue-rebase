@@ -19,7 +19,7 @@ class TrackDhlShipment extends Command
      *
      * @var string
      */
-    protected $description = 'Run DHL shipment tracking';
+    protected $description = 'Run DHL Shipment Tracking';
 
     /**
      * Execute the console command.
@@ -27,6 +27,8 @@ class TrackDhlShipment extends Command
     public function handle()
     {
         $task = new TrackingTask();
-        $task->trackDhl();
+        $track = $task->trackDhl();
+        $message = $track ? 'tracking complete w/o errors' : 'tracking complete w/ errors';
+        $this->info($message);
     }
 }

@@ -15,6 +15,11 @@ return [
     'user_id'    => env('UPS_USER_ID', 'test'),
     'password'   => env('UPS_PASSWORD', 'test'),
     'sandbox'    => env('UPS_SANDBOX', true),
+    'account'    => env('UPS_SHIPPER_NUMBER', ''),
+    'live_base_url'    => env('UPS_LIVE_BASE_URL', ''),
+    'sandbox_base_url'    => env('UPS_SANDBOX_BASE_URL', ''),
+    'client_id'    => env('UPS_CLIENT_ID', ''),
+    'client_secret'    => env('UPS_CLIENT_SECRET', ''),
     'Shipper' => [
         "Name" => "Parcels Mart Solution",
         "AttentionName" => "Parcels Mart Solutions",

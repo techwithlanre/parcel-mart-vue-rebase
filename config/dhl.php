@@ -16,5 +16,5 @@ return [
         'importAccountNumber' => env('DHL_IMPORT_ACCOUNT_NUMBER'),
         'username' => env('DHL_LIVE_USERNAME'),
         'password' => env('DHL_LIVE_PASSWORD'),
-    ]
+    ],
 ];

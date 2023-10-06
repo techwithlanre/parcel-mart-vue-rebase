@@ -89,11 +89,11 @@ class CustomerFeedbackController extends Controller
         $data['customer_feedback_id'] = $main_ticket->id;
 
         $reply = CustomerFeedbackReply::create($data);
-        if ($user->is_admin || $user->hasPermissionTo('create-user')) {
+        if ($user->is_admin || $user->hasPermissionTo('create-ticket')) {
             Mail::to($main_ticket->feedback_email)->send(new FeedbackReplyNotification($reply, $ticket));
         }
 
-        if (!$user->is_admin && !$user->hasPermissionTo('create-user')) {
+        if (!$user->is_admin && !$user->hasPermissionTo('create-ticket')) {
             Mail::to(env('MAIL_ADMIN'))->send(new FeedbackReplyNotification($reply, $ticket));
         }
 

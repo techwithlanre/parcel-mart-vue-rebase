@@ -341,8 +341,8 @@ class ShipmentServices
             throw ValidationException::withMessages(['message' => $message]);
         }
 
+        $current_balance = $user->balance;
         if ($user->user_type === 'business') {
-            $current_balance = $user->balance;
             $current_overdraft_amount = $total_amount - $current_balance; // loan amount at the moment
             $overdraft_wallet = WalletOverdraft::where('user_id', $user->id)->first();
             if (!$overdraft_wallet) {
@@ -389,10 +389,10 @@ class ShipmentServices
 
         if ($provider == 'ups') {
             $ups = new UpsServices($shipment);
-            $book_ups = $ups->bookShipment($shipment_item, $request);
+            $book_ups = $ups->bookShipment($shipment_item, $request, $rate);
         }
 
-        if ($book_aramex || $book_dhl) {
+        if ($book_aramex || $book_dhl || $book_ups) {
             if ($user->user_type === 'business' && $user->balance < $total_amount) {
                 $current_balance = $user->balance;
                 $overdraft_amount = $total_amount - $current_balance;
@@ -666,43 +666,10 @@ class ShipmentServices
             }
         }
 
-        $check_ups = CourierApiProvider::where('alias', 'ups');
-        if ($check_ups->value('status') == 'active') {
-            $ups = new UpsServices($shipment);
-            try {
-                $validate = $ups->validateAddress();
-                $response = Http::post('https://wwwcie.ups.com/rest/AV', [
-                        'type' => $type,
-                        'countryCode' => getCountry('id', $request->country_id)->iso2,
-                        'postalCode' => $request->postcode,
-                        'cityName' => getCity('id', $request->city_id)->name,
-                        'strictValidation' => "true"
-                    ]);
-
-                if ($response->status() == 200) {
-                    ShipmentProvider::updateOrCreate([
-                        'shipment_id' => $shipment_id,
-                        'provider' => 'dhl'
-                    ]);
-                } else {
-                    ShipmentProvider::where([
-                        'shipment_id' => $shipment_id,
-                        'provider' => 'dhl'
-                    ])->delete();
-                }
-            } catch(\Throwable $e) {
-                activity()
-                    ->causedBy(\request()->user())
-                    ->withProperties([
-                        'class' => __CLASS__,
-                        'method' => __FUNCTION__,
-                        'action' => 'DHL Validate Address rate',
-                        'line' => $e->getLine()
-                    ])
-                    ->log($e->getMessage());
-            }
-        }
-
+        ShipmentProvider::updateOrCreate([
+            'shipment_id' => $shipment_id,
+            'provider' => 'ups'
+        ]);
         return true;
     }
 }

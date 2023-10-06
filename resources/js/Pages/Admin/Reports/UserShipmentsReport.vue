@@ -23,7 +23,8 @@ const props = defineProps({
   insuranceAmount: Number,
   log: Array,
   shipments: Array,
-  dateRangeUrl: Array
+  dateRangeUrl: Array,
+  user_id: Number
 });
 
 let trackingNumber = ref('');
@@ -32,13 +33,13 @@ let status = ref('0');
 let dateRange = ref('');
 
 watch(dateRange, (value) => {
-  Inertia.get(route('reports.shipment'), { from: value[0], to: value[1] }, {
+  Inertia.get(route('reports.users.shipments', props.user_id), { from: value[0], to: value[1] }, {
     preserveState: true
   });
 });
 
 watch(trackingNumber, (value) => {
-  router.get(route('reports.shipment'), {
+  router.get(route('reports.users.shipments', props.user_id), {
     number: value
   }, {
     preserveState: true
@@ -47,7 +48,7 @@ watch(trackingNumber, (value) => {
 
 
 watch(status, (value) => {
-  router.get(route('reports.shipment'), {
+  router.get(route('reports.users.shipments', props.user_id), {
     status: value
   }, {
     preserveState: true
@@ -155,26 +156,26 @@ const cardsData = [
             <div class="overflow-x-auto rounded-b-xl">
               <table class="w-full text-sm text-left text-gray-500">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                  <tr class="bg-gray-100">
-                    <th class="text-left p-4 font-bold">User</th>
-                    <th class="text-left p-4 font-bold">Origin</th>
-                    <th class="text-left p-4 font-bold">Destination</th>
-                    <th class="text-left p-4 font-bold">Package</th>
-                    <th class="text-left p-4 font-bold">Tracking Number</th>
-                    <th class="text-left p-4 font-bold">Provider Cost</th>
-                    <th class="text-left p-4 font-bold">Amount Paid</th>
-                    <th class="text-left p-4 font-bold">Profit</th>
-                    <th class="text-left p-4 font-bold">Status</th>
-                    <th class="text-left p-4 font-bold">Action</th>
-                  </tr>
+                <tr class="bg-gray-100">
+                  <th class="text-left p-4 font-bold">User</th>
+                  <th class="text-left p-4 font-bold">Origin</th>
+                  <th class="text-left p-4 font-bold">Destination</th>
+                  <th class="text-left p-4 font-bold">Package</th>
+                  <th class="text-left p-4 font-bold">Tracking Number</th>
+                  <th class="text-left p-4 font-bold">Provider Cost</th>
+                  <th class="text-left p-4 font-bold">Amount Paid</th>
+                  <th class="text-left p-4 font-bold">Profit</th>
+                  <th class="text-left p-4 font-bold">Status</th>
+                  <th class="text-left p-4 font-bold">Action</th>
+                </tr>
                 </thead>
 
                 <tbody v-if="fetchingShipments">
-                  <tr>
-                    <td colspan="8" class="text-center p-5">
-                      <Loading />
-                    </td>
-                  </tr>
+                <tr>
+                  <td colspan="8" class="text-center p-5">
+                    <Loading />
+                  </td>
+                </tr>
                 </tbody>
                 <tbody v-else>
                 <tr v-if="log.length > 0"  class="bg-white border-t hover:bg-gray-50" v-for="item in log">
@@ -204,9 +205,9 @@ const cardsData = [
                   <td class="p-4">{{ Helper.nairaFormat(item.shipment?.shipping_rate_log?.total_charge - item.shipment?.shipping_rate_log?.provider_total_amount) }}</td>
                   <td class="p-4">
                     <span
-                      :class="{'bg-blue-100 text-blue-800' : item.shipment.status ==='processing',
+                        :class="{'bg-blue-100 text-blue-800' : item.shipment.status ==='processing',
                                   'bg-orange-100 text-orange-800' : item.shipment.status ==='pending', 'bg-green-100 text-green-800' : item.shipment.status ==='delivered'}"
-                      class="px-3 rounded-xl py-1">{{ item.shipment.status}}</span></td>
+                        class="px-3 rounded-xl py-1">{{ item.shipment.status}}</span></td>
                   <td class="p-4">
                     <Link :href="route('admin.shipment.details', item.shipment.id)" v-if="item.shipment.status !== 'pending'" class="btn btn-sm rounded-xl bg-green-400 text-white px-5 py-1 text-sm font-medium hover:text-green-600">View</Link>
                   </td>

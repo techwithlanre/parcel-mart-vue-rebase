@@ -11,6 +11,7 @@ use App\Models\Shipment;
 use App\Models\ShipmentAddress;
 use App\Models\ShipmentItem;
 use App\Models\ShippingRateLog;
+use App\Models\UpsShipmentLog;
 use Carbon\Carbon;
 use Exception;
 use GuzzleHttp\Client;
@@ -18,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Ups\Entity\Address as AddressAlias;
 use Ups\SimpleAddressValidation;
 
@@ -31,13 +33,14 @@ class UpsServices
     public string $destinationCountryCode = '';
     public string $shippingCurrency = '';
     protected string $baseUrl = '';
-    public string $clientId = 'SHcfIjA9d3Gu7iLAVEGi4uKnYSRYalW7GoUARK1K4EKY4YkL';
-    public string $clientSecret = '3hDpomnTOogSpubXqzgSa6yRn3KTyqKCO7uUqCHpcnzRmVXskdhlRaWUs2gGyqOV';
+    public string $clientId = '';
+    public string $clientSecret = '';
     protected string $credentials = '';
     public string $accessToken = '';
     protected string $requestGrantType = '';
     protected ShipmentAddress $origin;
     protected ShipmentAddress $destination;
+    private string $tracking_number;
 
     public function __construct(Shipment $shipment)
     {
@@ -47,18 +50,15 @@ class UpsServices
 
     private function init(): void
     {
-        $this->setBaseUrl();;
         $this->setCredentials();
         $this->getAccessToken();
     }
 
-    public function setBaseUrl(): void
-    {
-        $this->baseUrl = config('ups.sandbox') ? 'https://wwwcie.ups.com' : 'https://onlinetools.ups.con';
-    }
-
     private function setCredentials(): void
     {
+        $this->baseUrl = config('ups.sandbox') ? config('ups.sandbox_base_url') : config('ups.live_base_url');
+        $this->clientId = config('ups.client_id');
+        $this->clientSecret = config('ups.client_secret');
         $this->credentials = base64_encode("$this->clientId:$this->clientSecret");
     }
 
@@ -84,6 +84,8 @@ class UpsServices
                     ])
                     ->log($result['response']['errors'][0]['code'] . ' | ' . $result['response']['errors'][0]['message']);
             }
+
+            return false;
         }
 
         if (Arr::has($result, 'access_token')) $this->setAccessToken($result['access_token']);
@@ -92,7 +94,6 @@ class UpsServices
 
     public function validateAddress()
     {
-        //dd($this->accessToken);
         $payload = [
             "XAVRequest" => [
                 "AddressKeyFormat" => [
@@ -137,7 +138,7 @@ class UpsServices
                         ],
                         "Shipper" => [
                             "Name" => "Parcels Mart Solutions",
-                            "ShipperNumber" => "A1226Y",
+                            "ShipperNumber" => config('ups.account'),
                             "Address" => [
                                 "AddressLine" => "27, Sani Abacha Road, GRA",
                                 "City" => "Port Harcourt",
@@ -200,7 +201,6 @@ class UpsServices
                 ]
             ];
 
-
             $response = Http::withToken($this->accessToken)->post("$this->baseUrl/api/rating/v2205/Rate", $payload);
             return ($response->status() == 200) ? $response->body() : false;
         } catch (\Throwable $throwable) {
@@ -216,60 +216,93 @@ class UpsServices
         }
     }
 
-    public function pickup()
+    public function pickup(BookShipmentRequest $bookShipmentRequest, string $tracking_number)
     {
         $service_code = $this->serviceCode();
         if (!$service_code) return false;
         $weightUnit = $this->weightUnit(getCountry('id', $this->origin->country_id)->iso2);
         $shipment_item = ShipmentItem::where('shipment_id', $this->shipment->id)->first();
-        $jayParsedAry = [
-            "PickupCreationRequest" => [
-                "CustomerContext" => Str::uuid(),
-                "Request" => [
-                    "RequestOption" => "SCHEDULE"
-                ],
-                "Shipper" => [
-                    "Name" => "Parcels Mart Solutions",
-                    "ShipperNumber" => "A1226Y",
-                    "Address" => [
-                        "AddressLine" => "27, Sani Abacha Road, GRA",
-                        "City" => "Port Harcourt",
-                        "PostalCode" => "500001",
-                        "CountryCode" => "NG"
-                    ]
-                ],
-                "PickupDateInfo" => [
-                    "CloseTime" => "HH:MM:SS",
-                    "ReadyTime" => "HH:MM:SS",
-                    "PickupDate" => "YYYY-MM-DD"
-                ],
-                "PickupAddress" => [
-                    "CompanyName" => "Pickup Company Name",
-                    "ContactName" => "Pickup Contact Name",
-                    "PhoneNumber" => "Pickup Phone Number",
-                    "Address" => [
-                        "AddressLine" => "Pickup Address Line",
-                        "City" => "Pickup City",
-                        "StateProvinceCode" => "Pickup State",
-                        "PostalCode" => "Pickup Postal Code",
-                        "CountryCode" => "Pickup Country Code"
-                    ]
-                ],
-                "Package" => [
-                    [
-                        "TrackingNumber" => "Tracking Number (if applicable)",
-                        "Count" => "Number of Packages",
-                        "Weight" => "Package Weight (e.g., 10.0 LB)"
-                    ]
-                ],
-                "TotalWeight" => "Total Weight of all packages (e.g., 30.0 LB)"
-            ]
-        ];
+        $shipment_date = Carbon::create($bookShipmentRequest->shipment_date)->timezone('GMT+1');
 
+        try {
 
+            $payload = [
+                "PickupCreationRequest" => [
+                    "RatePickupIndicator" => "Y",
+                    "Shipper" => [
+                        "Account" => [
+                            "AccountNumber" => config('ups.account'),
+                            "AccountCountryCode" => "NG"
+                        ]
+                    ],
+                    "PickupDateInfo" => [
+//                        "CloseTime" => "1600",
+//                        "ReadyTime" => $shipment_date->toTimeString(),
+//                        "PickupDate" => $shipment_date->toDateString(),
+                        "CloseTime" => "1400",
+                        "ReadyTime" => "0500",
+                        "PickupDate" => "20230928"
+                    ],
+                    "PickupAddress" => [
+                        "CompanyName" => $this->origin->contact_name,
+                        "ContactName" => $this->origin->contact_name,
+                        "AddressLine" => $this->origin->address_1,
+                        "City" => getCity('id', $this->origin->city_id)->name,
+                        "CountryCode" => (string) getCountry('id', $this->origin->country_id)->iso2,
+                        "PostalCode" => $this->origin->postcode,
+                        "ResidentialIndicator" => "Y",
+                        "Phone" => [
+                            'Number' => $this->origin->contact_phone
+                        ],
+                    ],
+                    "CustomerContext" => Str::uuid(),
+                    "PaymentMethod" => "01",
+                    "Request" => [
+                        "RequestOption" => "SCHEDULE"
+                    ],
+                    "AlternateAddressIndicator" => 'Y',
+                    "PickupPiece" => [
+                        [
+                            "ServiceCode" => '001',
+                            "DestinationCountryCode" => getCountry('id', $this->destination->country_id)->iso2,
+                            "Quantity" => (string) $shipment_item->quantity,
+                            "ContainerCode" => "01"
+                        ]
+                    ],
+
+                    "TotalWeight" => [
+                        "Weight" => (string) $this->convertWeight($weightUnit, $shipment_item->weight),
+                        "UnitOfMeasurement" => $weightUnit
+                    ],
+                    //"ReferenceNumber" => Str::uuid(),
+                    "Notification" => [
+                        "ConfirmationEmailAddress" => $this->origin->contact_email,
+                        "UndeliverableEmailAddress" => $this->origin->contact_email
+                    ],
+//                    "TrackingData" => [
+//                        [
+//                            "TrackingNumber" => $tracking_number
+//                        ]
+//                    ],
+
+                ]
+            ];
+
+            //dd($payload);
+            $response = Http::withToken($this->accessToken)->post("$this->baseUrl/api/pickupcreation/v2205/pickup", $payload);
+            if ($response->status() != 200) {
+                throw ValidationException::withMessages(['message' => 'Unable to book shipment. Please try again later (P)']);
+            }
+            return $response->body();
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 
-    public function bookShipment(ShipmentItem $shipmentItem, BookShipmentRequest $bookShipmentRequest)
+    /**
+     * @throws ValidationException
+     */
+    public function bookShipment(ShipmentItem $shipmentItem, BookShipmentRequest $bookShipmentRequest, ShippingRateLog $shippingRateLog)
     {
         $service_code = $this->serviceCode();
         if (!$service_code) return false;
@@ -284,27 +317,12 @@ class UpsServices
                     "SubVersion" => "2205",
                     "RequestOption" => "nonvalidate",
                     "TransactionReference" => [
-                        "CustomerContext" => ""
+                        "CustomerContext" => Str::uuid()
                     ]
                 ],
                 "Shipment" => [
                     "Description" => "Parcel/Document Shipment",
-                    "Shipper" => [
-                        "Name" => "Parcels Mart Solution",
-                        "AttentionName" => "Parcels Mart Solutions",
-                        "TaxIdentificationNumber" => "",
-                        "Phone" => [
-                            "Number" => "08136437952",
-                            "Extension" => ""
-                        ],
-                        "ShipperNumber" => "A1226Y",
-                        "Address" => [
-                            "AddressLine" => "27, Sani Abacha Road, GRA",
-                            "City" => "Port Harcourt",
-                            "PostalCode" => "500001",
-                            "CountryCode" => "NG"
-                        ]
-                    ],
+                    "Shipper" => config('ups.Shipper'),
                     "ShipTo" => [
                         "Name" => $this->destination->contact_name,
                         "AttentionName" => $this->destination->contact_name,
@@ -337,7 +355,7 @@ class UpsServices
                         "ShipmentCharge" => [
                             "Type" => "01",
                             "BillShipper" => [
-                                "AccountNumber" => "A1226Y"
+                                "AccountNumber" => config('ups.account')
                             ]
                         ]
                     ],
@@ -376,11 +394,53 @@ class UpsServices
                 ]
             ]
         ];
-
+        //dd($payload);
         $response = Http::withToken($this->accessToken)->post("$this->baseUrl/api/shipments/v2205/ship", $payload);
-        dd($response->body());
-        return ($response->status() == 200) ? $response->body() : false;
+        if ($response->status() != 200) {
+            throw ValidationException::withMessages(['message' => 'Unable to book shipment. Please try again later']);
+        }
+        /*UpsShipme::create([
+            'shipment_id' => $shipment->id,
+            'shipment_rate_log_id' => $shippingRateLog->id,
+            'shipment_tracking_number' => $result['shipmentTrackingNumber'],
+            'tracking_url' => $result['trackingUrl'],
+            'cancel_pickup_url' => $result['cancelPickupUrl'],
+            'dispatch_confirmation_number' => $result['dispatchConfirmationNumber'],
+            'document_content' => json_encode($result['documents']),
+            'package_details' => json_encode($result['packages'])
+        ]);*/
 
+        $result = json_decode($response->body(), true);
+        $shipment_response = $result['ShipmentResponse']['Response']['ResponseStatus'];
+        if ($shipment_response['Code'] == 1 && $shipment_response['Description'] == 'Success') {
+            $shipment_result = $result['ShipmentResponse']['ShipmentResults'];
+            $tracking_number = $shipment_result['PackageResults']['TrackingNumber'];
+            $this->shipment->number = $tracking_number;
+            $this->shipment->save();
+
+            $ups_shipment_log = new UpsShipmentLog;
+            $ups_shipment_log->shipment_id = $this->shipment->id;
+            $ups_shipment_log->tracking_number = $tracking_number;
+            $ups_shipment_log->identification_number = $shipment_result['ShipmentIdentificationNumber'];
+            $ups_shipment_log->document_content = json_encode($shipment_result['PackageResults']['ShippingLabel']);
+            $ups_shipment_log->reference = $result['ShipmentResponse']['Response']['TransactionReference']['CustomerContext'];
+            $ups_shipment_log->save();
+
+            $pickup = $this->pickup($bookShipmentRequest, $tracking_number);
+            if (!$pickup) {
+                throw ValidationException::withMessages(['message' => 'Unable to book shipment. Please try again later']);
+            }
+
+            $pickup_result = json_decode($pickup, true);
+            $pickup_number = $pickup_result['PickupCreationResponse']['PRN'];
+            $shippingRateLog->pickup_number = $pickup_number;
+            $shippingRateLog->save();
+            $this->shipment->pickup_number = $pickup_number;
+            $this->shipment->save();
+            return true;
+        }
+
+        return ($response->status() == 200) ? $response->body() : false;
     }
 
     private function serviceCode(): bool|string
@@ -461,7 +521,7 @@ class UpsServices
     private function sendAuthRequest(): bool|string
     {
         try {
-            $url = 'https://wwwcie.ups.com/security/v1/oauth/token';
+            $url = $this->baseUrl . '/security/v1/oauth/token';
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

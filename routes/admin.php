@@ -1,8 +1,17 @@
 <?php
 
+use App\Events\ShipmentStatusUpdated;
 use Illuminate\Support\Facades\Route;
 use \App\Http\Controllers\Admin\UserController;
 use \App\Http\Controllers\Admin\ShipmentController;
+
+Route::get('', function () {
+    return view('welcome');
+});
+
+Route::get('event', function () {
+    ShipmentStatusUpdated::dispatch(\App\Models\Shipment::find(29));
+});
 
 Route::prefix('admin')->middleware('check.admin.user')->group(function () {
     Route::prefix('analytics')->group(function () {
@@ -15,6 +24,7 @@ Route::prefix('admin')->middleware('check.admin.user')->group(function () {
     Route::prefix('reports')->group(function () {
        Route::get('shipments', [\App\Http\Controllers\Admin\ReportsController::class, 'shipmentsReport'])->name('reports.shipment');
        Route::get('users', [\App\Http\Controllers\Admin\ReportsController::class, 'usersReport'])->name('reports.users');
+       Route::get('users/{user_id}/shipments', [\App\Http\Controllers\Admin\ReportsController::class, 'userShipmentsReport'])->name('reports.users.shipments');
        Route::get('payments', [\App\Http\Controllers\Admin\ReportsController::class, 'paymentReport'])->name('reports.payments');
        Route::get('tax', [\App\Http\Controllers\Admin\ReportsController::class, 'taxReport'])->name('reports.tax');
     });
@@ -67,5 +77,13 @@ Route::prefix('admin')->middleware('check.admin.user')->group(function () {
 
     Route::prefix('feedback')->group(function () {
         Route::get('/tickets', [\App\Http\Controllers\CustomerFeedbackController::class, 'allTicket'])->name('feedback.tickets');
+    });
+
+    Route::prefix('locations')->group(function () {
+        Route::get('', [\App\Http\Controllers\Admin\ShipmentLocationsController::class, 'index'])->name('countries');
+        Route::get('countries', [\App\Http\Controllers\Admin\ShipmentLocationsController::class, 'index'])->name('countries');
+        Route::get('states/{country_id}', [\App\Http\Controllers\Admin\ShipmentLocationsController::class, 'states'])->name('states');
+        Route::get('cities/{state_id}', [\App\Http\Controllers\Admin\ShipmentLocationsController::class, 'cities'])->name('cities');
+        Route::post('store-city', [\App\Http\Controllers\Admin\ShipmentLocationsController::class, 'storeCity'])->name('city.store');
     });
 });

@@ -133,7 +133,10 @@ import DashboardLayout from "@/Layouts/DashboardLayout.vue";
   <DashboardLayout page-title="Analytics Dashboard">
     <div class="flex lg:flex-row flex-col gap-x-5 gap-y-10">
       <div class="w-full">
-        <div class="grid grid-cols-2 gap-10">
+        <div class="">
+
+        </div>
+        <div class="grid sm:grid-cols-2 grid-cols-1 gap-10">
           <div class="p-5 shadow shadow-background rounded-xl border ">
             <h3 class="font-bold mb-5">Monthly Sales Chart</h3>
             <Line

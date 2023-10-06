@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Tasks\TrackingTask;
 use Illuminate\Console\Command;
 
 class TrackAramexShipment extends Command
@@ -11,7 +12,7 @@ class TrackAramexShipment extends Command
      *
      * @var string
      */
-    protected $signature = 'app:track-aramex-shipment';
+    protected $signature = 'shipment:track-aramex-shipment';
 
     /**
      * The console command description.
@@ -25,6 +26,7 @@ class TrackAramexShipment extends Command
      */
     public function handle()
     {
-        //
+        $task = new TrackingTask();
+        $task->trackAramex();
     }
 }

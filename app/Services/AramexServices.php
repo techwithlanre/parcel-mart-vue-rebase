@@ -105,8 +105,6 @@ class AramexServices
             $this->shippingCurrency
         );
 
-        dd($response);
-
         if (isset($response->error)) {
             activity()
                 ->performedOn(new Shipment())

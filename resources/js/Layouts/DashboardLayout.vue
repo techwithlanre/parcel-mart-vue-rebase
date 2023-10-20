@@ -52,7 +52,6 @@ const fullName = computed(() => {
   return page.props.auth.user.first_name + " " + page.props.auth.user.last_name
 });
 
-
 /*Echo.private('shipments.29').listen('ShipmentStatusUpdated', (e) => {
   let shipment = e.shipment;
   Swal.fire('Your shipment with tracking number 3456789 is being processed');

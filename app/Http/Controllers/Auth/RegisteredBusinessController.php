@@ -51,7 +51,7 @@ class RegisteredBusinessController extends Controller
 
 
         Auth::login($user);
-        return redirect(RouteServiceProvider::HOME);
+        return redirect(RouteServiceProvider::USER_HOME);
     }
 
     private function createReferral(User $user, $ref_by): void

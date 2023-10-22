@@ -66,6 +66,7 @@ class ShipmentServices
         try {
             $response = $dhl->calculateRate();
             $data = json_decode($response, true);
+            dd($data);
             if ($data && array_key_exists('products', $data)) {
                 $products = $data['products'];
                 foreach ($products as $product) {

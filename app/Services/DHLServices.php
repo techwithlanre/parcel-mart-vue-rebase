@@ -299,11 +299,11 @@ class DHLServices
             "content" => [
                 "packages" => [
                     [
-                        'weight' => $shipmentItem->weight,
+                        'weight' => (float) $shipmentItem->weight,
                         'dimensions' => [
-                            'length' => $shipmentItem->length,
-                            'width' => $shipmentItem->width,
-                            'height' => $shipmentItem->height,
+                            'length' => (float) $shipmentItem->length,
+                            'width' => (float) $shipmentItem->width,
+                            'height' => (float) $shipmentItem->height,
                         ],
                         'description' => $shipment->description ?? 'Package Description'
                     ]
@@ -329,8 +329,8 @@ class DHLServices
                         "price" => (float) $shipmentItem->value,
                         "description" => $shipmentItem->description,
                         "weight" => [
-                            "netValue" => $shipmentItem->weight,
-                            "grossValue" => $shipmentItem->weight
+                            "netValue" => (float) $shipmentItem->weight,
+                            "grossValue" => (float) $shipmentItem->weight
                         ],
                         "commodityCodes" => [
                             [

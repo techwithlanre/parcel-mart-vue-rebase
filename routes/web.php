@@ -27,27 +27,20 @@ use Inertia\Inertia;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-Route::get('', function () {
-    return Inertia::render('Auth/Login', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-        'countries' => \App\Models\Country::all()
-    ]);
-})->name('home');
-
 Route::get('coming-soon', function () {
     return Inertia::render('ComingSoon');
 })->name('coming.soon');
 
+Route::get('', [\App\Http\Controllers\ServicesController::class, 'index'])->name('home');
 Route::get('services', [\App\Http\Controllers\ServicesController::class, 'index'])->name('services');
 Route::get('contact', [\App\Http\Controllers\ContactController::class, 'index'])->name('contact');
 Route::get('company', [\App\Http\Controllers\AboutController::class, 'index'])->name('about');
-Route::get('tracking', function () {
+Route::get('h/tracking', function () {
     return Inertia::render('Tracking/Tracking');
-})->name('tracking');
+})->name('home.tracking');
+
+Route::post('track', [\App\Http\Controllers\ShipmentController::class, 'homeTrackShipment'])->name('home.shipment.track');
+Route::get('tracking-details/{shipment_id}', [\App\Http\Controllers\ShipmentController::class, 'trackingDetails'])->name('home.shipment.track.details');
 
 Route::post('contact', [\App\Http\Controllers\ContactController::class, 'send'])->name('contact.send');
 
@@ -69,12 +62,12 @@ Route::get('states/{country_id}', function () {
 });
 
 
-
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])->name('register.index');
     Route::post('register', [RegisteredUserController::class, 'store']);
     Route::post('business-register', [RegisteredBusinessController::class, 'store'])->name('register.business.index');
 
+    Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('login');
     Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
@@ -86,7 +79,6 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-
     Route::get('dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('quotes', [\App\Http\Controllers\QuoteController::class, 'index'])->name('quotes');

@@ -251,6 +251,11 @@ class ShipmentController extends Controller
         return $services->trackShipment($request);//
     }
 
+    public function homeTrackShipment(TrackShipmentRequest $request, ShipmentServices $services)
+    {
+        return $services->homeTrackShipment($request);//
+    }
+
     public function trackingDetails($shipment_id)
     {
         $tracking_log = TrackingLog::where(['shipment_id' => $shipment_id])->get();

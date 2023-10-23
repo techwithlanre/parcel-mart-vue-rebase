@@ -223,9 +223,7 @@ class UpsServices
         $weightUnit = $this->weightUnit(getCountry('id', $this->origin->country_id)->iso2);
         $shipment_item = ShipmentItem::where('shipment_id', $this->shipment->id)->first();
         $shipment_date = Carbon::create($bookShipmentRequest->shipment_date)->timezone('GMT+1');
-
         try {
-
             $payload = [
                 "PickupCreationRequest" => [
                     "RatePickupIndicator" => "Y",
@@ -236,12 +234,12 @@ class UpsServices
                         ]
                     ],
                     "PickupDateInfo" => [
-//                        "CloseTime" => "1600",
-//                        "ReadyTime" => $shipment_date->toTimeString(),
-//                        "PickupDate" => $shipment_date->toDateString(),
-                        "CloseTime" => "1400",
+                        "CloseTime" => "1600",
+                        "ReadyTime" => substr(str_replace(':', '', $shipment_date->toTimeString()), 0, 4),
+                        "PickupDate" => str_replace('-', '', $shipment_date->toDateString()),
+                        /*"CloseTime" => "1400",
                         "ReadyTime" => "0500",
-                        "PickupDate" => "20230928"
+                        "PickupDate" => "20230928"*/
                     ],
                     "PickupAddress" => [
                         "CompanyName" => $this->origin->contact_name,
@@ -269,7 +267,6 @@ class UpsServices
                             "ContainerCode" => "01"
                         ]
                     ],
-
                     "TotalWeight" => [
                         "Weight" => (string) $this->convertWeight($weightUnit, $shipment_item->weight),
                         "UnitOfMeasurement" => $weightUnit
@@ -279,14 +276,16 @@ class UpsServices
                         "ConfirmationEmailAddress" => $this->origin->contact_email,
                         "UndeliverableEmailAddress" => $this->origin->contact_email
                     ],
-//                    "TrackingData" => [
-//                        [
-//                            "TrackingNumber" => $tracking_number
-//                        ]
-//                    ],
-
                 ]
             ];
+
+            if (!config('ups.sandbox')) {
+                $payload['PickupCreationRequest']['TrackingData'] = [
+                    [
+                        "TrackingNumber" => $tracking_number
+                    ]
+                ];
+            }
 
             //dd($payload);
             $response = Http::withToken($this->accessToken)->post("$this->baseUrl/api/pickupcreation/v2205/pickup", $payload);
@@ -299,9 +298,6 @@ class UpsServices
         }
     }
 
-    /**
-     * @throws ValidationException
-     */
     public function bookShipment(ShipmentItem $shipmentItem, BookShipmentRequest $bookShipmentRequest, ShippingRateLog $shippingRateLog)
     {
         $service_code = $this->serviceCode();
@@ -321,7 +317,7 @@ class UpsServices
                     ]
                 ],
                 "Shipment" => [
-                    "Description" => "Parcel/Document Shipment",
+                    "Description" => $shipment_item->description,
                     "Shipper" => config('ups.Shipper'),
                     "ShipTo" => [
                         "Name" => $this->destination->contact_name,
@@ -330,7 +326,9 @@ class UpsServices
                             "Number" => $this->destination->contact_phone
                         ],
                         "Address" => [
-                            "AddressLine" => $this->destination->address_1,
+                            "AddressLine" => [
+                                $this->destination->address_1
+                            ],
                             "City" => getCity('id', $this->destination->city_id)->name,
                             "StateProvinceCode" => "",
                             "PostalCode" => $this->destination->postcode,
@@ -344,7 +342,9 @@ class UpsServices
                             "Number" => $this->origin->contact_phone
                         ],
                         "Address" => [
-                            "AddressLine" => $this->origin->address_1,
+                            "AddressLine" => [
+                                $this->origin->address_1
+                            ],
                             "City" => getCity('id', $this->origin->city_id)->name,
                             "StateProvinceCode" => "",
                             "PostalCode" => $this->origin->postcode,

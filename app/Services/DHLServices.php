@@ -68,7 +68,8 @@ class DHLServices
         }
 
         $response = Http::withBasicAuth($this->username, $this->password)
-            ->withHeaders(['Content-Type: application/json',])->post($this->base_url.'/rates', $this->calculateRatePayload);
+            ->withHeaders(['Content-Type: application/json'])->post($this->base_url.'/rates', $this->calculateRatePayload);
+        //dd($response->body());
         return $response->body();
     }
 

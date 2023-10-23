@@ -66,7 +66,6 @@ class ShipmentServices
         try {
             $response = $dhl->calculateRate();
             $data = json_decode($response, true);
-            dd($data);
             if ($data && array_key_exists('products', $data)) {
                 $products = $data['products'];
                 foreach ($products as $product) {
@@ -488,6 +487,19 @@ class ShipmentServices
         return redirect()->back()->with('error', 'An error occurred. Please try again later');
     }
 
+    public function homeTrackShipment(TrackShipmentRequest $request)
+    {
+        $shipment_number = trim($request->number);
+        $shipment = Shipment::where([
+            'number' => $shipment_number,
+        ])->first();
+
+        if (!$shipment) throw ValidationException::withMessages(['number' => 'Tracking number not found']);
+        if ($shipment->provider == 'aramex') return $this->homeTrackAramex($shipment);
+        if ($shipment->provider == 'dhl') return $this->homeTrackDhl($request, $shipment);
+        return redirect()->back()->with('error', 'An error occurred. Please try again later');
+    }
+
     private function trackAramex(Shipment $shipment): \Illuminate\Foundation\Application|\Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
         $aramex_shipment = AramexShipmentLog::where('shipment_id', $shipment->id)->first();
@@ -548,6 +560,80 @@ class ShipmentServices
             $tracking_data = json_decode($response, true);
             $tracking_log = $this->saveDhlTracking($tracking_data['shipments'], $shipment->id);
             if ($tracking_log) return \redirect(route('shipment.track.details', $shipment->id));
+            throw ValidationException::withMessages(['number' => 'We are working on tracking info. Please check back later']);
+        } catch (\Throwable $e) {
+            activity()
+                ->performedOn(new Shipment())
+                ->causedBy(\request()->user())
+                ->withProperties([
+                    'method' => __FUNCTION__,
+                    'action' => 'DHL Track Shipment'
+                ])
+                ->log($e->getMessage());
+            throw ValidationException::withMessages(['number' => 'We are working on tracking info. Please check back later']);
+        }
+    }
+
+    private function homeTrackAramex(Shipment $shipment): \Illuminate\Foundation\Application|\Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
+    {
+        $aramex_shipment = AramexShipmentLog::where('shipment_id', $shipment->id)->first();
+        try {
+            $response = Aramex::trackShipments([$aramex_shipment->aramex_id]);
+            if (!$response->HasErrors) {
+                $data = $response->TrackingResults->KeyValueOfstringArrayOfTrackingResultmFAkxlpY->Value->TrackingResult;
+                $check = TrackingLog::where([
+                    'shipment_id' => $shipment->id,
+                    'update_code' => $data->UpdateCode,
+                    'provider' => 'aramex',
+                ])->first();
+
+                if (!$check) {
+                    TrackingLog::create([
+                        'shipment_id' => $shipment->id,
+                        'update_code' => $data->UpdateCode,
+                        'waybill_number' => $data->WaybillNumber,
+                        'update_description' => $data->UpdateDescription,
+                        'update_datetime' => $data->UpdateDateTime,
+                        'update_location' => $data->UpdateLocation,
+                        'comment' => $data->Comments,
+                        'problem_code' => $data->ProblemCode,
+                        'gross_weight' => $data->GrossWeight,
+                        'chargeable_weight' => $data->ChargeableWeight,
+                        'weight_unit' => $data->WeightUnit,
+                        'provider' => 'aramex',
+                    ]);
+                    return \redirect(route('home.shipment.track.details', $shipment->id));
+                }
+
+                return \redirect(route('home.shipment.track.details', $shipment->id));
+            }
+
+            //return redirect()->back()->with('error', 'We are working on tracking info. Please check back later');
+            throw ValidationException::withMessages(['number' => 'We are working on tracking info. Please check back later']);
+        } catch (\Throwable  $e) {
+            activity()
+                ->performedOn(new Shipment())
+                ->causedBy(\request()->user())
+                ->withProperties([
+                    'method' => __FUNCTION__,
+                    'action' => 'Aramex Track Shipment'
+                ])
+                ->log($e->getMessage());
+            throw ValidationException::withMessages(['number' => 'We are working on tracking info. Please check back later xxxxxxx']);
+        }
+
+    }
+
+    private function homeTrackDhl(TrackShipmentRequest $request, Shipment $shipment)
+    {
+        $dhl_shipment = DhlShipmentLog::where('shipment_id', $shipment->id)->first();
+        if (!$dhl_shipment) return redirect()->back()->with('error', 'An error occurred. Please try again later');
+        try {
+            $dhl = new DHLServices($shipment);
+            $response = $dhl->trackShipment($dhl_shipment);
+            $tracking_data = json_decode($response, true);
+            $tracking_log = $this->saveDhlTracking($tracking_data['shipments'], $shipment->id);
+            if ($tracking_log) return \redirect(route('home.shipment.track.details', $shipment->id));
             throw ValidationException::withMessages(['number' => 'We are working on tracking info. Please check back later']);
         } catch (\Throwable $e) {
             activity()

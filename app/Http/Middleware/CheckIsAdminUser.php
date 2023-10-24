@@ -19,7 +19,7 @@ class CheckIsAdminUser
             return $next($request);
         }
 
-        return redirect(route('dashboard'))->with('error', 'You are not permitted to view this is resource');
+        return redirect(route('dashboard'))->with('error', 'You are not permitted to view this resource');
 
     }
 }

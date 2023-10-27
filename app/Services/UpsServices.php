@@ -288,11 +288,11 @@ class UpsServices
             }
 
 
-            dd($payload);
+            //dd($payload);
 
             //dd($payload);
             $response = Http::withToken($this->accessToken)->post("$this->baseUrl/api/pickupcreation/v2205/pickup", $payload);
-            dd($response->body());
+            ///dd($response->body());
             if ($response->status() != 200) {
                 throw ValidationException::withMessages(['message' => 'Unable to book shipment. Please try again later (P)']);
             }

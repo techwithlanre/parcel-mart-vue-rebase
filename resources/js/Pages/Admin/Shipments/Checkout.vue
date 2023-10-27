@@ -165,7 +165,7 @@ const showInvoiceForm = () => {
                         v-model="form.shipment_date"
                         :disabled-week-days="[6, 0]"
                         :min-time="{ hours: 9, minutes: 0 }"
-                        :max-time="{ hours: 16, minutes: 0 }"
+                        :max-time="{ hours: 15, minutes: 0 }"
                         class="mt-3"></VueDatePicker>
                     <InputError :message="form.errors.shipment_date" />
                   </div>

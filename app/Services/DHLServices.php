@@ -229,12 +229,13 @@ class DHLServices
         $account_number = $type == "I" ? $this->import_account_number : $this->account_number;
         $shipment_date = Carbon::create($bookShipmentRequest->shipment_date)->timezone('GMT+1');
         $shipment_date = str_replace(' ', 'T', $shipment_date->toDateTimeString()) . " GMT+01:00";
+
         $this->bookShipmentPayload = [
             "plannedShippingDateAndTime" => $shipment_date,
             "productCode" => $product_code,
             "pickup" =>  [
                 "isRequested" => true,
-                "closeTime" => "16:00",
+                "closeTime" => "18:00",
                 "location" => "reception",
             ],
             "outputImageProperties" => [
@@ -354,11 +355,13 @@ class DHLServices
             ];
         }
 
+
         return true;
     }
 
     private function sendBookShipmentRequest()
     {
+        //dd($this->base_url.'/shipments');
 
         try {
             $response = Http::withBasicAuth($this->username, $this->password)
@@ -368,6 +371,7 @@ class DHLServices
                     'Accept: application/json',
                 ])->post($this->base_url.'/shipments', $this->bookShipmentPayload);
             $result = json_decode($response->body(), true);
+            //dd($result);
             if (!isset($result['shipmentTrackingNumber'])) {
                 activity()
                     ->performedOn(new Shipment())

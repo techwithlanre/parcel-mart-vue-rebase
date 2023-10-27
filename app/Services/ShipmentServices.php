@@ -674,7 +674,6 @@ class ShipmentServices
      */
     public function validateAddress(CreateShipmentOriginRequest | CreateShipmentDestinationRequest $request, $shipment_id, $type = 'pickup'): bool
     {
-        $shipment = Shipment::find($shipment_id);
         $check_aramex = CourierApiProvider::where('alias', 'aramex');
         if ($check_aramex->value('status') == 'active') {
             try {
@@ -719,9 +718,13 @@ class ShipmentServices
 
         $check_dhl = CourierApiProvider::where('alias', 'dhl');
         if ($check_dhl->value('status') == 'active') {
+            $dhl_env = config('dhl.ENV');
+            $dhl_base_url = config('dhl.'.$dhl_env.'.baseUrl');
+            $dhl_username = config('dhl.'.$dhl_env.'.username');
+            $dhl_password = config('dhl.'.$dhl_env.'.password');
             try {
-                $response = Http::withBasicAuth('parcelmartsNG', 'C^3zZ@4zJ!5iC#5m')
-                    ->get('https://express.api.dhl.com/mydhlapi/test/address-validate', [
+                $response = Http::withBasicAuth($dhl_username, $dhl_password)
+                    ->get("$dhl_base_url/address-validate", [
                     'type' => $type,
                     'countryCode' => getCountry('id', $request->country_id)->iso2,
                     'postalCode' => $request->postcode,

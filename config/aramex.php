@@ -60,7 +60,7 @@ return [
         'Version'			 	=> 'v1'
 	],
 
-	'CompanyName' => 'Moustafa Allahham',
+	'CompanyName' => 'Parcels Mart Solutions',
 
 	/**						Business Attributes
 	 *  Usually there are attributes that never change in the projects (specially
@@ -128,7 +128,6 @@ return [
 	 */
 
 	'PaymentOptions' => null,
-
 	/**
 	 *	Service Code (Additional Services for the shipment)
 	 *  Separate by comma when selecting multiple services
@@ -136,7 +135,7 @@ return [
 	 * 		CODS = Cash on Delivery
 	 * 		FIRST = First Delivery
 	 * 		FRDM = Free Domicile
-	 * 		HFPU = Hold for pick up
+	 * 		HFPU = Hold for pickup
 	 * 		NOON = Noon Delivery
 	 * 		SIG = Signature Required
 	 *  For more information navigate to Appendix-C (Page: 52) in

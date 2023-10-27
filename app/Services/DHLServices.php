@@ -44,12 +44,12 @@ class DHLServices
 
     private function initialize(): void
     {
-        $this->env = \config('dhl.ENV');
-        $this->base_url = \config('dhl.'.$this->env.'.baseUrl');
-        $this->account_number = \config('dhl.'.$this->env.'.accountNumber');
-        $this->import_account_number = \config('dhl.'.$this->env.'.importAccountNumber');
-        $this->username = \config('dhl.'.$this->env.'.username');
-        $this->password = \config('dhl.'.$this->env.'.password');
+        $this->env = config('dhl.ENV');
+        $this->base_url = config('dhl.'.$this->env.'.baseUrl');
+        $this->account_number = config('dhl.'.$this->env.'.accountNumber');
+        $this->import_account_number = config('dhl.'.$this->env.'.importAccountNumber');
+        $this->username = config('dhl.'.$this->env.'.username');
+        $this->password = config('dhl.'.$this->env.'.password');
     }
 
     public function calculateRate()
@@ -68,7 +68,8 @@ class DHLServices
         }
 
         $response = Http::withBasicAuth($this->username, $this->password)
-            ->withHeaders(['Content-Type: application/json',])->post('https://express.api.dhl.com/mydhlapi/test/rates', $this->calculateRatePayload);
+            ->withHeaders(['Content-Type: application/json'])->post($this->base_url.'/rates', $this->calculateRatePayload);
+        //dd($response->body());
         return $response->body();
     }
 
@@ -299,11 +300,11 @@ class DHLServices
             "content" => [
                 "packages" => [
                     [
-                        'weight' => $shipmentItem->weight,
+                        'weight' => (float) $shipmentItem->weight,
                         'dimensions' => [
-                            'length' => $shipmentItem->length,
-                            'width' => $shipmentItem->width,
-                            'height' => $shipmentItem->height,
+                            'length' => (float) $shipmentItem->length,
+                            'width' => (float) $shipmentItem->width,
+                            'height' => (float) $shipmentItem->height,
                         ],
                         'description' => $shipment->description ?? 'Package Description'
                     ]
@@ -329,8 +330,8 @@ class DHLServices
                         "price" => (float) $shipmentItem->value,
                         "description" => $shipmentItem->description,
                         "weight" => [
-                            "netValue" => $shipmentItem->weight,
-                            "grossValue" => $shipmentItem->weight
+                            "netValue" => (float) $shipmentItem->weight,
+                            "grossValue" => (float) $shipmentItem->weight
                         ],
                         "commodityCodes" => [
                             [
@@ -365,7 +366,7 @@ class DHLServices
                     'Message-Reference: ' . Str::uuid(),
                     'Content-Type: application/json',
                     'Accept: application/json',
-                ])->post('https://express.api.dhl.com/mydhlapi/test/shipments', $this->bookShipmentPayload);
+                ])->post($this->base_url.'/shipments', $this->bookShipmentPayload);
             $result = json_decode($response->body(), true);
             if (!isset($result['shipmentTrackingNumber'])) {
                 activity()
@@ -392,33 +393,6 @@ class DHLServices
         }
     }
 
-
-
-    private function call(): bool|string
-    {
-        $curl = curl_init();
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://express.api.dhl.com/mydhlapi/test/rates',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_USERPWD => $this->username . ':' . $this->password,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => json_encode($this->calculateRatePayload),
-            CURLOPT_HTTPHEADER => array(
-                'Content-Type: application/json',
-                //'Cookie: BIGipServer~WSB~pl_wsb-express-chd.dhl.com_443=308824229.64288.0000; TS0136675b=012d4839b33c1e28aa1a127ce8ea39caa756544b554dd9ab314ee1e407d94291f3eb907609521f3055e3e88233bedf6ccfe7b4d42d'
-            ),
-        ));
-
-        $response = curl_exec($curl);
-        curl_close($curl);
-        return $response;
-    }
-
     public function trackShipment(DhlShipmentLog $dhlShipmentLog)
     {
         try {
@@ -433,7 +407,6 @@ class DHLServices
         } catch (\Throwable $e) {
             $response = $e->getMessage();
             return redirect()->back()->with('error', 'We are working on tracking info. Please check back later');
-
         }
     }
 
@@ -558,7 +531,7 @@ class DHLServices
             ]
         ];
 
-        return $this->sendRequest('https://express.api.dhl.com/mydhlapi/test/pickups', $pickupPayload);
+        return $this->sendRequest($this->base_url . '/pickups', $pickupPayload);
     }
 
     private function sendRequest($url, $payload)

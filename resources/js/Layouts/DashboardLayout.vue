@@ -11,8 +11,9 @@ import ShoppingBagIcon from "../../images/icons/shopping-bag.svg";
 import ChartIcon from "../../images/icons/graph.svg";
 import PencilIcon from "../../images/icons/pencil.svg";
 import OptionsIcon from "../../images/icons/options.svg";
-import {computed, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {DocumentIcon, DocumentTextIcon, CursorArrowRippleIcon, UsersIcon} from "@heroicons/vue/20/solid/index.js";
+import Swal from "sweetalert2";
 
 const page = usePage();
 defineProps({
@@ -21,26 +22,21 @@ defineProps({
 
 const mobileSidebarShow = ref(false)
 
-const sidebar = [
-  [
-    { name: "Dashboard", icon: OverviewIcon, route: "/dashboard", admin: false },
-    { name: "Shipments", icon: TruckIcon, route: "/shipments", admin: false },
-    { name: "Wallet", icon: WalletIcon, route: "/wallet", admin: false },
-    { name: "Address Book", icon: LocationIcon, route: '/address-book', admin: false},
-    { name: "FAQs", icon: FAQ, route: '/faq', admin: false  },
-    { name: "Invite & Earn", icon: InviteIcon, route: '/invite', admin: false  },
-    { name: "Feedback", icon: FAQ, route: '/feedback/tickets/user', admin: false  },
-  ],
-];
-
-const adminMenu = [
-  { name: "Analytics", icon: ChartIcon, route: "/admin/analytics", admin: false, permissionKey: ['read-dashboard'] },
+const menu = [
+  { name: "Dashboard", icon: OverviewIcon, route: "/dashboard", admin: false },
+  { name: "Shipments", icon: TruckIcon, route: "/shipments", admin: false },
+  { name: "Wallet", icon: WalletIcon, route: "/wallet", admin: false },
+  { name: "Address Book", icon: LocationIcon, route: '/address-book', admin: false},
+  { name: "FAQs", icon: FAQ, route: '/faq', admin: false  },
+  { name: "Invite & Earn", icon: InviteIcon, route: '/invite', admin: false  },
+  { name: "Feedback", icon: FAQ, route: '/feedback/tickets/user', admin: false  },
+  { name: "Analytics", icon: ChartIcon, route: "/admin/analytics", admin: true, permissionKey: ['read-dashboard'] },
   { name: "Reports", icon: DocumentTextIcon, route: "/admin/reports/shipments" , admin: true, permissionKey: ['read-shipment-report'] },
   { name: "Users", icon: UsersIcon, route: "/admin/users", admin: true, permissionKey: ["read-user", "create-user"] },
   { name: "Quotes", icon: PencilIcon, route: "/admin/quotes", admin: true, permissionKey: ["read-user", "create-user"] },
   { name: "Roles", icon: CursorArrowRippleIcon, route: "/admin/roles", admin: true, permissionKey: ["read-role", "create-role", 'edit-role', 'delete-role'] },
-  { name: "Shipment Locations", icon: LocationIcon, route: "/admin/shipment-locations", admin: true, permissionKey: ["read-role", "create-role", 'edit-role', 'delete-role'] },
-  { name: "Providers", icon: OptionsIcon, route: "/admin/settings/rate", admin: false, permissionKey: ["read-provider"] },
+  { name: "Locations", icon: LocationIcon, route: "/admin/locations/countries", admin: true, permissionKey: ["read-role", "create-role", 'edit-role', 'delete-role'] },
+  { name: "Providers", icon: OptionsIcon, route: "/admin/settings/rate", admin: true, permissionKey: ["read-provider"] },
   { name: "All Tickets", icon: FAQ, route: '/admin/feedback/tickets', admin: true,   permissionKey: ['read-ticket']},
 ];
 
@@ -54,7 +50,13 @@ const checkPermission = (featurePermissions) => {
 
 const fullName = computed(() => {
   return page.props.auth.user.first_name + " " + page.props.auth.user.last_name
-} )
+});
+
+/*Echo.private('shipments.29').listen('ShipmentStatusUpdated', (e) => {
+  let shipment = e.shipment;
+  Swal.fire('Your shipment with tracking number 3456789 is being processed');
+});*/
+
 </script>
 
 
@@ -80,7 +82,10 @@ const fullName = computed(() => {
           {{ pageTitle }}
         </div>
         <div class="">
-          <div>
+          <div class="flex flex-row">
+            <div class="sm:block hidden">
+
+            </div>
             <Link :href="route('profile.edit')" class="sm:block hidden">
               {{ fullName }}
             </Link>
@@ -96,23 +101,18 @@ const fullName = computed(() => {
     <!-- Sidebar -->
     <div :class="{'w-64': mobileSidebarShow === true}" style="z-index: 100" class="fixed flex flex-col top-14 left-0 w-0 md:w-64 bg-primary h-full text-white transition-all duration-500 border-none sidebar">
       <div class="overflow-y-auto overflow-x-hidden flex flex-col justify-between flex-grow">
-        <ul class="flex flex-col py-1 space-y-1" v-for="group  in sidebar">
-          <li v-for="item in group" class="pt-1">
-            <Link :href="item.route"
-                  :class="{'text-primary bg-[#004e4f] border-l border-white outline-non group font-bold hover:text-primary hover:bg-background': $page.url === item.route}"
-                  class="relative flex flex-row items-center h-11 focus:outline-none  text-white hover:text-white border-l-4 border-transparent hover:bg-[#008083]/50 hover:border-background pr-6 duration-500">
+        <ul class="">
+          <li v-for="item in menu" v-if="$page.props.auth.user.is_admin === 0" class="pt-1">
+            <Link v-if="!item.admin" :href="item.route" :class="{'text-primary bg-[#004e4f] border-l border-r border-r-red-500 border-white outline-non group font-bold hover:text-primary hover:bg-background/5': $page.url === item.route}"
+                  class="relative flex flex-row items-center h-11 focus:outline-none text-white hover:text-white border-l-4 border-transparent hover:bg-[#008083]/50 hover:border-background pr-6 duration-500">
                 <span class="inline-flex justify-center items-center sm:ml-4 ml-2.5">
                   <Component :is="item.icon" class="w-5 h-5 fill-current" />
                 </span>
                 <span class="ml-2 text-sm tracking-wide truncate">{{ item.name }}</span>
             </Link>
           </li>
-          <li v-if="$page.props.auth.user.is_admin === 1" class="py-5 px-5 pt-10 relative text-sm flex flex-col items-start h-11 font-bold focus:outline-none  text-white hover:text-white border-l-4 border-transparent hover:bg-[#008083]/50 hover:border-background pr-6 duration-500">
-            ADMIN MENU
-          </li>
-          <li v-if="$page.props.auth.user.is_admin === 1" v-for="item in adminMenu" :key="item" class="mt-10 pt-1">
-            <Link :href="item.route" v-if="checkPermission(item.permissionKey)"
-                  :class="{'text-primary bg-[#004e4f] border-l border-white outline-non group font-bold hover:text-primary hover:bg-background': $page.url === item.route}"
+          <li v-for="item in menu" v-if="$page.props.auth.user.is_admin === 1" class="">
+            <Link v-if="item.admin" :href="item.route" :class="{'text-primary bg-[#004e4f] border-l border-white outline-non group font-bold hover:text-primary hover:bg-background': $page.url === item.route}"
                   class="relative flex flex-row items-center h-11 focus:outline-none  text-white hover:text-white border-l-4 border-transparent hover:bg-[#008083]/50 hover:border-background pr-6 duration-500">
                 <span class="inline-flex justify-center items-center sm:ml-4 ml-2.5">
                   <Component :is="item.icon" class="w-5 h-5 fill-current" />
@@ -120,7 +120,7 @@ const fullName = computed(() => {
               <span class="ml-2 text-sm tracking-wide truncate">{{ item.name }}</span>
             </Link>
           </li>
-          <li class="mt-10">
+          <li class="">
             <Link :href="route('logout')"
                   class="relative flex flex-row items-center h-11 focus:outline-none  text-white hover:text-white border-l-4 border-transparent hover:bg-[#008083]/50 hover:border-background pr-6 duration-500">
                 <span class="inline-flex justify-center items-center sm:ml-4 ml-2.5">

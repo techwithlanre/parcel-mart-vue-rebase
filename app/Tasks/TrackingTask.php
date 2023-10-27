@@ -3,16 +3,27 @@
 namespace App\Tasks;
 
 use App\Models\Shipment;
-use App\Services\AramexServices;
-use App\Services\DHLServices;
 use App\Services\UpsServices;
 use App\Traits\TrackingTrait;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Octw\Aramex\Aramex;
 
 class TrackingTask
 {
     use TrackingTrait;
+
+    private string $username;
+    private string $password;
+    private string $baseUrl;
+
+    public function __construct()
+    {
+        $env = config('dhl.ENV');
+        $this->baseUrl = config('dhl.'.$env.'.baseUrl');
+        $this->username = config('dhl.'.$env.'.username');
+        $this->password = config('dhl.'.$env.'.password');
+    }
 
     public function trackDhl(): bool
     {
@@ -42,7 +53,7 @@ class TrackingTask
 
     private function sendDhlTrackingRequest($tracking_url): \GuzzleHttp\Promise\PromiseInterface|\Illuminate\Http\Client\Response
     {
-        return Http::withBasicAuth("parcelmartsNG", "C^3zZ@4zJ!5iC#5m")
+        return Http::withBasicAuth($this->username, $this->password)
             ->withHeaders([
                 'Message-Reference: ' . Str::uuid(),
                 'Content-Type: application/json',
@@ -50,9 +61,35 @@ class TrackingTask
             ])->get($tracking_url);
     }
 
-    public function trackAramex(AramexServices $services)
+    public function trackAramex(): void
     {
+        $shipments = Shipment::whereNotIN('status', ['delivered', 'cancelled'])
+            ->join('aramex_shipment_logs', 'shipments.id', '=', 'aramex_shipment_logs.shipment_id')->get();
 
+        try {
+            foreach ($shipments as $shipment) {
+                $response = Aramex::trackShipments([$shipment->number]);
+                if ((isset($response->HasErrors) && $response->HasErrors) || (isset($response->error) && $response->error)) {
+                    activity()
+                        ->performedOn(new Shipment())
+                        ->withProperties([
+                            'method' => __FUNCTION__,
+                            'action' => 'Cron: Aramex Track Shipment'
+                        ])
+                        ->log($response->errors->Notification->Message);
+                    continue;
+                }
+                $this->saveAramexTracking($response, $shipment->id);
+            }
+        } catch (\Throwable  $e) {
+            activity()
+                ->performedOn(new Shipment())
+                ->withProperties([
+                    'method' => __FUNCTION__,
+                    'action' => 'Cron: Aramex Track Shipment'
+                ])
+                ->log($e->getMessage());
+        }
     }
 
     public function trackUps(UpsServices $services)

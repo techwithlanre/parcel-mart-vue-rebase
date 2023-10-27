@@ -37,4 +37,31 @@ trait TrackingTrait
         }
         return $tracking_log;
     }
+
+    public static function saveAramexTracking($response, $shipment_id)
+    {
+        $data = $response->TrackingResults->KeyValueOfstringArrayOfTrackingResultmFAkxlpY->Value->TrackingResult;
+        $check = TrackingLog::where([
+            'shipment_id' => $shipment_id,
+            'update_code' => $data->UpdateCode,
+            'provider' => 'aramex',
+        ])->first();
+
+        if (!$check) {
+            TrackingLog::create([
+                'shipment_id' => $shipment_id,
+                'update_code' => $data->UpdateCode,
+                'waybill_number' => $data->WaybillNumber,
+                'update_description' => $data->UpdateDescription,
+                'update_datetime' => $data->UpdateDateTime,
+                'update_location' => $data->UpdateLocation,
+                'comment' => $data->Comments,
+                'problem_code' => $data->ProblemCode,
+                'gross_weight' => $data->GrossWeight,
+                'chargeable_weight' => $data->ChargeableWeight,
+                'weight_unit' => $data->WeightUnit,
+                'provider' => 'aramex',
+            ]);
+        }
+    }
 }

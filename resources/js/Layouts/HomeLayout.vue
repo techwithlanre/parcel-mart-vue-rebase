@@ -17,7 +17,7 @@ defineProps({
 
         <div class="bg-white overflow-x-hidden">
             <div class="p-6 w-full">
-                <FrontNavigation />
+<!--                <FrontNavigation />-->
             </div>
         </div>
         <slot />

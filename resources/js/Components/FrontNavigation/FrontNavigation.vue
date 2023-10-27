@@ -6,10 +6,10 @@ import logo from '/resources/images/logo.png';
 import {Link, usePage} from "@inertiajs/vue3";
 
 const navigation = [
-    { name: 'Tracking', href: route('tracking') },
+    /*{ name: 'Tracking', href: route('tracking') },
     { name: 'Services', href: route('services') },
     { name: 'Company', href: route('about') },
-    { name: 'Contact', href: route('contact') },
+    { name: 'Contact', href: route('contact') },*/
 ]
 
 const mobileMenuOpen = ref(false)

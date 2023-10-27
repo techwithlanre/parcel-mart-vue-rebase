@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AllowedShipmentCountry;
+use App\Models\City;
 use App\Models\Country;
+use App\Models\State;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -13,7 +15,33 @@ class ShipmentLocationsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+
+    public function index(Request $request)
+    {
+
+        $countries = Country::where(function ($query) use ($request) {
+            $query->when($request->filled('search'), function ($query) use ($request) {
+                return $query->where('name', 'LIKE', '%'. $request->get('search'). '%');
+            });
+        })->orderBy('name', 'ASC')->paginate(10);
+        $search = $request->get('search') ?? '';
+        return Inertia::render('Admin/ShipmentLocations/Countries', compact('countries', 'search'));
+    }
+
+    public function states(Request $request, $country_id)
+    {
+        $states = State::where('country_id', $country_id)->orderBy('name', 'ASC')->paginate(10);
+        return Inertia::render('Admin/ShipmentLocations/States', compact('states'));
+    }
+
+    public function cities(Request $request, $state_id)
+    {
+        $cities = City::where('state_id', $state_id)->orderBy('name', 'ASC')->paginate(10);
+        $countries = Country::all();
+        return Inertia::render('Admin/ShipmentLocations/Cities', compact('cities', 'countries', 'state_id'));
+    }
+
+    public function allowedDestinations()
     {
         $allowed_shipment_countries = AllowedShipmentCountry::paginate(10);
         $data = [];
@@ -98,9 +126,6 @@ class ShipmentLocationsController extends Controller
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $allowed_countries = json_encode($request->allowed_countries);
@@ -110,11 +135,15 @@ class ShipmentLocationsController extends Controller
         return redirect(route('shipment-locations.index'))->with('message', 'Saved');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function storeCity(Request $request)
     {
-        //
+        $state = getState('id', $request->state_id);
+        $city = City::updateOrCreate(
+            ['name' => $request->city_name, 'state_id' => $request->state_id],[
+            'country_id' => $state->country_id,
+            'country_code' => $state->country_code,
+            'state_code' => $state->iso2
+        ]);
+        return to_route('cities', $request->state_id)->with('message', 'City created successfully');
     }
 }

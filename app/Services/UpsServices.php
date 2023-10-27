@@ -8,8 +8,10 @@ use App\Http\Requests\TrackShipmentRequest;
 use App\Models\InsuranceOption;
 use App\Models\ItemCategory;
 use App\Models\Shipment;
+use App\Models\ShipmentAddress;
 use App\Models\ShipmentItem;
 use App\Models\ShippingRateLog;
+use App\Models\UpsShipmentLog;
 use Carbon\Carbon;
 use Exception;
 use GuzzleHttp\Client;
@@ -17,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Ups\Entity\Address as AddressAlias;
 use Ups\SimpleAddressValidation;
 
@@ -30,11 +33,14 @@ class UpsServices
     public string $destinationCountryCode = '';
     public string $shippingCurrency = '';
     protected string $baseUrl = '';
-    public string $clientId = 'SHcfIjA9d3Gu7iLAVEGi4uKnYSRYalW7GoUARK1K4EKY4YkL';
-    public string $clientSecret = '3hDpomnTOogSpubXqzgSa6yRn3KTyqKCO7uUqCHpcnzRmVXskdhlRaWUs2gGyqOV';
+    public string $clientId = '';
+    public string $clientSecret = '';
     protected string $credentials = '';
     public string $accessToken = '';
     protected string $requestGrantType = '';
+    protected ShipmentAddress $origin;
+    protected ShipmentAddress $destination;
+    private string $tracking_number;
 
     public function __construct(Shipment $shipment)
     {
@@ -44,18 +50,15 @@ class UpsServices
 
     private function init(): void
     {
-        $this->setBaseUrl();;
         $this->setCredentials();
         $this->getAccessToken();
     }
 
-    public function setBaseUrl(): void
-    {
-        $this->baseUrl = config('ups.sandbox') ? 'https://wwwcie.ups.com' : 'https://onlinetools.ups.con';
-    }
-
     private function setCredentials(): void
     {
+        $this->baseUrl = config('ups.sandbox') ? config('ups.sandbox_base_url') : config('ups.live_base_url');
+        $this->clientId = config('ups.client_id');
+        $this->clientSecret = config('ups.client_secret');
         $this->credentials = base64_encode("$this->clientId:$this->clientSecret");
     }
 
@@ -81,6 +84,8 @@ class UpsServices
                     ])
                     ->log($result['response']['errors'][0]['code'] . ' | ' . $result['response']['errors'][0]['message']);
             }
+
+            return false;
         }
 
         if (Arr::has($result, 'access_token')) $this->setAccessToken($result['access_token']);
@@ -89,7 +94,6 @@ class UpsServices
 
     public function validateAddress()
     {
-        //dd($this->accessToken);
         $payload = [
             "XAVRequest" => [
                 "AddressKeyFormat" => [
@@ -115,9 +119,10 @@ class UpsServices
     public function calculateRate(): false|string
     {
         //TODO rate will come in
-        $service_code = $this->serviceCode($this->request->origin, $this->request->destination);
+        $service_code = $this->serviceCode();
         if (!$service_code) return false;
-        $weightUnit = $this->weightUnit(getCountry('id', $this->request->destination['country'])->iso2);
+        $weightUnit = $this->weightUnit(getCountry('id', $this->origin->country_id)->iso2);
+        $shipment_item = ShipmentItem::where('shipment_id', $this->shipment->id)->first();
         try {
             $payload = [
                 "RateRequest" => [
@@ -133,7 +138,7 @@ class UpsServices
                         ],
                         "Shipper" => [
                             "Name" => "Parcels Mart Solutions",
-                            "ShipperNumber" => "A1226Y",
+                            "ShipperNumber" => config('ups.account'),
                             "Address" => [
                                 "AddressLine" => "27, Sani Abacha Road, GRA",
                                 "City" => "Port Harcourt",
@@ -142,23 +147,23 @@ class UpsServices
                             ]
                         ],
                         "ShipFrom" => [
-                            "Name" => $this->request->origin['contact_name'],
+                            "Name" => $this->origin->contact_name,
                             "Address" => [
-                                "AddressLine" => $this->request->origin['address_1'],
-                                "City" => getCity('id', $this->request->origin['city'])->name,
+                                "AddressLine" => $this->origin->address_1,
+                                "City" => getCity('id', $this->origin->city_id)->name,
                                 "StateProvinceCode" => "",
-                                "PostalCode" => $this->request->origin['postcode'],
-                                "CountryCode" => getCountry('id', $this->request->origin['country'])->iso2
+                                "PostalCode" => $this->origin->postcode,
+                                "CountryCode" => getCountry('id', $this->origin->country_id)->iso2
                             ]
                         ],
                         "ShipTo" => [
-                            "Name" => $this->request->destination['contact_name'],
+                            "Name" => $this->destination->contact_name,
                             "Address" => [
-                                "AddressLine" => $this->request->destination['address_1'],
-                                "City" => getCity('id', $this->request->destination['city'])->name,
+                                "AddressLine" => $this->destination->address_1,
+                                "City" => getCity('id', $this->destination->city_id)->name,
                                 "StateProvinceCode" => "",
-                                "PostalCode" => $this->request->destination['postcode'],
-                                "CountryCode" => getCountry('id', $this->request->destination['country'])->iso2
+                                "PostalCode" => $this->destination->postcode,
+                                "CountryCode" => getCountry('id', $this->destination->country_id)->iso2
                             ]
                         ],
                         "Service" => [
@@ -170,7 +175,7 @@ class UpsServices
                                 "Code" => $weightUnit,
                                 "Description" => $weightUnit == "KGS" ? "Kilogram" : "Ponds"
                             ],
-                            "Weight" => (string) $this->convertWeight($weightUnit, $this->request->shipment['weight'])
+                            "Weight" => (string) $this->convertWeight($weightUnit, $shipment_item->weight)
                         ],
                         "Package" => [
                             "PackagingType" => [
@@ -181,22 +186,21 @@ class UpsServices
                                 "UnitOfMeasurement" => [
                                     "Code" =>  $this->metric($weightUnit)
                                 ],
-                                "Length" => (string) $this->convertMetric($weightUnit, $this->request->shipment['length']),
-                                "Width" => (string) $this->convertMetric($weightUnit, $this->request->shipment['width']),
-                                "Height" => (string) $this->convertMetric($weightUnit, $this->request->shipment['height'])
+                                "Length" => (string) $this->convertMetric($weightUnit, $shipment_item->length),
+                                "Width" => (string) $this->convertMetric($weightUnit, $shipment_item->width),
+                                "Height" => (string) $this->convertMetric($weightUnit, $shipment_item->height)
                             ],
                             "PackageWeight" => [
                                 "UnitOfMeasurement" => [
                                     "Code" => $weightUnit
                                 ],
-                                "Weight" => (string) $this->convertWeight($weightUnit, $this->request->shipment['weight'])
+                                "Weight" => (string) $this->convertWeight($weightUnit, $shipment_item->weight)
                             ]
                         ]
                     ]
                 ]
             ];
 
-            //dd($this->accessToken);
             $response = Http::withToken($this->accessToken)->post("$this->baseUrl/api/rating/v2205/Rate", $payload);
             return ($response->status() == 200) ? $response->body() : false;
         } catch (\Throwable $throwable) {
@@ -212,14 +216,94 @@ class UpsServices
         }
     }
 
-    public function bookShipment(Shipment $shipment, ShipmentItem $shipmentItem, InsuranceOption $insuranceOption, ShippingRateLog $shippingRateLog, BookShipmentRequest $bookShipmentRequest)
+    public function pickup(BookShipmentRequest $bookShipmentRequest, string $tracking_number)
     {
-        $origin = json_decode($shipment->origin_address, true);
-        $destination = json_decode($shipment->destination_address, true);
-        $product_code = $this->productCode($origin, $destination, $shipment);
-        if (!$product_code) return false;
-        $type = $this->shipmentType($origin, $destination);
-        if (!$type) return false;
+        $service_code = $this->serviceCode();
+        if (!$service_code) return false;
+        $weightUnit = $this->weightUnit(getCountry('id', $this->origin->country_id)->iso2);
+        $shipment_item = ShipmentItem::where('shipment_id', $this->shipment->id)->first();
+        $shipment_date = Carbon::create($bookShipmentRequest->shipment_date)->timezone('GMT+1');
+        try {
+            $payload = [
+                "PickupCreationRequest" => [
+                    "RatePickupIndicator" => "Y",
+                    "Shipper" => [
+                        "Account" => [
+                            "AccountNumber" => config('ups.account'),
+                            "AccountCountryCode" => "NG"
+                        ]
+                    ],
+                    "PickupDateInfo" => [
+                        "CloseTime" => "1600",
+                        "ReadyTime" => substr(str_replace(':', '', $shipment_date->toTimeString()), 0, 4),
+                        "PickupDate" => str_replace('-', '', $shipment_date->toDateString()),
+                        /*"CloseTime" => "1400",
+                        "ReadyTime" => "0500",
+                        "PickupDate" => "20230928"*/
+                    ],
+                    "PickupAddress" => [
+                        "CompanyName" => $this->origin->contact_name,
+                        "ContactName" => $this->origin->contact_name,
+                        "AddressLine" => $this->origin->address_1,
+                        "City" => getCity('id', $this->origin->city_id)->name,
+                        "CountryCode" => (string) getCountry('id', $this->origin->country_id)->iso2,
+                        "PostalCode" => $this->origin->postcode,
+                        "ResidentialIndicator" => "Y",
+                        "Phone" => [
+                            'Number' => $this->origin->contact_phone
+                        ],
+                    ],
+                    "CustomerContext" => Str::uuid(),
+                    "PaymentMethod" => "01",
+                    "Request" => [
+                        "RequestOption" => "SCHEDULE"
+                    ],
+                    "AlternateAddressIndicator" => 'Y',
+                    "PickupPiece" => [
+                        [
+                            "ServiceCode" => '001',
+                            "DestinationCountryCode" => getCountry('id', $this->destination->country_id)->iso2,
+                            "Quantity" => (string) $shipment_item->quantity,
+                            "ContainerCode" => "01"
+                        ]
+                    ],
+                    "TotalWeight" => [
+                        "Weight" => (string) $this->convertWeight($weightUnit, $shipment_item->weight),
+                        "UnitOfMeasurement" => $weightUnit
+                    ],
+                    //"ReferenceNumber" => Str::uuid(),
+                    "Notification" => [
+                        "ConfirmationEmailAddress" => $this->origin->contact_email,
+                        "UndeliverableEmailAddress" => $this->origin->contact_email
+                    ],
+                ]
+            ];
+
+            if (!config('ups.sandbox')) {
+                $payload['PickupCreationRequest']['TrackingData'] = [
+                    [
+                        "TrackingNumber" => $tracking_number
+                    ]
+                ];
+            }
+
+            //dd($payload);
+            $response = Http::withToken($this->accessToken)->post("$this->baseUrl/api/pickupcreation/v2205/pickup", $payload);
+            if ($response->status() != 200) {
+                throw ValidationException::withMessages(['message' => 'Unable to book shipment. Please try again later (P)']);
+            }
+            return $response->body();
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    public function bookShipment(ShipmentItem $shipmentItem, BookShipmentRequest $bookShipmentRequest, ShippingRateLog $shippingRateLog)
+    {
+        $service_code = $this->serviceCode();
+        if (!$service_code) return false;
+        $weightUnit = $this->weightUnit(getCountry('id', $this->origin->country_id)->iso2);
+        $shipment_item = ShipmentItem::where('shipment_id', $this->shipment->id)->first();
         $shipment_date = Carbon::create($bookShipmentRequest->shipment_date)->timezone('GMT+1');
         $shipment_date = str_replace(' ', 'T', $shipment_date->toDateTimeString()) . " GMT+01:00";
 
@@ -229,92 +313,77 @@ class UpsServices
                     "SubVersion" => "2205",
                     "RequestOption" => "nonvalidate",
                     "TransactionReference" => [
-                        "CustomerContext" => ""
+                        "CustomerContext" => Str::uuid()
                     ]
                 ],
                 "Shipment" => [
-                    "Description" => "Parcel/Document Shipment",
-                    "Shipper" => [
-                        "Name" => "Parcels Mart Solution",
-                        "AttentionName" => "Parcels Mart Solutions",
-                        "TaxIdentificationNumber" => "123456",
-                        "Phone" => [
-                            "Number" => "1115554758",
-                            "Extension" => ""
-                        ],
-                        "ShipperNumber" => "A1226Y",
-                        "Address" => [
-                            "AddressLine" => "27, Sani Abacha Road, GRA",
-                            "City" => "Port Harcourt",
-                            "PostalCode" => "500001",
-                            "CountryCode" => "NG"
-                        ]
-                    ],
+                    "Description" => $shipment_item->description,
+                    "Shipper" => config('ups.Shipper'),
                     "ShipTo" => [
-                        "AttentionName" => "1160b_74",
+                        "Name" => $this->destination->contact_name,
+                        "AttentionName" => $this->destination->contact_name,
                         "Phone" => [
-                            "Number" => "9225377171"
+                            "Number" => $this->destination->contact_phone
                         ],
                         "Address" => [
-                            "AddressLine" => $this->request->origin['address_1'],
-                            "City" => "New York",
+                            "AddressLine" => [
+                                $this->destination->address_1
+                            ],
+                            "City" => getCity('id', $this->destination->city_id)->name,
                             "StateProvinceCode" => "",
-                            "PostalCode" => "95113",
-                            "CountryCode" => "US"
+                            "PostalCode" => $this->destination->postcode,
+                            "CountryCode" => getCountry('id', $this->destination->country_id)->iso2
                         ]
                     ],
                     "ShipFrom" => [
-                        "Name" => $origin['contact_name'],
-                        "AttentionName" => "1160b_74",
+                        "Name" => $this->origin->contact_name,
+                        "AttentionName" => $this->origin->contact_name,
                         "Phone" => [
-                            "Number" => $origin['contact_phone']
+                            "Number" => $this->origin->contact_phone
                         ],
-                        "FaxNumber" => "",
                         "Address" => [
                             "AddressLine" => [
-                                "2311 York Rd"
+                                $this->origin->address_1
                             ],
-                            "City" => "Alpharetta",
-                            "StateProvinceCode" => "GA",
-                            "PostalCode" => "30005",
-                            "CountryCode" => "NG"
+                            "City" => getCity('id', $this->origin->city_id)->name,
+                            "StateProvinceCode" => "",
+                            "PostalCode" => $this->origin->postcode,
+                            "CountryCode" => getCountry('id', $this->origin->country_id)->iso2
                         ]
                     ],
                     "PaymentInformation" => [
                         "ShipmentCharge" => [
                             "Type" => "01",
                             "BillShipper" => [
-                                "AccountNumber" => "A1226Y"
+                                "AccountNumber" => config('ups.account')
                             ]
                         ]
                     ],
                     "Service" => [
-                        "Code" => "08",
+                        "Code" => $service_code,
                         "Description" => "Express"
                     ],
                     "Package" => [
-                        "Description" => " ",
+                        "Description" => "Package",
                         "Packaging" => [
                             "Code" => "02",
-                            "Description" => "Nails"
+                            "Description" => "Package"
                         ],
                         "Dimensions" => [
                             "UnitOfMeasurement" => [
-                                "Code" => "CM",
-                                "Description" => "Inches"
+                                "Code" =>  $this->metric($weightUnit)
                             ],
-                            "Length" => "10",
-                            "Width" => "30",
-                            "Height" => "45"
+                            "Length" => (string) $this->convertMetric($weightUnit, $shipment_item->length),
+                            "Width" => (string) $this->convertMetric($weightUnit, $shipment_item->width),
+                            "Height" => (string) $this->convertMetric($weightUnit, $shipment_item->height)
                         ],
                         "PackageWeight" => [
                             "UnitOfMeasurement" => [
-                                "Code" => "KGS",
-                                "Description" => "Pounds"
+                                "Code" => $weightUnit
                             ],
-                            "Weight" => "5"
+                            "Weight" => (string) $this->convertWeight($weightUnit, $shipment_item->weight)
                         ]
-                    ]
+                    ],
                 ],
                 "LabelSpecification" => [
                     "LabelImageFormat" => [
@@ -325,12 +394,64 @@ class UpsServices
                 ]
             ]
         ];
+        //dd($payload);
+        $response = Http::withToken($this->accessToken)->post("$this->baseUrl/api/shipments/v2205/ship", $payload);
+        if ($response->status() != 200) {
+            throw ValidationException::withMessages(['message' => 'Unable to book shipment. Please try again later']);
+        }
+        /*UpsShipme::create([
+            'shipment_id' => $shipment->id,
+            'shipment_rate_log_id' => $shippingRateLog->id,
+            'shipment_tracking_number' => $result['shipmentTrackingNumber'],
+            'tracking_url' => $result['trackingUrl'],
+            'cancel_pickup_url' => $result['cancelPickupUrl'],
+            'dispatch_confirmation_number' => $result['dispatchConfirmationNumber'],
+            'document_content' => json_encode($result['documents']),
+            'package_details' => json_encode($result['packages'])
+        ]);*/
 
+        $result = json_decode($response->body(), true);
+        $shipment_response = $result['ShipmentResponse']['Response']['ResponseStatus'];
+        if ($shipment_response['Code'] == 1 && $shipment_response['Description'] == 'Success') {
+            $shipment_result = $result['ShipmentResponse']['ShipmentResults'];
+            $tracking_number = $shipment_result['PackageResults']['TrackingNumber'];
+            $this->shipment->number = $tracking_number;
+            $this->shipment->save();
+
+            $ups_shipment_log = new UpsShipmentLog;
+            $ups_shipment_log->shipment_id = $this->shipment->id;
+            $ups_shipment_log->tracking_number = $tracking_number;
+            $ups_shipment_log->identification_number = $shipment_result['ShipmentIdentificationNumber'];
+            $ups_shipment_log->document_content = json_encode($shipment_result['PackageResults']['ShippingLabel']);
+            $ups_shipment_log->reference = $result['ShipmentResponse']['Response']['TransactionReference']['CustomerContext'];
+            $ups_shipment_log->save();
+
+            $pickup = $this->pickup($bookShipmentRequest, $tracking_number);
+            if (!$pickup) {
+                throw ValidationException::withMessages(['message' => 'Unable to book shipment. Please try again later']);
+            }
+
+            $pickup_result = json_decode($pickup, true);
+            $pickup_number = $pickup_result['PickupCreationResponse']['PRN'];
+            $shippingRateLog->pickup_number = $pickup_number;
+            $shippingRateLog->save();
+            $this->shipment->pickup_number = $pickup_number;
+            $this->shipment->save();
+            return true;
+        }
+
+        return ($response->status() == 200) ? $response->body() : false;
     }
 
-    private function serviceCode($origin, $destination): bool|string
+    private function serviceCode(): bool|string
     {
-        $type = $this->shipmentType($origin, $destination);
+        $this->origin = ShipmentAddress::where([
+            'shipment_id' => $this->shipment->id,
+            'type' => 'origin'])->first();
+        $this->destination = ShipmentAddress::where([
+            'shipment_id' => $this->shipment->id,
+            'type' => 'destination'])->first();
+        $type = $this->shipmentType();
         if (!$type) return false;
         return ($type == "DOMESTIC") ? '11' : '65';
     }
@@ -348,10 +469,10 @@ class UpsServices
         return $product_code;
     }
 
-    private function shipmentType($origin, $destination): string
+    private function shipmentType(): string
     {
-        $origin_country = getCountry('id', $origin['country'])->iso2;
-        $destination_country = getCountry('id', $destination['country'])->iso2;
+        $origin_country = getCountry('id', $this->origin->country_id)->iso2;
+        $destination_country = getCountry('id', $this->destination->country_id)->iso2;
 
         $type = '';
         if ($origin_country == 'NG') {
@@ -400,7 +521,7 @@ class UpsServices
     private function sendAuthRequest(): bool|string
     {
         try {
-            $url = 'https://wwwcie.ups.com/security/v1/oauth/token';
+            $url = $this->baseUrl . '/security/v1/oauth/token';
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

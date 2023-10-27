@@ -30,11 +30,6 @@ createInertiaApp({
             .use(VueAnimateOnScroll)
             .use(Antd)
             .use('VueDatePicker', VueDatePicker)
-            .use(VueSidebarMenu)
-            /*.use(TawkMessengerVue, {
-                propertyId : '60c6342465b7290ac635bafa',
-                widgetId : '1f833nce0'
-            })*/
             .mount(el);
     },
     progress: {

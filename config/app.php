@@ -169,7 +169,7 @@ return [
          */
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
-        // App\Providers\BroadcastServiceProvider::class,
+        App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Spatie\Permission\PermissionServiceProvider::class,
@@ -190,6 +190,7 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         'Paystack' => Unicodeveloper\Paystack\Facades\Paystack::class,
         'Aramex' => Octw\Aramex\Aramex::class,
+        'OneSignal' => Berkayk\OneSignal\OneSignalFacade::class
     ])->toArray(),
 
 ];

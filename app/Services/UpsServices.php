@@ -64,6 +64,7 @@ class UpsServices
 
     private function setAccessToken($accessToken): void
     {
+        dd($accessToken);
         $this->accessToken = $accessToken;
     }
 
@@ -237,9 +238,6 @@ class UpsServices
                         "CloseTime" => "1600",
                         "ReadyTime" => substr(str_replace(':', '', $shipment_date->toTimeString()), 0, 4),
                         "PickupDate" => str_replace('-', '', $shipment_date->toDateString()),
-                        /*"CloseTime" => "1400",
-                        "ReadyTime" => "0500",
-                        "PickupDate" => "20230928"*/
                     ],
                     "PickupAddress" => [
                         "CompanyName" => $this->origin->contact_name,
@@ -248,7 +246,7 @@ class UpsServices
                         "City" => getCity('id', $this->origin->city_id)->name,
                         "CountryCode" => (string) getCountry('id', $this->origin->country_id)->iso2,
                         "PostalCode" => $this->origin->postcode,
-                        "ResidentialIndicator" => "Y",
+                        "ResidentialIndicator" => "N",
                         "Phone" => [
                             'Number' => $this->origin->contact_phone
                         ],
@@ -261,7 +259,7 @@ class UpsServices
                     "AlternateAddressIndicator" => 'Y',
                     "PickupPiece" => [
                         [
-                            "ServiceCode" => '001',
+                            "ServiceCode" => $service_code,
                             "DestinationCountryCode" => getCountry('id', $this->destination->country_id)->iso2,
                             "Quantity" => (string) $shipment_item->quantity,
                             "ContainerCode" => "01"
@@ -271,11 +269,14 @@ class UpsServices
                         "Weight" => (string) $this->convertWeight($weightUnit, $shipment_item->weight),
                         "UnitOfMeasurement" => $weightUnit
                     ],
-                    //"ReferenceNumber" => Str::uuid(),
                     "Notification" => [
                         "ConfirmationEmailAddress" => $this->origin->contact_email,
                         "UndeliverableEmailAddress" => $this->origin->contact_email
                     ],
+                    "CSR" => [
+                        "ProfileId" => "1 Q83 122",
+                        "ProfileCountryCode" => "NG"
+                    ]
                 ]
             ];
 
@@ -288,11 +289,11 @@ class UpsServices
             }
 
 
-            //dd($payload);
+            //echo "<pre>";
 
             //dd($payload);
-            $response = Http::withToken($this->accessToken)->post("$this->baseUrl/api/pickupcreation/v2205/pickup", $payload);
-            ///dd($response->body());
+            $response = Http::withToken($this->accessToken)->post("$this->baseUrl/api/pickupcreation/v1607/pickup", $payload);
+
             if ($response->status() != 200) {
                 throw ValidationException::withMessages(['message' => 'Unable to book shipment. Please try again later (P)']);
             }
@@ -480,13 +481,11 @@ class UpsServices
 
         $type = '';
         if ($origin_country == 'NG') {
-            if ($destination_country == 'NG') $type = 'DOMESTIC';
-            if ($destination_country != 'NG') $type = 'EXPORT';
+            $type = ($destination_country == 'NG') ? 'DOMESTIC' : 'EXPORT';
         }
 
         if ($origin_country != 'NG') {
-            if ($destination_country == 'NG') $type = 'IMPORT';
-            if ($destination_country != 'NG') $type = 'INTERNATIONAL';
+            $type = ($destination_country == 'NG') ? 'IMPORT' : 'INTERNATIONAL';
         }
         
         return $type;

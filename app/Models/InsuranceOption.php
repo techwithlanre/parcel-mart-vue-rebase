@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class InsuranceOption extends Model
 {
     use HasFactory;
+    
+    protected $fillable = [
+        'name',
+        'description',
+        'cover',
+        'percentage',
+    ];
 }

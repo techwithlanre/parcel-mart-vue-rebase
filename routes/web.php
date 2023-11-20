@@ -27,14 +27,11 @@ use Inertia\Inertia;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::get('coming-soon', function () {
-    return Inertia::render('ComingSoon');
-})->name('coming.soon');
-
-Route::get('', [\App\Http\Controllers\ServicesController::class, 'index'])->name('home');
+Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('login');
 Route::get('services', [\App\Http\Controllers\ServicesController::class, 'index'])->name('services');
 Route::get('contact', [\App\Http\Controllers\ContactController::class, 'index'])->name('contact');
 Route::get('company', [\App\Http\Controllers\AboutController::class, 'index'])->name('about');
+
 Route::get('h/tracking', function () {
     return Inertia::render('Tracking/Tracking');
 })->name('home.tracking');
@@ -44,11 +41,11 @@ Route::get('tracking-details/{shipment_id}', [\App\Http\Controllers\ShipmentCont
 
 Route::post('contact', [\App\Http\Controllers\ContactController::class, 'send'])->name('contact.send');
 
-Route::post('/send-quote-form', function(\Illuminate\Http\Request $request) {
+Route::post('send-quote-form', function(\Illuminate\Http\Request $request) {
     //$path = $request->file('commercial_invoice')->store('quotes');
     //$path = $request->file('commercial_invoice')->store('quotes');
     //Mail::to('quotes@parcelsmartsolution.com')->send(new \App\Mail\QuoteForm($request));
-    return redirect(\route('dashboard'))->with('message', 'Your request has been sent');
+    return redirect(route('dashboard'))->with('message', 'Your request has been sent');
 })->name('send.quote.form');
 
 
@@ -67,7 +64,7 @@ Route::middleware('guest')->group(function () {
     Route::post('register', [RegisteredUserController::class, 'store']);
     Route::post('business-register', [RegisteredBusinessController::class, 'store'])->name('register.business.index');
 
-    Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('login');
+    //Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('login');
     Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');

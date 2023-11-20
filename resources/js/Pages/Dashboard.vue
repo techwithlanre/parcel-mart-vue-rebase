@@ -187,7 +187,11 @@ const trackShipment = () => {
                                     <h3 class="text-xl font-bold">{{ balance }}</h3>
                                 </div>
                             </div>
-                            <div class="text-3xl"></div>
+                            <div class="text-3xl">
+                              <a :href="route('wallet.index')">
+                                <PrimaryButton>Fund Wallet</PrimaryButton>
+                              </a>
+                            </div>
                         </div>
                     </div>
                 </div>

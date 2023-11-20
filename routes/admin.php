@@ -86,4 +86,9 @@ Route::prefix('admin')->middleware('check.admin.user')->group(function () {
         Route::get('cities/{state_id}', [\App\Http\Controllers\Admin\ShipmentLocationsController::class, 'cities'])->name('cities');
         Route::post('store-city', [\App\Http\Controllers\Admin\ShipmentLocationsController::class, 'storeCity'])->name('city.store');
     });
+
+    Route::prefix('insurance-options')->group(function () {
+        Route::get('', [\App\Http\Controllers\Admin\InsuranceOptionController::class, 'index'])->name('insurance.options.index');
+        Route::post('store', [\App\Http\Controllers\Admin\InsuranceOptionController::class, 'store'])->name('insurance.options.store');
+    });
 });

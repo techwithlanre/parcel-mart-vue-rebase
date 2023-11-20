@@ -31,6 +31,7 @@ const openSetCreditLimitModal = (user) => {
   currentUser.value = user;
   isOpenSetCreditLimit.value = true;
 }
+
 const openUserChangeRoleModal = (user) => {
   currentUser.value = user;
   isOpenUserChangeRole.value = true;

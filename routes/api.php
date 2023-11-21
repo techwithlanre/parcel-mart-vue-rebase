@@ -26,7 +26,7 @@ Route::group(['middleware'], function () {
         Route::get('/email/confirm/{token}', [UserAuthController::class, 'registerConfirm'])->name('email_confirmation');
 
         // Password reset routes
-        Route::post('password/email',  [UserAuthController::class, 'forget_password']);
+        Route::post('password/email', [UserAuthController::class, 'forget_password']);
 //        Route::post('password/code/check', [MobileController::class, 'code_check']);
 //        Route::post('password/reset', [MobileController::class, 'reset_password']);
 //

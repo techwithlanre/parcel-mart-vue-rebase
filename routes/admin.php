@@ -5,10 +5,6 @@ use Illuminate\Support\Facades\Route;
 use \App\Http\Controllers\Admin\UserController;
 use \App\Http\Controllers\Admin\ShipmentController;
 
-Route::get('', function () {
-    return view('welcome');
-});
-
 Route::get('event', function () {
     ShipmentStatusUpdated::dispatch(\App\Models\Shipment::find(29));
 });
@@ -22,11 +18,11 @@ Route::prefix('admin')->middleware('check.admin.user')->group(function () {
     });
 
     Route::prefix('reports')->group(function () {
-       Route::get('shipments', [\App\Http\Controllers\Admin\ReportsController::class, 'shipmentsReport'])->name('reports.shipment');
-       Route::get('users', [\App\Http\Controllers\Admin\ReportsController::class, 'usersReport'])->name('reports.users');
-       Route::get('users/{user_id}/shipments', [\App\Http\Controllers\Admin\ReportsController::class, 'userShipmentsReport'])->name('reports.users.shipments');
-       Route::get('payments', [\App\Http\Controllers\Admin\ReportsController::class, 'paymentReport'])->name('reports.payments');
-       Route::get('tax', [\App\Http\Controllers\Admin\ReportsController::class, 'taxReport'])->name('reports.tax');
+        Route::get('shipments', [\App\Http\Controllers\Admin\ReportsController::class, 'shipmentsReport'])->name('reports.shipment');
+        Route::get('users', [\App\Http\Controllers\Admin\ReportsController::class, 'usersReport'])->name('reports.users');
+        Route::get('users/{user_id}/shipments', [\App\Http\Controllers\Admin\ReportsController::class, 'userShipmentsReport'])->name('reports.users.shipments');
+        Route::get('payments', [\App\Http\Controllers\Admin\ReportsController::class, 'paymentReport'])->name('reports.payments');
+        Route::get('tax', [\App\Http\Controllers\Admin\ReportsController::class, 'taxReport'])->name('reports.tax');
     });
 
     Route::get('admin-filter-shipments', [\App\Http\Controllers\Admin\ShipmentController::class, 'filterShipment'])->name('admin.shipment.filter');

@@ -64,7 +64,6 @@ class UpsServices
 
     private function setAccessToken($accessToken): void
     {
-        dd($accessToken);
         $this->accessToken = $accessToken;
     }
 
@@ -176,7 +175,7 @@ class UpsServices
                                 "Code" => $weightUnit,
                                 "Description" => $weightUnit == "KGS" ? "Kilogram" : "Ponds"
                             ],
-                            "Weight" => (string) $this->convertWeight($weightUnit, $shipment_item->weight)
+                            "Weight" => (string)$this->convertWeight($weightUnit, $shipment_item->weight)
                         ],
                         "Package" => [
                             "PackagingType" => [
@@ -185,17 +184,17 @@ class UpsServices
                             ],
                             "Dimensions" => [
                                 "UnitOfMeasurement" => [
-                                    "Code" =>  $this->metric($weightUnit)
+                                    "Code" => $this->metric($weightUnit)
                                 ],
-                                "Length" => (string) $this->convertMetric($weightUnit, $shipment_item->length),
-                                "Width" => (string) $this->convertMetric($weightUnit, $shipment_item->width),
-                                "Height" => (string) $this->convertMetric($weightUnit, $shipment_item->height)
+                                "Length" => (string)$this->convertMetric($weightUnit, $shipment_item->length),
+                                "Width" => (string)$this->convertMetric($weightUnit, $shipment_item->width),
+                                "Height" => (string)$this->convertMetric($weightUnit, $shipment_item->height)
                             ],
                             "PackageWeight" => [
                                 "UnitOfMeasurement" => [
                                     "Code" => $weightUnit
                                 ],
-                                "Weight" => (string) $this->convertWeight($weightUnit, $shipment_item->weight)
+                                "Weight" => (string)$this->convertWeight($weightUnit, $shipment_item->weight)
                             ]
                         ]
                     ]
@@ -244,7 +243,7 @@ class UpsServices
                         "ContactName" => $this->origin->contact_name,
                         "AddressLine" => $this->origin->address_1,
                         "City" => getCity('id', $this->origin->city_id)->name,
-                        "CountryCode" => (string) getCountry('id', $this->origin->country_id)->iso2,
+                        "CountryCode" => (string)getCountry('id', $this->origin->country_id)->iso2,
                         "PostalCode" => $this->origin->postcode,
                         "ResidentialIndicator" => "N",
                         "Phone" => [
@@ -261,12 +260,12 @@ class UpsServices
                         [
                             "ServiceCode" => $service_code,
                             "DestinationCountryCode" => getCountry('id', $this->destination->country_id)->iso2,
-                            "Quantity" => (string) $shipment_item->quantity,
+                            "Quantity" => (string)$shipment_item->quantity,
                             "ContainerCode" => "01"
                         ]
                     ],
                     "TotalWeight" => [
-                        "Weight" => (string) $this->convertWeight($weightUnit, $shipment_item->weight),
+                        "Weight" => (string)$this->convertWeight($weightUnit, $shipment_item->weight),
                         "UnitOfMeasurement" => $weightUnit
                     ],
                     "Notification" => [
@@ -293,7 +292,7 @@ class UpsServices
 
             //dd($payload);
             $response = Http::withToken($this->accessToken)->post("$this->baseUrl/api/pickupcreation/v1607/pickup", $payload);
-
+            //dd($response->body());
             if ($response->status() != 200) {
                 throw ValidationException::withMessages(['message' => 'Unable to book shipment. Please try again later (P)']);
             }
@@ -376,17 +375,17 @@ class UpsServices
                         ],
                         "Dimensions" => [
                             "UnitOfMeasurement" => [
-                                "Code" =>  $this->metric($weightUnit)
+                                "Code" => $this->metric($weightUnit)
                             ],
-                            "Length" => (string) $this->convertMetric($weightUnit, $shipment_item->length),
-                            "Width" => (string) $this->convertMetric($weightUnit, $shipment_item->width),
-                            "Height" => (string) $this->convertMetric($weightUnit, $shipment_item->height)
+                            "Length" => (string)$this->convertMetric($weightUnit, $shipment_item->length),
+                            "Width" => (string)$this->convertMetric($weightUnit, $shipment_item->width),
+                            "Height" => (string)$this->convertMetric($weightUnit, $shipment_item->height)
                         ],
                         "PackageWeight" => [
                             "UnitOfMeasurement" => [
                                 "Code" => $weightUnit
                             ],
-                            "Weight" => (string) $this->convertWeight($weightUnit, $shipment_item->weight)
+                            "Weight" => (string)$this->convertWeight($weightUnit, $shipment_item->weight)
                         ]
                     ],
                 ],
@@ -458,7 +457,7 @@ class UpsServices
             'type' => 'destination'])->first();
         $type = $this->shipmentType();
         if (!$type) return false;
-        return ($type == "DOMESTIC") ? '11' : '65';
+        return ($type == "DOMESTIC") ? '011' : '065';
     }
 
     private function productCode($origin, $destination, $shipmentItem): bool|string
@@ -469,7 +468,7 @@ class UpsServices
         if ($type == "DOMESTIC") $product_code = 'N';
         if ($type == "IMPORT" || $type == 'EXPORT') {
             $category = ItemCategory::find($shipmentItem['category'])->name ?? "Parcel";
-            $product_code = $category == substr($category, 0 ,1);
+            $product_code = $category == substr($category, 0, 1);
         }
         return $product_code;
     }
@@ -487,7 +486,7 @@ class UpsServices
         if ($origin_country != 'NG') {
             $type = ($destination_country == 'NG') ? 'IMPORT' : 'INTERNATIONAL';
         }
-        
+
         return $type;
     }
 
@@ -508,7 +507,7 @@ class UpsServices
 
     private function metric($weightUnit): string
     {
-        return  ($weightUnit == 'LBS') ? "IN" : "CM";
+        return ($weightUnit == 'LBS') ? "IN" : "CM";
     }
 
     private function convertMetric($weighUnit, $value)

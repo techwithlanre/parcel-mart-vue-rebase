@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\ShipmentDateTimeRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 
@@ -31,7 +32,8 @@ class BookShipmentRequest extends FormRequest
             'invoice_date' => 'nullable|date',
             'invoice_number' => 'nullable|min:4',
             'insurance' => 'required|exists:insurance_options,id',
-            'shipment_date' => ['required','date','after:'.date('Y-m-d'),'before:'.date('Y-m-d', strtotime("+10 days"))],
+            //'shipment_date' => ['required', 'date', 'after:' . date('Y-m-d 09:00:00', strtotime("+1 day")), 'before:' . date('Y-m-d 15:00:00', strtotime("+10 days"))],
+            'shipment_date' => ['required', 'date', new ShipmentDateTimeRule],
 
         ];
     }

@@ -10,7 +10,7 @@ Route::get('allowed-countries/{country_id}', function (\Illuminate\Http\Request 
         foreach (explode(',', $allowed->allowed_destinations) as $dest) {
             $data[] = [
                 'id' => $dest,
-                'name' =>getCountry('id', $dest)->name
+                'name' => getCountry('id', $dest)->name
             ];
         }
         return response()->json($data);

@@ -27,6 +27,7 @@ use App\Traits\TrackingTrait;
 use App\Traits\ValidateAramexAddress;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Mail;
 use Octw\Aramex\Aramex;
@@ -36,6 +37,7 @@ class ShipmentServices
 
     use ValidateAramexAddress;
     use TrackingTrait;
+
     protected array $errors = [];
     protected bool $aramex_rate_found = false;
     protected bool $dhl_rate_found = false;
@@ -70,8 +72,8 @@ class ShipmentServices
                 $products = $data['products'];
                 foreach ($products as $product) {
                     if ($product['totalPrice'][0]['price'] > 0) {
-                        $provider_amount_before_tax = (int) number_format($product['totalPrice'][0]['price'] * 0.925, 2, '.', '');
-                        $provider_tax = (int) number_format($product['totalPrice'][0]['price'] * 0.075, 2,  '.', '');
+                        $provider_amount_before_tax = (int)number_format($product['totalPrice'][0]['price'] * 0.925, 2, '.', '');
+                        $provider_tax = (int)number_format($product['totalPrice'][0]['price'] * 0.075, 2, '.', '');
                         $provider_total_amount = $provider_amount_before_tax + $provider_tax;
                         $provider_percentage = CourierApiProvider::where('alias', 'dhl')->value('profit_margin');
                         $charge_before_tax = $provider_amount_before_tax * (1 + ($provider_percentage / 100));
@@ -175,7 +177,7 @@ class ShipmentServices
 
                 ShippingRateLog::where([
                     'user_id' => $shipment->user_id,
-                    'shipment_id'=>$shipment_id,
+                    'shipment_id' => $shipment_id,
                     'courier_api_provider_id' => $provider->value('id'),
                     'provider_code' => 'aramex',
                 ])->delete();
@@ -210,14 +212,14 @@ class ShipmentServices
                     ->log($response);
                 ShippingRateLog::where([
                     'user_id' => $shipment->user_id,
-                    'shipment_id'=>$shipment_id,
+                    'shipment_id' => $shipment_id,
                     'courier_api_provider_id' => $provider->value('id')
                 ])->delete();
             }
         } catch (\Throwable $e) {
             ShippingRateLog::where([
                 'user_id' => $shipment->user_id,
-                'shipment_id'=>$shipment_id,
+                'shipment_id' => $shipment_id,
                 'courier_api_provider_id' => $provider->value('id')
             ])->delete();
             activity()
@@ -253,7 +255,7 @@ class ShipmentServices
 
                         ShippingRateLog::where([
                             'user_id' => $shipment->user_id,
-                            'shipment_id'=>$shipment_id,
+                            'shipment_id' => $shipment_id,
                             'courier_api_provider_id' => $provider->value('id'),
                             'provider_code' => 'ups',
                         ])->delete();
@@ -303,7 +305,7 @@ class ShipmentServices
                     if (!$ups_rate_found) {
                         ShippingRateLog::where([
                             'user_id' => $shipment->user_id,
-                            'shipment_id'=>$shipment_id,
+                            'shipment_id' => $shipment_id,
                             'courier_api_provider_id' => $provider->value('id'),
                             'provider_code' => 'ups',
                         ])->delete();
@@ -349,7 +351,7 @@ class ShipmentServices
                 $overdraft_wallet = WalletOverdraft::create([
                     'user_id' => $user->id,
                     'balance' => 0,
-                    ])->first();
+                ])->first();
             }
             $previous_overdraft = $overdraft_wallet->balance;
             $total_overdraft = $current_overdraft_amount + $previous_overdraft;
@@ -359,7 +361,7 @@ class ShipmentServices
         }
 
         $provider = $rate->provider_code;
-        $book_aramex = $book_dhl = $book_ups =  false;
+        $book_aramex = $book_dhl = $book_ups = false;
         if ($provider == 'aramex') {
             $aramex = new AramexServices($shipment);
             $pickup = $aramex->createPickup($request, $shipment_item);
@@ -409,7 +411,7 @@ class ShipmentServices
             }
 
             $transaction = '';
-            if ($user->user_type === 'business' && $user->balance >= $total_amount)  {
+            if ($user->user_type === 'business' && $user->balance >= $total_amount) {
                 $transaction = $user->withdraw($total_amount);
             }
             if ($user->user_type === 'individual') {
@@ -421,7 +423,7 @@ class ShipmentServices
             $rate->save();
 
             $shipment->provider_id = $rate->courier_api_provider_id;
-            $shipment->shipping_rate_log_id  = $rate->id;
+            $shipment->shipping_rate_log_id = $rate->id;
             $shipment->provider = $provider;
             $shipment->is_paid = 1;
             $shipment->status = 'processing';
@@ -430,8 +432,8 @@ class ShipmentServices
             //log transaction
             WalletTransaction::create([
                 'user_id' => $user->id,
-                'transaction_id' => $transaction->id,
-                'reference' => $transaction->uuid,
+                'transaction_id' => $transaction->id ?? NULL,
+                'reference' => $transaction->uuid ?? Str::uuid(),
                 'status' => 'success',
                 'amount' => $total_amount,
                 'before' => $current_balance,
@@ -456,7 +458,7 @@ class ShipmentServices
             return redirect(route($route, $request['shipment_id']))->with('error', 'DHL shipment is not available for selected locations at the moment. Please try again later');
         }
 
-        if ($provider == 'aramex'  && !$book_aramex) {
+        if ($provider == 'aramex' && !$book_aramex) {
             $route = (auth()->user()->is_admin == 1) ? 'admin.shipment.checkout' : 'shipment.checkout';
             return redirect(route($route, $request['shipment_id']))->with('error', 'Aramex shipment is not available for selected locations at the moment. Please try again later');
         }
@@ -672,7 +674,7 @@ class ShipmentServices
     /**
      * @throws GuzzleException
      */
-    public function validateAddress(CreateShipmentOriginRequest | CreateShipmentDestinationRequest $request, $shipment_id, $type = 'pickup'): bool
+    public function validateAddress(CreateShipmentOriginRequest|CreateShipmentDestinationRequest $request, $shipment_id, $type = 'pickup'): bool
     {
         $check_aramex = CourierApiProvider::where('alias', 'aramex');
         if ($check_aramex->value('status') == 'active') {
@@ -719,18 +721,18 @@ class ShipmentServices
         $check_dhl = CourierApiProvider::where('alias', 'dhl');
         if ($check_dhl->value('status') == 'active') {
             $dhl_env = config('dhl.ENV');
-            $dhl_base_url = config('dhl.'.$dhl_env.'.baseUrl');
-            $dhl_username = config('dhl.'.$dhl_env.'.username');
-            $dhl_password = config('dhl.'.$dhl_env.'.password');
+            $dhl_base_url = config('dhl.' . $dhl_env . '.baseUrl');
+            $dhl_username = config('dhl.' . $dhl_env . '.username');
+            $dhl_password = config('dhl.' . $dhl_env . '.password');
             try {
                 $response = Http::withBasicAuth($dhl_username, $dhl_password)
                     ->get("$dhl_base_url/address-validate", [
-                    'type' => $type,
-                    'countryCode' => getCountry('id', $request->country_id)->iso2,
-                    'postalCode' => $request->postcode,
-                    'cityName' => getCity('id', $request->city_id)->name,
-                    'strictValidation' => "true"
-                ]);
+                        'type' => $type,
+                        'countryCode' => getCountry('id', $request->country_id)->iso2,
+                        'postalCode' => $request->postcode,
+                        'cityName' => getCity('id', $request->city_id)->name,
+                        'strictValidation' => "true"
+                    ]);
 
                 if ($response->status() == 200) {
                     ShipmentProvider::updateOrCreate([
@@ -743,7 +745,7 @@ class ShipmentServices
                         'provider' => 'dhl'
                     ])->delete();
                 }
-            } catch(\Throwable $e) {
+            } catch (\Throwable $e) {
                 activity()
                     ->causedBy(\request()->user())
                     ->withProperties([

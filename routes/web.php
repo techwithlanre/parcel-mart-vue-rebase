@@ -41,7 +41,7 @@ Route::get('tracking-details/{shipment_id}', [\App\Http\Controllers\ShipmentCont
 
 Route::post('contact', [\App\Http\Controllers\ContactController::class, 'send'])->name('contact.send');
 
-Route::post('send-quote-form', function(\Illuminate\Http\Request $request) {
+Route::post('send-quote-form', function (\Illuminate\Http\Request $request) {
     //$path = $request->file('commercial_invoice')->store('quotes');
     //$path = $request->file('commercial_invoice')->store('quotes');
     //Mail::to('quotes@parcelsmartsolution.com')->send(new \App\Mail\QuoteForm($request));
@@ -54,7 +54,7 @@ Route::post('send-quote', [\App\Http\Controllers\QuoteController::class, 'reques
 
 Route::get('states/{country_id}', function () {
     return response()->json([
-        'states'=>\App\Models\State::where('country_id', request()->country_id)->get()
+        'states' => \App\Models\State::where('country_id', request()->country_id)->get()
     ]);
 });
 
@@ -81,7 +81,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('quotes', [\App\Http\Controllers\QuoteController::class, 'index'])->name('quotes');
 
     /*Address Book*/
-    Route::resource('address-book',\App\Http\Controllers\AddressBookController::class);
+    Route::resource('address-book', \App\Http\Controllers\AddressBookController::class);
     //Route::resource('shipments', \App\Http\Controllers\ShipmentController::class);
 
     Route::prefix('shipments')->group(function () {
@@ -114,12 +114,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     /*Settings*/
     Route::prefix('settings')->group(function () {
-       Route::get('/', [\App\Http\Controllers\SettingController::class, 'index'])->name('setting.index');
-       Route::prefix('shipping')->group(function () {
-           Route::get('description', [\App\Http\Controllers\ShippingSettingController::class, 'description'])->name('shipping.setting.description');
-           Route::post('description', [\App\Http\Controllers\ShippingSettingController::class, 'createDescription'])->name('shipping.setting.description.post');
-           Route::get('measurement', [\App\Http\Controllers\ShippingSettingController::class, 'measurement'])->name('shipping.setting.measurement');
-       });
+        Route::get('/', [\App\Http\Controllers\SettingController::class, 'index'])->name('setting.index');
+        Route::prefix('shipping')->group(function () {
+            Route::get('description', [\App\Http\Controllers\ShippingSettingController::class, 'description'])->name('shipping.setting.description');
+            Route::post('description', [\App\Http\Controllers\ShippingSettingController::class, 'createDescription'])->name('shipping.setting.description.post');
+            Route::get('measurement', [\App\Http\Controllers\ShippingSettingController::class, 'measurement'])->name('shipping.setting.measurement');
+        });
     });
 
     Route::prefix('feedback')->group(function () {
@@ -136,7 +136,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('faq', [\App\Http\Controllers\FaqController::class, 'index'])->name('faq.index');
 
 
-    Route::prefix('billing')->group(function (){
+    Route::prefix('billing')->group(function () {
         Route::get('', [\App\Http\Controllers\BillingController::class, 'cards'])->name('billing.cards.get');
         Route::get('cards', [\App\Http\Controllers\BillingController::class, 'cards'])->name('billing.cards.get');
         Route::post('cards', [\App\Http\Controllers\BillingController::class, 'createCard'])->name('billing.cards.post');
@@ -153,7 +153,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::get('verify-email', EmailVerificationPromptController::class)->name('verification.notice');
-Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)->middleware(['auth','signed', 'throttle:6,1'])->name('verification.verify');
+Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)->middleware(['auth', 'signed', 'throttle:6,1'])->name('verification.verify');
 Route::post('email/verification-notification', [EmailVerificationNotificationController::class, 'store'])->middleware('throttle:6,1')->name('verification.send');
 Route::get('confirm-password', [ConfirmablePasswordController::class, 'show'])->name('password.confirm');
 Route::post('confirm-password', [ConfirmablePasswordController::class, 'store']);

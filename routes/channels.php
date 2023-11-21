@@ -14,5 +14,5 @@ use Illuminate\Support\Facades\Broadcast;
 */
 
 Broadcast::channel('shipments.{shipmentId}', function ($user, $shipmentId) {
-    return (int) $user->id === (int) \App\Models\Shipment::find($shipmentId)->user_id;
+    return (int)$user->id === (int)\App\Models\Shipment::find($shipmentId)->user_id;
 });

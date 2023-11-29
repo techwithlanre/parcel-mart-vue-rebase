@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CheckIsAdminUser
+class CheckIsUser
 {
     /**
      * Handle an incoming request.
@@ -15,11 +15,10 @@ class CheckIsAdminUser
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->user()?->is_admin) {
+        if (!$request->user()?->is_admin) {
             return $next($request);
         }
 
-        return redirect(route('dashboard'));
-
+        return redirect(route('reports.shipment'));
     }
 }

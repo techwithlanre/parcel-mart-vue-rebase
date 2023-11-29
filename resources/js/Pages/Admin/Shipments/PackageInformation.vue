@@ -124,7 +124,7 @@ onMounted(() => {
               </div>
             </div>
             <div class="flex lg:flex-row flex-col items-center w-full gap-x-10 gap-y-4 mt-10">
-              <Link :href="route('shipment.destination', shipment_id)" class="w-full">
+              <Link :href="route('admin.shipment.destination', shipment_id)" class="w-full">
                 <SecondaryButton class="w-full">
                   Back
                 </SecondaryButton>

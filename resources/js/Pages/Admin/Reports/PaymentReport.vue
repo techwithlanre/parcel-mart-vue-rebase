@@ -98,7 +98,7 @@ watch(dateRange, (value) => {
 </script>
 
 <template>
-  <DashboardLayout page-title="Payments Report">
+  <DashboardLayout page-title="Payments Dashboard">
     <ReportsLayout>
       <div class="flex flex-col justify-end mb-20 w-max">
         <InputLabel value="Filter Data" />

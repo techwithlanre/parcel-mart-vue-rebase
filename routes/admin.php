@@ -17,7 +17,8 @@ Route::prefix('admin')->middleware('check.admin.user')->group(function () {
         Route::get('filter-shipments', [\App\Http\Controllers\Admin\AnalyticController::class, 'filterShipments'])->name('admin.analytics.shipments.filter');
     });
 
-    Route::prefix('reports')->group(function () {
+    Route::prefix('dashboard')->group(function () {
+        Route::get('', [\App\Http\Controllers\Admin\ReportsController::class, 'shipmentsReport'])->name('reports.shipment');
         Route::get('shipments', [\App\Http\Controllers\Admin\ReportsController::class, 'shipmentsReport'])->name('reports.shipment');
         Route::get('users', [\App\Http\Controllers\Admin\ReportsController::class, 'usersReport'])->name('reports.users');
         Route::get('users/{user_id}/shipments', [\App\Http\Controllers\Admin\ReportsController::class, 'userShipmentsReport'])->name('reports.users.shipments');

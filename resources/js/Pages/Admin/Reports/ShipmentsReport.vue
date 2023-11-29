@@ -90,7 +90,7 @@ const cardsData = [
 ]
 </script>
 <template>
-  <DashboardLayout page-title="Shipments Report">
+  <DashboardLayout page-title="Shipments Dashboard">
     <ReportsLayout>
       <div class="flex flex-col justify-end mb-20 w-max">
         <InputLabel value="Filter Data" />

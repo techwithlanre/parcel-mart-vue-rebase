@@ -48,6 +48,7 @@ class ShipmentServices
     public function calculateShipmentCost($shipment_id): bool|\Illuminate\Http\RedirectResponse
     {
         $shipment_providers = ShipmentProvider::where('shipment_id', $shipment_id)->get();
+        ShippingRateLog::where(['shipment_id' => $shipment_id])->delete();
         foreach ($shipment_providers as $sp) {
             $provider = CourierApiProvider::where('alias', $sp->provider);
             if ($provider->value('status') != 'active') continue;
@@ -160,6 +161,9 @@ class ShipmentServices
         }
     }
 
+    /**
+     * @throws ValidationException
+     */
     private function aramex_calculate_rate($shipment_id, $provider)
     {
         $shipment = Shipment::find($shipment_id);
@@ -231,6 +235,7 @@ class ShipmentServices
                 ])
                 ->log($e->getMessage());
             $this->errors[] = 'Aramex shipment is not available at the moment.';
+            throw ValidationException::withMessages(['message' => $e->getMessage()]);
         }
     }
 
@@ -713,8 +718,7 @@ class ShipmentServices
                         'method' => __FUNCTION__,
                         'action' => 'DHL Validate Address rate',
                         'line' => $e->getLine()
-                    ])
-                    ->log($e->getMessage());
+                    ])->log($e->getMessage());
             }
         }
 

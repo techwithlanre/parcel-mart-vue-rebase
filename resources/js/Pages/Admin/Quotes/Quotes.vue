@@ -41,9 +41,7 @@ const submitSetPrice = () => {
 
 
 const convertQuoteToShipment = (quote_id) => {
-  convertForm.post(route('admin.convert-quote-to-shipment', quote_id), {
-
-  });
+  convertForm.post(route('admin.convert-quote-to-shipment', quote_id));
 }
 
 </script>

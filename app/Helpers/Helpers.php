@@ -18,3 +18,13 @@ if (! function_exists('getCity')) {
         return \App\Models\City::where($key, $value)->first();
     }
 }
+
+if (! function_exists('upsErrorMessage')) {
+    function upsErrorMessage($result) {
+        if (array_key_exists($result['response']['errors'][0]['code'], config('messages'))) {
+            return config('messages')[$result['response']['errors'][0]['code']];
+        }
+
+        return NULL;
+    }
+}

@@ -4,9 +4,9 @@ import {DocumentIcon, WalletIcon, MapPinIcon, UsersIcon} from "@heroicons/vue/20
 import TopNav from "@/Components/TopNav.vue";
 
 const tabs = [
-  { name: "Shipments Report", icon: WalletIcon, route: "/admin/reports/shipments", permissionKey: ['read-shipment-report']},
-  { name: "Users Report", icon: UsersIcon, route: "/admin/reports/users", permissionKey: ['read-user-report']},
-  { name: "Payment Report", icon: WalletIcon, route: "/admin/reports/payments", permissionKey: ['read-payment-report']},
+  { name: "Shipments", icon: WalletIcon, route: "/admin/dashboard/shipments", permissionKey: ['read-shipment-report']},
+  { name: "Users", icon: UsersIcon, route: "/admin/dashboard/users", permissionKey: ['read-user-report']},
+  { name: "Payment", icon: WalletIcon, route: "/admin/dashboard/payments", permissionKey: ['read-payment-report']},
 ];
 
 </script>

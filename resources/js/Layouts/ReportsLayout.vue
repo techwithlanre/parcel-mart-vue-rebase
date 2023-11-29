@@ -6,7 +6,7 @@ import TopNav from "@/Components/TopNav.vue";
 const tabs = [
   { name: "Shipments", icon: WalletIcon, route: "/admin/dashboard/shipments", permissionKey: ['read-shipment-report']},
   { name: "Users", icon: UsersIcon, route: "/admin/dashboard/users", permissionKey: ['read-user-report']},
-  { name: "Payment", icon: WalletIcon, route: "/admin/dashboard/payments", permissionKey: ['read-payment-report']},
+  { name: "Payments", icon: WalletIcon, route: "/admin/dashboard/payments", permissionKey: ['read-payment-report']},
 ];
 
 </script>

@@ -106,7 +106,7 @@ onMounted(() => {
             <div class="flex lg:flex-row flex-col w-full gap-x-10 gap-y-4">
               <div class="w-full">
                 <InputLabel value="Length (CM)" class="font-normal"/>
-                <TextInput type="text" v-model="form.length" min="0" placeholder=""
+                <TextInput type="text" v-model="form.length" min="0" placeholder="" value=""
                             :class="{'border-orange-300': form.errors.length}" class="mt-2"/>
                 <InputError class="mt-2" :message="form.errors.length" />
               </div>

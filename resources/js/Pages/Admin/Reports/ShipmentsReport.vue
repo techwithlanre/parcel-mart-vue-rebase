@@ -218,8 +218,8 @@ const checkPermission = (permission) => {
                                   'bg-orange-100 text-orange-800' : item.shipment.status ==='pending', 'bg-green-100 text-green-800' : item.shipment.status ==='delivered'}"
                       class="px-3 rounded-xl py-1">{{ item.shipment.status}}</span></td>
                   <td class="p-4">
-                    <Link :href="route('admin.shipment.details', item.shipment.id)" v-if="item.shipment.status !== 'pending'" class="btn btn-sm rounded-xl bg-green-400 text-white px-5 py-1 text-sm font-medium hover:text-green-600">View</Link>
-                    <Link :href="route('admin.shipment.origin', item.shipment.id)" v-show="checkPermission('create-shipment') || checkPermission('edit-shipment')" v-if="item.shipment.status === 'pending'" class="btn btn-sm rounded-xl bg-green-400 text-white px-5 py-1 text-sm font-medium hover:text-green-600">View</Link>
+                    <Link :href="route('admin.shipment.details', item.shipment.id)" v-if="item.shipment.status !== 'pending'" class="btn btn-sm rounded-xl bg-green-400 text-white px-5 py-1 text-sm font-medium hover:text-green-600 hover:bg-green-50 duration-500">View</Link>
+                    <Link :href="route('admin.shipment.origin', item.shipment.id)" v-show="checkPermission('create-shipment') || checkPermission('edit-shipment')" v-if="item.shipment.status === 'pending'" class="btn btn-sm rounded-xl bg-yellow-400 text-white px-5 py-1 text-sm font-medium hover:bg-yellow-50 hover:text-yellow-600 duration-500">Continue</Link>
                   </td>
                 </tr>
                 <tr v-else>

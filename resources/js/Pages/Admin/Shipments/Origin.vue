@@ -237,7 +237,7 @@ const populateAddress = (address) => {
               </div>
             </div>
             <div class="mt-2">
-              <InputLabel value="Postcode *"/>
+              <InputLabel value="Postcode"/>
               <TextInput
                   id="postcode"
                   type="text"
@@ -247,14 +247,6 @@ const populateAddress = (address) => {
 
                   autocomplete="postcode"/>
               <InputError class="mt-2" :message="form.errors.postcode" />
-            </div>
-            <div class="mt-2 flex  items-center gap-x-4">
-              <Checkbox
-                  id="postcode"
-                  v-model="form.save_address"
-                  placeholder=""
-                  autocomplete="postcode"/>
-              <InputLabel value="Save Address"/>
             </div>
             <div class="flex flex-col items-center justify-end mt-6">
               <PrimaryButton type="submit" class="w-full" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">

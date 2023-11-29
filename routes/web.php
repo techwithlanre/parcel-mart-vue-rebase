@@ -75,7 +75,7 @@ Route::middleware('guest')->group(function () {
 
 });
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'check.user'])->group(function () {
     Route::get('dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('quotes', [\App\Http\Controllers\QuoteController::class, 'index'])->name('quotes');

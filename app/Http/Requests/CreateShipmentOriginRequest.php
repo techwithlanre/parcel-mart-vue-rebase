@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Rules\AddressRule;
 use App\Rules\BusinessNameRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CreateShipmentOriginRequest extends FormRequest
 {
@@ -37,7 +38,7 @@ class CreateShipmentOriginRequest extends FormRequest
             'country_id' => 'required|numeric|exists:countries,id',
             'state_id' => 'required|numeric|exists:states,id',
             'city_id' => 'required|numeric|exists:cities,id',
-            'postcode' => 'required|min:2'
+            'postcode' => [Rule::requiredIf($this->request->get('country_id') != 161)]
         ];
     }
 

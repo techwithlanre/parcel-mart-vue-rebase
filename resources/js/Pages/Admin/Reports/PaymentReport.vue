@@ -98,7 +98,7 @@ watch(dateRange, (value) => {
 </script>
 
 <template>
-  <DashboardLayout page-title="Payments Report">
+  <DashboardLayout page-title="Payments Dashboard">
     <ReportsLayout>
       <div class="flex flex-col justify-end mb-20 w-max">
         <InputLabel value="Filter Data" />
@@ -154,7 +154,7 @@ watch(dateRange, (value) => {
               <th class="text-left p-4 font-medium">Channel</th>
               <th class="text-left p-4 font-medium">Status</th>
               <th class="text-left p-4 font-medium">Time Initiated</th>
-              <th class="text-left p-4 font-medium">Time Completed</th>
+<!--              <th class="text-left p-4 font-medium">Time Completed</th>-->
             </tr>
             </thead>
             <tbody>
@@ -180,7 +180,7 @@ watch(dateRange, (value) => {
                 </span>
               </td>
               <td class="p-4"><date-format short-month :has-time="true" :date="item.time_initiated" /></td>
-              <td class="p-4"><date-format short-month :has-time="true" :date="item.time_completed" /></td>
+<!--              <td class="p-4"><date-format short-month :has-time="true" :date="item.time_completed" /></td>-->
             </tr>
             </tbody>
           </table>

@@ -114,10 +114,13 @@ const checkPermission = (permission) => {
                               <Link v-show="checkPermission('create-shipment')" :href="route('admin.shipment.origin') + '?user=' + item.id" class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-background sdark:text-gray-400 sdark:hover:bg-gray-700 sdark:hover:text-gray-300">
                                 Book Shipment
                               </Link>
+                              <Link v-show="checkPermission('read-shipment')" :href="route('reports.users.shipments', item.id)" class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-background sdark:text-gray-400 sdark:hover:bg-gray-700 sdark:hover:text-gray-300">
+                                Shipments Report
+                              </Link>
                               <a href="javascript:void(0)" v-if="item.user_type === 'business'" v-on:click="openSetCreditLimitModal(item)" class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-background sdark:text-gray-400 sdark:hover:bg-gray-700 sdark:hover:text-gray-300">
                                 Set Credit Limit
                               </a>
-                              <a v-show="checkPermission('edit-user')" href="javascript:void(0)"  v-on:click="openUserChangeRoleModal(item)" class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-background sdark:text-gray-400 sdark:hover:bg-gray-700 sdark:hover:text-gray-300">
+                              <a v-show="checkPermission('edit-user') && item.is_admin === 1" href="javascript:void(0)" v-on:click="openUserChangeRoleModal(item)" class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-background sdark:text-gray-400 sdark:hover:bg-gray-700 sdark:hover:text-gray-300">
                                 Change User Role
                               </a>
                             </div>

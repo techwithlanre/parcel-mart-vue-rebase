@@ -7,7 +7,6 @@ import LocationIcon from "../../images/icons/_location.svg";
 import FAQ from "../../images/icons/_faq.svg";
 import InviteIcon from "../../images/icons/_invite.svg";
 import LogoutIcon from "../../images/icons/_logout.svg";
-import ShoppingBagIcon from "../../images/icons/shopping-bag.svg";
 import ChartIcon from "../../images/icons/graph.svg";
 import PencilIcon from "../../images/icons/pencil.svg";
 import OptionsIcon from "../../images/icons/options.svg";
@@ -30,8 +29,8 @@ const menu = [
   { name: "FAQs", icon: FAQ, route: '/faq', admin: false  },
   { name: "Invite & Earn", icon: InviteIcon, route: '/invite', admin: false  },
   { name: "Feedback", icon: FAQ, route: '/feedback/tickets/user', admin: false  },
+  { name: "Dashboard", icon: DocumentTextIcon, route: "/admin/dashboard/shipments" , admin: true, permissionKey: ['read-shipment-report'] },
   { name: "Analytics", icon: ChartIcon, route: "/admin/analytics", admin: true, permissionKey: ['read-dashboard'] },
-  { name: "Reports", icon: DocumentTextIcon, route: "/admin/reports/shipments" , admin: true, permissionKey: ['read-shipment-report'] },
   { name: "Users", icon: UsersIcon, route: "/admin/users", admin: true, permissionKey: ["read-user", "create-user"] },
   { name: "Quotes", icon: PencilIcon, route: "/admin/quotes", admin: true, permissionKey: ["read-user", "create-user"] },
   { name: "Roles", icon: CursorArrowRippleIcon, route: "/admin/roles", admin: true, permissionKey: ["read-role", "create-role", 'edit-role', 'delete-role'] },
@@ -79,7 +78,7 @@ const fullName = computed(() => {
 
       <div class="flex flex-1 flex-row justify-between items-center header-right px-10 bg-white" style="z-index: 100 !important;">
         <div class="font-bold text-lg">
-          {{ pageTitle }}
+          <div>{{ pageTitle }}</div>
         </div>
         <div class="">
           <div class="flex flex-row">
@@ -87,7 +86,15 @@ const fullName = computed(() => {
 
             </div>
             <Link :href="route('profile.edit')" class="sm:block hidden">
-              {{ fullName }}
+              <div class="flex flex-row gap-2 items-center">
+                <div class="">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-primary">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+
+                </div>
+                <div>{{ fullName.split(' ')[0] }}</div>
+              </div>
             </Link>
             <Link :href="route('profile.edit')" class="sm:hidden block text-sm font-bold">
               Profile

@@ -210,7 +210,7 @@ class ShipmentController extends Controller
 
     public function checkout($id) {
         $shipment = Shipment::whereId($id)->where('user_id', auth()->user()->id)->with('shipment_items', 'country', 'city', 'state')->first();
-        if ($shipment->status == 'processing') return redirect(route('shipment.details', $id));
+        if ($shipment && $shipment?->status == 'processing') return redirect(route('shipment.details', $id));
         $shipping_rate_log = ShippingRateLog::where(['shipment_id' => $id, 'user_id' => auth()->user()->id])->with('courier_api_provider')->get();
         $shipment_item = ShipmentItem::find($shipment->shipment_items[0]->id);
         $item_category = ItemCategory::find($shipment_item->item_category_id);

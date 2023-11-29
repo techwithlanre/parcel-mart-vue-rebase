@@ -230,7 +230,7 @@ const populateAddress = (address) => {
               </div>
             </div>
             <div class="mt-2">
-              <InputLabel value="Postcode *"/>
+              <InputLabel value="Postcode"/>
               <TextInput
                   id="postcode"
                   type="text"
@@ -242,17 +242,8 @@ const populateAddress = (address) => {
               <InputError class="mt-2" :message="form.errors.postcode" />
             </div>
 
-            <div class="mt-2 flex  items-center gap-x-4">
-              <Checkbox
-                  id="postcode"
-                  v-model="form.save_address"
-                  placeholder=""
-                  autocomplete="postcode"/>
-              <InputLabel value="Save Address"/>
-            </div>
-
             <div class="flex lg:flex-row flex-col items-center w-full gap-x-10 gap-y-4 mt-10">
-              <Link :href="route('shipment.origin', shipment_id)" class="w-full">
+              <Link :href="route('admin.shipment.origin', shipment_id)" class="w-full">
                 <SecondaryButton class="w-full">
                   Back
                 </SecondaryButton>

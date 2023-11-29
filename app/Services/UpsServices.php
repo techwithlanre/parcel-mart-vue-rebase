@@ -400,21 +400,11 @@ class UpsServices
         ];
         //dd($payload);
         $response = Http::withToken($this->accessToken)->post("$this->baseUrl/api/shipments/v2205/ship", $payload);
-        if ($response->status() != 200) {
-            throw ValidationException::withMessages(['message' => 'Unable to book shipment. Please try again later']);
-        }
-        /*UpsShipme::create([
-            'shipment_id' => $shipment->id,
-            'shipment_rate_log_id' => $shippingRateLog->id,
-            'shipment_tracking_number' => $result['shipmentTrackingNumber'],
-            'tracking_url' => $result['trackingUrl'],
-            'cancel_pickup_url' => $result['cancelPickupUrl'],
-            'dispatch_confirmation_number' => $result['dispatchConfirmationNumber'],
-            'document_content' => json_encode($result['documents']),
-            'package_details' => json_encode($result['packages'])
-        ]);*/
-
         $result = json_decode($response->body(), true);
+        if ($response->status() != 200) {
+            throw ValidationException::withMessages(['message' => upsErrorMessage($result) ?? "UPS Shipment is unavailable at the moment"]);
+        }
+
         $shipment_response = $result['ShipmentResponse']['Response']['ResponseStatus'];
         if ($shipment_response['Code'] == 1 && $shipment_response['Description'] == 'Success') {
             $shipment_result = $result['ShipmentResponse']['ShipmentResults'];
@@ -432,7 +422,7 @@ class UpsServices
 
             $pickup = $this->pickup($bookShipmentRequest, $tracking_number);
             if (!$pickup) {
-                throw ValidationException::withMessages(['message' => 'Unable to book shipment. Please try again later']);
+                throw ValidationException::withMessages(['message' => upsErrorMessage($result) ?? "UPS Shipment is unavailable at the moment"]);
             }
 
             $pickup_result = json_decode($pickup, true);

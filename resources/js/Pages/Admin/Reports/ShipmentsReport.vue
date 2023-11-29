@@ -3,7 +3,7 @@ import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 import Helper from "@/Helpers/Helper.js";
 import ReportsLayout from "@/Layouts/ReportsLayout.vue";
 import {onMounted, ref, watch} from "vue";
-import {Link, router, useForm} from "@inertiajs/vue3";
+import {Link, router, useForm, usePage} from "@inertiajs/vue3";
 import TextInput from "@/Components/TextInput.vue";
 import SelectInput from "@/Components/SelectInput.vue";
 import {WalletIcon} from "@heroicons/vue/20/solid/index.js";
@@ -25,6 +25,8 @@ const props = defineProps({
   shipments: Array,
   dateRangeUrl: Array
 });
+
+const page = usePage();
 
 let trackingNumber = ref('');
 let status = ref('0');
@@ -87,10 +89,19 @@ const cardsData = [
   {name: "Total Shipment Cost", data: Helper.nairaFormat(props.shipmentCost)},
   {name: "Profit On Shipments", data: Helper.nairaFormat(props.shipmentCharge - props.shipmentCost)},
   {name: "Total Insurance", data: Helper.nairaFormat(props.insuranceAmount)}
-]
+];
+const userPermissions = ref([]);
+
+onMounted(() => {
+  userPermissions.value = page.props.auth.permissions;
+})
+
+const checkPermission = (permission) => {
+  return userPermissions.value.includes(permission);
+}
 </script>
 <template>
-  <DashboardLayout page-title="Shipments Report">
+  <DashboardLayout page-title="Shipments Dashboard">
     <ReportsLayout>
       <div class="flex flex-col justify-end mb-20 w-max">
         <InputLabel value="Filter Data" />
@@ -203,12 +214,12 @@ const cardsData = [
                   <td class="p-4">{{ Helper.nairaFormat(item.shipment?.shipping_rate_log?.total_charge ?? 0) ?? '' }}</td>
                   <td class="p-4">{{ Helper.nairaFormat(item.shipment?.shipping_rate_log?.total_charge - item.shipment?.shipping_rate_log?.provider_total_amount) }}</td>
                   <td class="p-4">
-                    <span
-                      :class="{'bg-blue-100 text-blue-800' : item.shipment.status ==='processing',
+                    <span :class="{'bg-blue-100 text-blue-800' : item.shipment.status ==='processing',
                                   'bg-orange-100 text-orange-800' : item.shipment.status ==='pending', 'bg-green-100 text-green-800' : item.shipment.status ==='delivered'}"
                       class="px-3 rounded-xl py-1">{{ item.shipment.status}}</span></td>
                   <td class="p-4">
-                    <Link :href="route('admin.shipment.details', item.shipment.id)" v-if="item.shipment.status !== 'pending'" class="btn btn-sm rounded-xl bg-green-400 text-white px-5 py-1 text-sm font-medium hover:text-green-600">View</Link>
+                    <Link :href="route('admin.shipment.details', item.shipment.id)" v-if="item.shipment.status !== 'pending'" class="btn btn-sm rounded-xl bg-green-400 text-white px-5 py-1 text-sm font-medium hover:text-green-600 hover:bg-green-50 duration-500">View</Link>
+                    <Link :href="route('admin.shipment.origin', item.shipment.id)" v-show="checkPermission('create-shipment') || checkPermission('edit-shipment')" v-if="item.shipment.status === 'pending'" class="btn btn-sm rounded-xl bg-yellow-400 text-white px-5 py-1 text-sm font-medium hover:bg-yellow-50 hover:text-yellow-600 duration-500">Continue</Link>
                   </td>
                 </tr>
                 <tr v-else>
